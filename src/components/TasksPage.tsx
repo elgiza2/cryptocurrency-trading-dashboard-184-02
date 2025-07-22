@@ -197,7 +197,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
           <h1 className="text-xl font-bold mb-4 text-center">Tasks</h1>
           
           <Tabs defaultValue="main" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-secondary/60 h-8 border border-white/10">
+            <TabsList className="grid w-full grid-cols-4 bg-secondary/60 h-8 border border-white/10">
               <TabsTrigger 
                 value="main" 
                 className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs"
@@ -208,6 +208,12 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
               <TabsTrigger value="social" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs">
                 Social
               </TabsTrigger>
+              <TabsTrigger value="daily" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs">
+                Daily
+              </TabsTrigger>
+              <TabsTrigger value="partners" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs">
+                Partners
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="main" className="space-y-2 mt-4">
@@ -217,11 +223,11 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
                 </div>
               ) : (
                 <>
-                  {tasks.filter(task => task.mission_type === 'main' || task.mission_type === 'daily').filter(task => !completedTasks.includes(task.id)).map(task => (
+                  {tasks.filter(task => task.mission_type === 'main').filter(task => !completedTasks.includes(task.id)).map(task => (
                     <TaskCard key={task.id} task={task} onComplete={completeTask} />
                   ))}
                   
-                  {tasks.filter(task => task.mission_type === 'main' || task.mission_type === 'daily').filter(task => !completedTasks.includes(task.id)).length === 0 && (
+                  {tasks.filter(task => task.mission_type === 'main').filter(task => !completedTasks.includes(task.id)).length === 0 && (
                     <div className="text-center text-muted-foreground py-6 text-sm">
                       All tasks completed! Check back later for new tasks.
                     </div>
@@ -244,6 +250,46 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
                   {tasks.filter(task => task.mission_type === 'social').filter(task => !completedTasks.includes(task.id)).length === 0 && (
                     <div className="text-center text-muted-foreground py-6 text-sm">
                       All tasks completed! Check back later for new tasks.
+                    </div>
+                  )}
+                </>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="daily" className="space-y-2 mt-4">
+              {isLoading ? (
+                <div className="text-center text-muted-foreground py-6 text-sm">
+                  Loading tasks...
+                </div>
+              ) : (
+                <>
+                  {tasks.filter(task => task.mission_type === 'daily').filter(task => !completedTasks.includes(task.id)).map(task => (
+                    <TaskCard key={task.id} task={task} onComplete={completeTask} />
+                  ))}
+                  
+                  {tasks.filter(task => task.mission_type === 'daily').filter(task => !completedTasks.includes(task.id)).length === 0 && (
+                    <div className="text-center text-muted-foreground py-6 text-sm">
+                      All daily tasks completed! Check back tomorrow for new tasks.
+                    </div>
+                  )}
+                </>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="partners" className="space-y-2 mt-4">
+              {isLoading ? (
+                <div className="text-center text-muted-foreground py-6 text-sm">
+                  Loading tasks...
+                </div>
+              ) : (
+                <>
+                  {tasks.filter(task => task.mission_type === 'partners').filter(task => !completedTasks.includes(task.id)).map(task => (
+                    <TaskCard key={task.id} task={task} onComplete={completeTask} showUrl={true} />
+                  ))}
+                  
+                  {tasks.filter(task => task.mission_type === 'partners').filter(task => !completedTasks.includes(task.id)).length === 0 && (
+                    <div className="text-center text-muted-foreground py-6 text-sm">
+                      No partner tasks available! Check back later for new partnerships.
                     </div>
                   )}
                 </>
