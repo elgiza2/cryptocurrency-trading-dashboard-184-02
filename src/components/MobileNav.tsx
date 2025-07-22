@@ -43,46 +43,67 @@ const MobileNav = ({
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800 p-2">
-      <div className="flex justify-around items-center max-w-md mx-auto">
-        {navItems.map(({ id, icon: Icon, label, special }) => (
-          <div key={id} className="flex flex-col items-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`flex flex-col gap-1 transition-all duration-300 rounded-lg border-none bg-transparent hover:bg-transparent p-2 relative ${
-                special 
-                  ? 'h-16 w-16' 
-                  : 'h-auto'
-              }`}
-              onClick={() => onTabChange(id)}
-            >
-              <div className={`relative flex items-center justify-center ${
-                special 
-                  ? 'h-12 w-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 shadow-lg shadow-pink-500/50' 
-                  : ''
-              }`}>
-                <Icon className={`${special ? "h-6 w-6 text-white" : "h-5 w-5"} ${
-                  activeTab === id 
-                    ? special ? 'text-white' : 'text-pink-500'
-                    : 'text-gray-400'
+    <div className="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800 p-3">
+      <div className="flex justify-center items-end max-w-md mx-auto relative">
+        {/* Left buttons */}
+        <div className="flex flex-1 justify-around">
+          {navItems.slice(0, 2).map(({ id, icon: Icon, label }) => (
+            <div key={id} className="flex flex-col items-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex flex-col gap-1 transition-all duration-300 rounded-lg border-none bg-transparent hover:bg-transparent p-2"
+                onClick={() => onTabChange(id)}
+              >
+                <Icon className={`h-5 w-5 ${
+                  activeTab === id ? 'text-pink-500' : 'text-gray-400'
                 }`} />
-                {id === 'missions' && (
-                  <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                    23
-                  </div>
-                )}
-              </div>
-              <span className={`text-xs font-medium ${
-                activeTab === id 
-                  ? special ? 'text-white' : 'text-pink-500'
-                  : 'text-gray-400'
-              }`}>
-                {label}
-              </span>
-            </Button>
-          </div>
-        ))}
+                <span className={`text-xs font-medium ${
+                  activeTab === id ? 'text-pink-500' : 'text-gray-400'
+                }`}>
+                  {label}
+                </span>
+              </Button>
+            </div>
+          ))}
+        </div>
+
+        {/* Center Roulette button */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 -translate-y-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex items-center justify-center transition-all duration-300 rounded-full border-none bg-transparent hover:bg-transparent p-0 hover:scale-110"
+            onClick={() => onTabChange('roulette')}
+          >
+            <div className="h-16 w-16 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 shadow-xl shadow-pink-500/50 flex items-center justify-center animate-pulse">
+              <Gamepad2 className="h-8 w-8 text-white" />
+            </div>
+          </Button>
+        </div>
+
+        {/* Right buttons */}
+        <div className="flex flex-1 justify-around">
+          {navItems.slice(3).map(({ id, icon: Icon, label }) => (
+            <div key={id} className="flex flex-col items-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex flex-col gap-1 transition-all duration-300 rounded-lg border-none bg-transparent hover:bg-transparent p-2"
+                onClick={() => onTabChange(id)}
+              >
+                <Icon className={`h-5 w-5 ${
+                  activeTab === id ? 'text-pink-500' : 'text-gray-400'
+                }`} />
+                <span className={`text-xs font-medium ${
+                  activeTab === id ? 'text-pink-500' : 'text-gray-400'
+                }`}>
+                  {label}
+                </span>
+              </Button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
