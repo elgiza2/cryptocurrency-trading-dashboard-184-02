@@ -258,8 +258,18 @@ const ActivityRewardsPage = ({
             {/* User Profile */}
             <Card className="bg-secondary/50 border-white/10 p-3 rounded-2xl backdrop-blur-sm">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-base">🔥</span>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-r from-orange-500 to-red-500">
+                  {telegramUser?.photo_url ? (
+                    <img 
+                      src={telegramUser.photo_url} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-white font-bold text-base">
+                      {telegramUser?.first_name?.[0] || telegramUser?.username?.[0] || '🔥'}
+                    </span>
+                  )}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-base">You</h3>
@@ -348,8 +358,18 @@ const ActivityRewardsPage = ({
             {/* User Friends Status */}
             <Card className="bg-secondary/50 border-white/10 p-3 rounded-2xl backdrop-blur-sm">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-base">🔥</span>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-r from-orange-500 to-red-500">
+                  {telegramUser?.photo_url ? (
+                    <img 
+                      src={telegramUser.photo_url} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-white font-bold text-base">
+                      {telegramUser?.first_name?.[0] || telegramUser?.username?.[0] || '🔥'}
+                    </span>
+                  )}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-base">You</h3>
@@ -404,8 +424,18 @@ const ActivityRewardsPage = ({
             {/* User Mining Status */}
             <Card className="bg-secondary/50 border-white/10 p-3 rounded-2xl backdrop-blur-sm">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-base">🔥</span>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-r from-orange-500 to-red-500">
+                  {telegramUser?.photo_url ? (
+                    <img 
+                      src={telegramUser.photo_url} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-white font-bold text-base">
+                      {telegramUser?.first_name?.[0] || telegramUser?.username?.[0] || '🔥'}
+                    </span>
+                  )}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-base">You</h3>
