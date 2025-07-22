@@ -222,7 +222,7 @@ const Index = () => {
       <div className="pb-20">
         {renderContent()}
       </div>
-      <MobileNav currentPage={currentPage} onPageChange={setCurrentPage} />
+      <MobileNav activeTab={currentPage} onTabChange={setCurrentPage} />
     </div>
   );
 };
