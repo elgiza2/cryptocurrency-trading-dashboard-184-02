@@ -39,7 +39,7 @@ const RoulettePage = ({
   }, [onHideNavigation]);
   const gifts = [{
     name: "Nothing",
-    image: "https://cdn-icons-png.flaticon.com/512/1828/1828843.png",
+    image: "/nothing-icon.png",
     price: 0
   }, {
     name: "Plush Pepe",
