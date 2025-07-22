@@ -20,7 +20,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        'poppins': ['Poppins', 'sans-serif'],
+        'inter': ['Inter', 'sans-serif'],
         'matrix': ['Share Tech Mono', 'monospace'],
         'cyber': ['Orbitron', 'sans-serif'],
         'neon': ['Electrolize', 'sans-serif'],
@@ -72,6 +72,9 @@ export default {
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
+        },
+        link: {
+          DEFAULT: "hsl(var(--link))",
         },
       },
       borderRadius: {
