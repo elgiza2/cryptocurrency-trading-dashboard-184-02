@@ -55,7 +55,7 @@ const MobileNav = ({
       {/* Background with blur and gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-lg" />
       
-      <div className="relative px-3 py-2">
+      <div className="relative px-2 py-1">
         <div className="flex items-end justify-center max-w-sm mx-auto">
           {/* Left side buttons */}
           <div className="flex space-x-2 flex-1 justify-around">
@@ -115,18 +115,17 @@ const NavButton = ({ item, isActive, onClick }: NavButtonProps) => {
     <Button
       variant="ghost"
       className={cn(
-        "flex flex-col items-center gap-1 h-auto p-2 rounded-xl transition-all duration-300 group relative overflow-hidden",
-        "hover:scale-105 active:scale-95",
-        isActive ? "shadow-lg" : "hover:bg-white/5"
+        "flex flex-col items-center gap-1 h-auto p-1 rounded-lg transition-all duration-300 group",
+        "hover:scale-105 active:scale-95"
       )}
       onClick={onClick}
     >
       
       {/* Icon without background */}
       <Icon className={cn(
-        "h-5 w-5 transition-all duration-300",
+        "h-4 w-4 transition-all duration-300",
         isActive 
-          ? `text-transparent bg-gradient-to-br ${gradient} bg-clip-text drop-shadow-sm`
+          ? "text-white"
           : "text-gray-400 group-hover:text-white"
       )} />
       
