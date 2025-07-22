@@ -112,10 +112,38 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
         await DatabaseService.completeMission(telegramUser.id.toString(), taskId);
         setCompletedTasks(prev => [...prev, taskId]);
         
-        toast({
-          title: "Task Completed!",
-          description: `You earned ${reward} $SPACE tokens`,
-        });
+        // Check if this is the Daily Login Check mission
+        const task = tasks.find(t => t.id === taskId);
+        if (task && task.title === "Daily Login Check") {
+          // Create a transaction of 0.25 TON for the daily login
+          const tonCrypto = await DatabaseService.getCryptocurrencies();
+          const tonCoin = tonCrypto.data?.find(crypto => crypto.symbol === 'TON');
+          
+          if (tonCoin) {
+            await DatabaseService.createTransaction(
+              telegramUser.id.toString(),
+              tonCoin.id,
+              0.25,
+              'buy',
+              tonCoin.current_price || 0
+            );
+            
+            toast({
+              title: "Daily Login Completed!",
+              description: `You earned ${reward} $SPACE tokens and 0.25 TON!`,
+            });
+          } else {
+            toast({
+              title: "Task Completed!",
+              description: `You earned ${reward} $SPACE tokens`,
+            });
+          }
+        } else {
+          toast({
+            title: "Task Completed!",
+            description: `You earned ${reward} $SPACE tokens`,
+          });
+        }
         
         fetchUserTasks(); // Refresh user tasks
       }
