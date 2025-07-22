@@ -114,18 +114,34 @@ const ServerPage = ({
   const confirmPurchase = async () => {
     if (!selectedServer) return;
 
-    const hasSufficientBalance = userBalance.ton >= selectedServer.price;
-    
-    if (!hasSufficientBalance) {
+    if (!tonConnectUI.wallet) {
       toast({
-        title: "Insufficient Balance",
-        description: "Please top up your TON balance first.",
+        title: "Wallet Required",
+        description: "Please connect your TON wallet first",
         variant: "destructive"
       });
       return;
     }
 
     try {
+      // Import TonTransactionService
+      const { TonTransactionService } = await import('@/services/tonTransactionService');
+      const transactionService = new TonTransactionService(tonConnectUI);
+
+      toast({
+        title: "Processing Transaction",
+        description: "Please confirm the TON transaction in your wallet...",
+      });
+
+      // Send TON transaction for server purchase
+      const tonTransactionResult = await transactionService.sendTransaction(
+        "UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq", // Destination address
+        selectedServer.price, // Amount in TON
+        `Server Purchase: ${selectedServer.name}` // Comment
+      );
+
+      console.log('TON Transaction completed:', tonTransactionResult);
+
       const newServer = {
         ...selectedServer,
         purchasedAt: new Date().toISOString(),
@@ -141,17 +157,33 @@ const ServerPage = ({
 
       toast({
         title: "Server Purchased!",
-        description: `${selectedServer.name} has been added to your collection.`,
+        description: `${selectedServer.name} has been added to your collection. Transaction: ${selectedServer.price} TON`,
         className: "bg-green-900 border-green-700 text-green-100"
       });
 
       setSelectedServer(null);
-    } catch (error) {
-      toast({
-        title: "Purchase Failed",
-        description: "Transaction was cancelled or failed.",
-        variant: "destructive"
-      });
+    } catch (error: any) {
+      console.error('Error purchasing server:', error);
+      
+      if (error.message?.includes('User declined')) {
+        toast({
+          title: "Transaction Cancelled",
+          description: "You cancelled the transaction. No charges were made.",
+          variant: "destructive"
+        });
+      } else if (error.message?.includes('Insufficient')) {
+        toast({
+          title: "Insufficient Balance",
+          description: `You need at least ${selectedServer.price} TON to purchase this server.`,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Purchase Failed",
+          description: error.message || "Transaction was cancelled or failed.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -305,33 +337,12 @@ const ServerPage = ({
                     </div>
                   </div>
 
-                  {!hasSufficientBalance && (
-                    <div className="bg-destructive/20 border border-destructive/30 rounded-xl p-3">
-                      <h4 className="text-destructive font-semibold mb-1 text-base">You don't have enough TON!</h4>
-                      <p className="text-xs text-white/70 leading-relaxed">
-                        Top up your balance by {(selectedServer.price - userBalance.ton).toFixed(8)} TON to rent this server.
-                      </p>
-                    </div>
-                  )}
-
-                  {hasSufficientBalance ? (
-                    <Button 
-                      onClick={confirmPurchase}
-                      className="w-full bg-primary hover:bg-primary/90 h-12 text-base font-medium rounded-2xl"
-                    >
-                      Confirm
-                    </Button>
-                  ) : (
-                    <Button 
-                      onClick={() => {
-                        setSelectedServer(null);
-                        setShowDepositDialog(true);
-                      }}
-                      className="w-full bg-primary hover:bg-primary/90 h-12 text-base font-medium rounded-2xl"
-                    >
-                      Top Up Balance
-                    </Button>
-                  )}
+                  <Button 
+                    onClick={confirmPurchase}
+                    className="w-full bg-primary hover:bg-primary/90 h-12 text-base font-medium rounded-2xl"
+                  >
+                    {!tonConnectUI?.wallet ? "Connect Wallet" : "Confirm Purchase"}
+                  </Button>
                 </div>
               </Card>
             </div>

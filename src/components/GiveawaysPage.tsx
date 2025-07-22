@@ -265,12 +265,17 @@ const GiveawaysPage = () => {
         {/* زر الانضمام */}
         {!isFinished && giveaway.current_participants < giveaway.max_participants && (
           <Button 
-            onClick={() => joinGiveaway(giveaway)}
+            onClick={() => !tonConnectUI?.wallet ? tonConnectUI.openModal() : joinGiveaway(giveaway)}
             className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
             size="lg"
-            disabled={!tonConnectUI?.wallet}
           >
-            <span>{!tonConnectUI?.wallet ? "Connect Wallet" : `Join ${giveaway.entry_fee_ton} TON`}</span>
+            {!tonConnectUI?.wallet ? (
+              <div className="flex items-center gap-2">
+                <span>Connect Wallet</span>
+              </div>
+            ) : (
+              <span>Join {giveaway.entry_fee_ton} TON</span>
+            )}
             <ArrowRight className="w-4 h-4 mr-2" />
           </Button>
         )}
@@ -300,26 +305,6 @@ const GiveawaysPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       
-      {/* Connect Wallet Prompt */}
-      {!tonConnectUI.wallet && (
-        <div className="mb-6 p-4 bg-primary/20 border border-primary/30 rounded-xl">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-white text-lg">💰</span>
-            </div>
-            <div>
-              <h3 className="text-white font-semibold">Connect Your TON Wallet</h3>
-              <p className="text-white/70 text-sm">Connect your wallet to join giveaways and win prizes!</p>
-            </div>
-            <Button 
-              onClick={() => tonConnectUI.openModal()}
-              className="ml-auto bg-primary hover:bg-primary/90"
-            >
-              Connect Wallet
-            </Button>
-          </div>
-        </div>
-      )}
 
       <Tabs defaultValue="active" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">

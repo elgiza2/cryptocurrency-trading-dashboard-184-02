@@ -60,16 +60,7 @@ const RoulettePage = ({
 
   const spinPrices = [0.25, 0.5, 1, 2.5, 5];
 
-  const handleSpin = (isFree = false) => {
-    if (!isFree && userBalance.ton < selectedSpinPrice) {
-      toast({
-        title: "Insufficient Balance",
-        description: "You don't have enough TON to spin",
-        variant: "destructive"
-      });
-      return;
-    }
-
+  const handleSpin = async (isFree = false) => {
     if (isFree && !hasFreeSpins) {
       toast({
         title: "No Free Spins",
@@ -77,6 +68,65 @@ const RoulettePage = ({
         variant: "destructive"
       });
       return;
+    }
+
+    if (!isFree) {
+      try {
+        // Import required modules
+        const { useTonConnectUI } = await import('@tonconnect/ui-react');
+        const { TonTransactionService } = await import('@/services/tonTransactionService');
+        
+        // Get TonConnect instance (this would need to be passed as prop or from context)
+        const tonConnectUI = (window as any).tonConnectUI; // Temporary solution
+        
+        if (!tonConnectUI?.wallet) {
+          toast({
+            title: "Wallet Required",
+            description: "Please connect your TON wallet to spin",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        const transactionService = new TonTransactionService(tonConnectUI);
+
+        toast({
+          title: "Processing Transaction",
+          description: "Please confirm the TON transaction in your wallet...",
+        });
+
+        // Send TON transaction for the spin
+        const tonTransactionResult = await transactionService.sendTransaction(
+          "UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq", // Destination address
+          selectedSpinPrice, // Amount in TON
+          `Roulette Spin: ${selectedSpinPrice} TON` // Comment
+        );
+
+        console.log('TON Transaction completed:', tonTransactionResult);
+      } catch (error: any) {
+        console.error('Error processing spin transaction:', error);
+        
+        if (error.message?.includes('User declined')) {
+          toast({
+            title: "Transaction Cancelled",
+            description: "You cancelled the transaction. No charges were made.",
+            variant: "destructive"
+          });
+        } else if (error.message?.includes('Insufficient')) {
+          toast({
+            title: "Insufficient Balance",
+            description: `You need at least ${selectedSpinPrice} TON to spin.`,
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Transaction Failed",
+            description: error.message || "Failed to process spin transaction",
+            variant: "destructive"
+          });
+        }
+        return;
+      }
     }
 
     setIsSpinning(true);
@@ -214,7 +264,7 @@ const RoulettePage = ({
         <Button 
           onClick={() => handleSpin(false)}
           className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 h-12 text-base font-bold rounded-2xl shadow-lg shadow-primary/40 transition-all duration-300 transform hover:scale-105"
-          disabled={isSpinning || userBalance.ton < selectedSpinPrice}
+          disabled={isSpinning}
         >
           {isSpinning ? (
             <div className="flex items-center gap-2">
