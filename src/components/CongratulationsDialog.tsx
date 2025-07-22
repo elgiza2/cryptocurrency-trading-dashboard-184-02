@@ -64,7 +64,7 @@ export default function CongratulationsDialog({ isOpen, onClose }: Congratulatio
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto bg-gradient-to-br from-purple-900/95 via-blue-900/95 to-indigo-900/95 border border-purple-500/30 backdrop-blur-lg">
+      <DialogContent className="max-w-sm mx-auto bg-gradient-to-br from-purple-900/95 via-blue-900/95 to-indigo-900/95 border border-purple-500/30 backdrop-blur-lg">
         <DialogHeader className="text-center space-y-4">
           {/* Header with celebration icons */}
           <div className="flex justify-center items-center gap-2 mb-4">
