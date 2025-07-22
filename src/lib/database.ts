@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export class DatabaseService {
@@ -209,18 +210,34 @@ export class DatabaseService {
         return { data: existing, error: null };
       }
 
+      // Get mission details for reward
+      const { data: mission } = await supabase
+        .from('missions')
+        .select('reward_amount')
+        .eq('id', missionId)
+        .single();
+
       // Create completion record
       const { data, error } = await supabase
         .from('user_missions')
         .insert({
           user_id: userId,
           mission_id: missionId,
-          reward_claimed: false
+          reward_claimed: true
         })
         .select()
         .single();
 
-      return { data, error };
+      if (error) {
+        throw error;
+      }
+
+      // Add reward to user balance
+      if (mission?.reward_amount) {
+        await this.updateUserBalance(userId, Number(mission.reward_amount));
+      }
+
+      return { data, error: null };
     } catch (error) {
       console.error('Error in completeMission:', error);
       return { data: null, error };
@@ -234,14 +251,17 @@ export class DatabaseService {
         .from('wallet_holdings')
         .select(`
           *,
-          cryptocurrencies!cryptocurrency_id (
+          cryptocurrency:cryptocurrencies!cryptocurrency_id (
+            id,
             symbol,
             name,
             icon_url,
-            current_price
+            current_price,
+            price_change_24h
           )
         `)
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .gt('balance', 0);
 
       return { data, error };
     } catch (error) {
@@ -269,6 +289,29 @@ export class DatabaseService {
       return { data, error };
     } catch (error) {
       console.error('Error in getTransactions:', error);
+      return { data: null, error };
+    }
+  }
+
+  // Servers
+  static async getUserServers(userId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('user_servers')
+        .select(`
+          *,
+          servers!server_id (
+            name,
+            description,
+            icon_url
+          )
+        `)
+        .eq('user_id', userId)
+        .eq('is_active', true);
+
+      return { data, error };
+    } catch (error) {
+      console.error('Error in getUserServers:', error);
       return { data: null, error };
     }
   }

@@ -1,298 +1,349 @@
 
 import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Gift, 
-  Coins, 
-  Star,
-  Server,
-  TrendingUp,
-  Zap,
-  Info,
-  ChevronRight
-} from "lucide-react";
+import { Clock, Zap, Coins, Server, Gift } from "lucide-react";
+import { useApp } from "@/contexts/AppContext";
+import { DatabaseService } from "@/lib/database";
 import { useToast } from "@/hooks/use-toast";
 
-interface MiningDashboardProps {
-  onNavigateToNFT?: () => void;
-  onNavigateToServers?: () => void;
-  onNavigateToActivityRewards?: () => void;
-  onNavigateToExchange?: () => void;
-  onNavigateToAboutServers?: () => void;
-  onNavigateToWallet?: () => void;
-  userBalance?: { space: number; ton: number; si?: number };
-  userServers?: any[];
+interface MiningSession {
+  id: string;
+  user_id: string;
+  start_time: string;
+  end_time: string;
+  duration_hours: number;
+  reward_amount: number;
+  is_active: boolean;
+  is_completed: boolean;
+  is_claimed: boolean;
 }
 
-const MiningDashboard = ({ 
-  onNavigateToNFT, 
-  onNavigateToServers,
-  onNavigateToActivityRewards,
-  onNavigateToExchange,
-  onNavigateToAboutServers,
-  onNavigateToWallet,
-  userBalance = { space: 0.8001, ton: 0.1175, si: 1000 },
-  userServers = []
-}: MiningDashboardProps) => {
-  const [dailyIncome, setDailyIncome] = useState(0);
-  const [telegramUser, setTelegramUser] = useState<any>(null);
+interface UserServer {
+  id: string;
+  user_id: string;
+  server_id: string;
+  mining_power: number;
+  start_time: string;
+  end_time: string;
+  purchase_price: number;
+  is_active: boolean;
+  servers: {
+    name: string;
+    description: string;
+    icon_url: string;
+  };
+}
+
+interface UserNFT {
+  id: string;
+  mining_power: number;
+  nft_collections: {
+    name: string;
+    image_url: string;
+  };
+}
+
+const MiningDashboard = () => {
+  const { userData, balance, updateBalance, refreshUserData } = useApp();
+  const [miningSession, setMiningSession] = useState<MiningSession | null>(null);
+  const [userServers, setUserServers] = useState<UserServer[]>([]);
+  const [userNFTs, setUserNFTs] = useState<UserNFT[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [startingMining, setStartingMining] = useState(false);
+  const [claimingReward, setClaimingReward] = useState(false);
   const { toast } = useToast();
 
-  // Sample income sources
-  const incomeSources = [
-    { source: "Server Mining", amount: 450, type: "server" },
-    { source: "NFT Mining", amount: 125, type: "nft" },
-    { source: "Referral Bonus", amount: 50, type: "referral" },
-    { source: "Activity Rewards", amount: 25, type: "activity" }
-  ];
-
   useEffect(() => {
-    // Get Telegram user data
-    if ((window as any).Telegram?.WebApp?.initDataUnsafe?.user) {
-      setTelegramUser((window as any).Telegram.WebApp.initDataUnsafe.user);
-    } else {
-      setTelegramUser({
-        id: 123456789,
-        first_name: "Demo",
-        last_name: "User",
-        username: "demo_user"
-      });
+    if (userData) {
+      loadMiningData();
     }
+  }, [userData]);
 
-    // Load user servers and calculate income
-    const income = userServers.reduce((total: number, server: any) => total + (server.income || 0), 0);
-    setDailyIncome(income);
-  }, []);
-
-  const handleGetGifts = () => {
-    if (onNavigateToActivityRewards) {
-      onNavigateToActivityRewards();
-    } else {
+  const loadMiningData = async () => {
+    if (!userData) return;
+    
+    try {
+      setLoading(true);
+      
+      // Load current mining session
+      const { data: session } = await DatabaseService.getMiningSession(userData.telegram_id);
+      setMiningSession(session);
+      
+      // Load user servers (assuming we'll add this method)
+      // const { data: servers } = await DatabaseService.getUserServers(userData.telegram_id);
+      // setUserServers(servers || []);
+      
+      // Load user NFTs
+      const { data: nfts } = await DatabaseService.getUserNFTs(userData.telegram_id);
+      setUserNFTs(nfts || []);
+      
+    } catch (error) {
+      console.error('Error loading mining data:', error);
       toast({
-        title: "Activity Rewards",
-        description: "Opening rewards page..."
+        title: "خطأ في تحميل البيانات",
+        description: "فشل في تحميل بيانات التعدين",
+        variant: "destructive"
       });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSpaceBalanceClick = () => {
-    if (onNavigateToExchange) {
-      onNavigateToExchange();
-    } else {
+  const calculateTotalMiningPower = () => {
+    const nftPower = userNFTs.reduce((total, nft) => total + (nft.mining_power || 1), 0);
+    const serverPower = userServers.reduce((total, server) => total + (server.mining_power || 1), 0);
+    return Math.max(1, nftPower + serverPower);
+  };
+
+  const calculateDailyIncome = () => {
+    const baseDailyReward = 125.5;
+    const miningPowerMultiplier = calculateTotalMiningPower();
+    return baseDailyReward * miningPowerMultiplier;
+  };
+
+  const getMiningProgress = () => {
+    if (!miningSession || !miningSession.is_active) return 0;
+    
+    const startTime = new Date(miningSession.start_time).getTime();
+    const endTime = new Date(miningSession.end_time).getTime();
+    const currentTime = Date.now();
+    
+    const elapsed = currentTime - startTime;
+    const total = endTime - startTime;
+    
+    return Math.min(100, (elapsed / total) * 100);
+  };
+
+  const getRemainingTime = () => {
+    if (!miningSession || !miningSession.is_active) return "00:00:00";
+    
+    const endTime = new Date(miningSession.end_time).getTime();
+    const currentTime = Date.now();
+    const remaining = Math.max(0, endTime - currentTime);
+    
+    const hours = Math.floor(remaining / (1000 * 60 * 60));
+    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+    
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const startMining = async () => {
+    if (!userData) return;
+    
+    try {
+      setStartingMining(true);
+      
+      const dailyIncome = calculateDailyIncome();
+      const { data, error } = await DatabaseService.createMiningSession(
+        userData.telegram_id,
+        8,
+        dailyIncome
+      );
+      
+      if (error) {
+        toast({
+          title: "خطأ في بدء التعدين",
+          description: "فشل في بدء جلسة تعدين جديدة",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      setMiningSession(data);
       toast({
-        title: "Currency Exchange",
-        description: "Opening exchange page..."
+        title: "تم بدء التعدين",
+        description: `بدأت جلسة تعدين جديدة لمدة 8 ساعات`,
       });
+      
+    } catch (error) {
+      console.error('Error starting mining:', error);
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء بدء التعدين",
+        variant: "destructive"
+      });
+    } finally {
+      setStartingMining(false);
     }
   };
 
-  const handleAboutMining = () => {
-    if (onNavigateToAboutServers) {
-      onNavigateToAboutServers();
-    } else {
+  const claimReward = async () => {
+    if (!miningSession || !userData) return;
+    
+    try {
+      setClaimingReward(true);
+      
+      const { data, error } = await DatabaseService.completeMiningSession(miningSession.id);
+      
+      if (error) {
+        toast({
+          title: "خطأ في استلام المكافأة",
+          description: "فشل في استلام مكافأة التعدين",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Update local state
+      setMiningSession(null);
+      await refreshUserData();
+      
       toast({
-        title: "About Mining",
-        description: "Mining with servers provides 24/7 passive income in $SPACE tokens."
+        title: "تم استلام المكافأة!",
+        description: `تم إضافة ${miningSession.reward_amount} SPACE إلى محفظتك`,
       });
+      
+    } catch (error) {
+      console.error('Error claiming reward:', error);
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء استلام المكافأة",
+        variant: "destructive"
+      });
+    } finally {
+      setClaimingReward(false);
     }
   };
 
-  const handleTopUpBalance = () => {
-    if (onNavigateToWallet) {
-      onNavigateToWallet();
-    } else {
-      toast({
-        title: "Wallet",
-        description: "Opening wallet page for deposit..."
-      });
-    }
+  const canClaimReward = () => {
+    if (!miningSession || !miningSession.is_active) return false;
+    const endTime = new Date(miningSession.end_time).getTime();
+    return Date.now() >= endTime;
   };
 
-  const handleRentServer = () => {
-    if (onNavigateToServers) {
-      onNavigateToServers();
-    } else {
-      toast({
-        title: "Servers",
-        description: "Opening servers page..."
-      });
-    }
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[200px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
-    <ScrollArea className="h-screen bg-background unified-black-bg">
-      <div className="min-h-screen text-foreground p-3 space-y-3">
-        
-        {/* Get Gifts Header with Glass Effect */}
-        <Card 
-          className="bg-gradient-to-r from-purple-500/80 to-purple-600/80 border-purple-500/30 cursor-pointer hover:border-purple-400/50 transition-colors rounded-xl backdrop-blur-xl bg-opacity-80"
-          onClick={handleGetGifts}
-        >
-          <div className="p-3 flex items-center gap-3">
-            <div className="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center">
-              <img 
-                src="https://cdn.changes.tg/gifts/models/Gem%20Signet/png/Render.png?v=1" 
-                alt="Gift" 
-                className="w-6 h-6 object-contain"
-              />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-base font-bold text-white mb-1">Get gifts for free!</h2>
-              <p className="text-xs text-purple-100">
-                Participate in weekly sweepstakes
-              </p>
-            </div>
+    <div className="space-y-6 p-4">
+      {/* Balance Card */}
+      <Card className="glass-card">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-foreground">
+            <Coins className="h-5 w-5" />
+            رصيدك الحالي
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold text-foreground">
+            {balance.toFixed(4)} SPACE
           </div>
-        </Card>
-
-        {/* User Balance - Black Design */}
-        <Card className="bg-black backdrop-blur-xl border-white/20 p-3 rounded-xl">
-          <div className="flex items-center justify-between">
-            <div 
-              className="flex-1 cursor-pointer hover:bg-white/10 rounded-lg p-2 transition-colors"
-              onClick={handleSpaceBalanceClick}
-            >
-              <div className="text-lg font-bold text-white">{userBalance.space.toFixed(4)}</div>
-              <div className="text-xs text-gray-300">
-                $SPACE balance
-              </div>
-            </div>
-            <ChevronRight className="h-4 w-4 text-blue-300 mx-2" />
-            <div className="flex-1 text-right">
-              <div className="text-lg font-bold text-white">{userBalance.ton.toFixed(4)}</div>
-              <div className="text-xs text-gray-300">
-                TON balance
-              </div>
-            </div>
+          <div className="text-sm text-muted-foreground mt-1">
+            ≈ ${(balance * 0.000683).toFixed(6)} USD
           </div>
-        </Card>
+        </CardContent>
+      </Card>
 
-        {/* Quick Actions with Glass Effect */}
-        <Card className="bg-black border-border p-2 rounded-2xl">
-          <div className="space-y-2">
-            <Button 
-              onClick={onNavigateToNFT}
-              className="w-full h-12 bg-transparent border-none text-foreground hover:bg-transparent justify-between rounded-xl"
-              variant="ghost"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-transparent rounded-full flex items-center justify-center">
-                  <Zap className="w-6 h-6 text-primary" />
-                </div>
-                <span className="text-base">NFT Miners</span>
+      {/* Mining Status Card */}
+      <Card className="glass-card">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-foreground">
+            <Zap className="h-5 w-5" />
+            حالة التعدين
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {miningSession && miningSession.is_active ? (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-foreground">التقدم:</span>
+                <span className="text-foreground">{getMiningProgress().toFixed(1)}%</span>
               </div>
-              <ChevronRight className="h-5 w-5 text-gray-400" />
-            </Button>
-            
-            <Button 
-              onClick={handleAboutMining}
-              className="w-full h-12 bg-transparent border-none text-white hover:bg-transparent justify-between rounded-xl"
-              variant="ghost"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-transparent rounded-full flex items-center justify-center">
-                  <Info className="w-6 h-6 text-primary" />
-                </div>
-                <span className="text-base">About Mining</span>
-              </div>
-              <ChevronRight className="h-5 w-5 text-gray-400" />
-            </Button>
-          </div>
-        </Card>
-
-        {/* Your Servers - Black Design */}
-        <div>
-          <h3 className="text-lg font-semibold mb-3 text-blue-100">Your Servers</h3>
-          <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl">
-            <div className="p-3">
-              {userServers.length > 0 ? (
-                <div className="space-y-3 mb-3">
-                  <div className="bg-white/10 backdrop-blur-sm p-3 rounded-xl">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
-                      <div>
-                        <div className="font-semibold text-sm text-blue-100">Flux</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-lg font-bold text-white">28d 12h 46m</div>
-                        <div className="text-xs text-blue-200">Time Left</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-bold flex items-center gap-1 text-white">
-                          ~ 0.02 
-                          <img 
-                            src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" 
-                            alt="TON" 
-                            className="w-4 h-4"
-                          />
-                        </div>
-                        <div className="text-xs text-blue-200">Income Per Day</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-4 mb-3">
-                  <Server className="h-8 w-8 mx-auto mb-2 text-blue-300" />
-                  <p className="text-blue-200 mb-2 text-sm">No servers rented yet</p>
-                </div>
-              )}
               
-              <div className="flex gap-2">
+              <Progress value={getMiningProgress()} className="w-full" />
+              
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">الوقت المتبقي:</span>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  <span className="font-mono">{getRemainingTime()}</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">المكافأة المتوقعة:</span>
+                <span className="font-bold">{miningSession.reward_amount} SPACE</span>
+              </div>
+              
+              {canClaimReward() ? (
                 <Button 
-                  onClick={handleRentServer}
-                  className="w-full bg-transparent hover:bg-white/10 border-0 h-12 text-base rounded-2xl font-medium text-white"
-                  variant="outline"
+                  onClick={claimReward} 
+                  disabled={claimingReward}
+                  className="w-full"
                 >
-                  Rent Server
+                  {claimingReward ? "جاري الاستلام..." : "استلم المكافأة"}
                 </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Your Income - Borderless Design */}
-        <div>
-          <h3 className="text-lg font-semibold mb-3 text-blue-100">Your Income</h3>
-          <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-2xl p-4">
-            <div className="space-y-3">
-              {incomeSources.map((income, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-white/10 backdrop-blur-sm rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${
-                      income.type === 'server' ? 'bg-purple-400' :
-                      income.type === 'nft' ? 'bg-pink-400' :
-                      income.type === 'referral' ? 'bg-blue-400' : 'bg-green-400'
-                    }`} />
-                    <span className="font-medium text-sm text-blue-100">{income.source}</span>
-                  </div>
-                  <span className="font-semibold text-green-300 text-sm">
-                    +{income.amount} SPACE
-                  </span>
+              ) : (
+                <Badge variant="outline" className="w-full justify-center py-2">
+                  التعدين قيد التشغيل...
+                </Badge>
+              )}
+            </>
+          ) : (
+            <>
+              <div className="text-center space-y-2">
+                <div className="text-lg font-semibold text-foreground">
+                  الدخل اليومي المتوقع: {calculateDailyIncome().toFixed(2)} SPACE
                 </div>
-              ))}
+                <div className="text-sm text-muted-foreground">
+                  قوة التعدين: {calculateTotalMiningPower()}x
+                </div>
+              </div>
               
-              <div className="border-t border-white/20 pt-3 mt-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-base text-blue-100">Total Daily Income</span>
-                  <span className="font-bold text-green-300 text-base">
-                    +{incomeSources.reduce((total, income) => total + income.amount, 0)} SPACE
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+              <Button 
+                onClick={startMining} 
+                disabled={startingMining}
+                className="w-full"
+              >
+                {startingMining ? "جاري البدء..." : "ابدأ التعدين (8 ساعات)"}
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
-        {/* Bottom spacing */}
-        <div className="h-16"></div>
-      </div>
-    </ScrollArea>
+      {/* Mining Power Breakdown */}
+      {(userNFTs.length > 0 || userServers.length > 0) && (
+        <Card className="glass-card">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Server className="h-5 w-5" />
+              مصادر قوة التعدين
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {userNFTs.map((nft) => (
+              <div key={nft.id} className="flex items-center justify-between p-2 bg-card/30 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Gift className="h-4 w-4" />
+                  <span className="text-sm">{nft.nft_collections?.name || 'NFT'}</span>
+                </div>
+                <span className="text-sm font-semibold">+{nft.mining_power}x</span>
+              </div>
+            ))}
+            
+            {userServers.map((server) => (
+              <div key={server.id} className="flex items-center justify-between p-2 bg-card/30 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Server className="h-4 w-4" />
+                  <span className="text-sm">{server.servers?.name || 'Server'}</span>
+                </div>
+                <span className="text-sm font-semibold">+{server.mining_power}x</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 };
 
