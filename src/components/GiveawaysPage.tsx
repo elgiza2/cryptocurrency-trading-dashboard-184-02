@@ -195,56 +195,56 @@ const GiveawaysPage = () => {
 
   const GiveawayCard = ({ giveaway, isFinished = false }: { giveaway: Giveaway; isFinished?: boolean }) => (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-primary/20">
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-1 pt-3">
           <div className="flex items-start justify-between">
-            <CardTitle className="text-base font-bold text-primary">{giveaway.title}</CardTitle>
-            <Badge variant={isFinished ? "secondary" : "default"} className="shrink-0 text-xs">
+            <CardTitle className="text-sm font-bold text-primary leading-tight">{giveaway.title}</CardTitle>
+            <Badge variant={isFinished ? "secondary" : "default"} className="shrink-0 text-xs px-1 py-0">
               {isFinished ? "Ended" : "Active"}
             </Badge>
           </div>
       </CardHeader>
       
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-2 px-3 pb-3">
         {/* Prize Image */}
-        <div className="relative aspect-square w-20 mx-auto">
+        <div className="relative aspect-square w-16 mx-auto">
           <img 
             src={giveaway.prize_image_url} 
             alt={giveaway.title}
-            className="w-full h-full object-contain rounded-lg border border-primary/10"
+            className="w-full h-full object-contain rounded border border-primary/10"
           />
         </div>
 
         {/* Giveaway Info */}
-        <div className="space-y-2">
+        <div className="space-y-1">
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
-              <Users className="w-3 h-3" />
+              <Users className="w-2.5 h-2.5" />
               <span>Participants</span>
             </div>
-            <span className="font-medium">{giveaway.current_participants}/{giveaway.max_participants}</span>
+            <span className="font-medium text-xs">{giveaway.current_participants}/{giveaway.max_participants}</span>
           </div>
 
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
-              <Clock className="w-3 h-3" />
+              <Clock className="w-2.5 h-2.5" />
               <span>Time Left</span>
             </div>
-            <span className="font-medium">{formatTimeRemaining(giveaway.end_time)}</span>
+            <span className="font-medium text-xs">{formatTimeRemaining(giveaway.end_time)}</span>
           </div>
 
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
-              <Calendar className="w-3 h-3" />
+              <Calendar className="w-2.5 h-2.5" />
               <span>Entry Fee</span>
             </div>
-            <span className="font-bold text-primary">{giveaway.entry_fee_ton} TON</span>
+            <span className="font-bold text-primary text-xs">{giveaway.entry_fee_ton} TON</span>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full bg-secondary rounded-full h-1.5">
+        <div className="w-full bg-secondary rounded-full h-1">
           <div 
-            className="bg-gradient-to-r from-primary to-primary/80 h-1.5 rounded-full transition-all duration-300"
+            className="bg-gradient-to-r from-primary to-primary/80 h-1 rounded-full transition-all duration-300"
             style={{ width: `${(giveaway.current_participants / giveaway.max_participants) * 100}%` }}
           />
         </div>
@@ -253,7 +253,7 @@ const GiveawaysPage = () => {
         {!isFinished && giveaway.current_participants < giveaway.max_participants && (
           <Button 
             onClick={() => !tonConnectUI?.wallet ? tonConnectUI.openModal() : joinGiveaway(giveaway)}
-            className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+            className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 h-7 text-xs"
             size="sm"
           >
             {!tonConnectUI?.wallet ? (
@@ -261,12 +261,12 @@ const GiveawaysPage = () => {
             ) : (
               <span>Join {giveaway.entry_fee_ton} TON</span>
             )}
-            <ArrowRight className="w-3 h-3 ml-1" />
+            <ArrowRight className="w-2.5 h-2.5 ml-1" />
           </Button>
         )}
 
         {!isFinished && giveaway.current_participants >= giveaway.max_participants && (
-          <Button disabled className="w-full" size="sm">
+          <Button disabled className="w-full h-7 text-xs" size="sm">
             Giveaway Full
           </Button>
         )}
