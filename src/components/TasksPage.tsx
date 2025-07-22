@@ -157,7 +157,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
 
   return (
     <ScrollArea className="h-screen">
-      <div className="min-h-screen bg-black text-white p-2">
+      <div className="min-h-screen text-foreground p-2">
         <div className="max-w-md mx-auto">
           <h1 className="text-xl font-bold mb-4 text-center">Tasks</h1>
           

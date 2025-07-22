@@ -234,7 +234,7 @@ const WalletPage = ({ userBalance: propUserBalance }: WalletPageProps) => {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 space-y-6">
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 space-y-6">
         <div className="text-center space-y-3">
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
             <CreditCard className="h-8 w-8 text-primary" />
@@ -278,7 +278,7 @@ const WalletPage = ({ userBalance: propUserBalance }: WalletPageProps) => {
 
   return (
     <ScrollArea className="h-screen">
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen text-foreground">
         {/* Header */}
         <div className="p-4 text-center space-y-2">
           <div className="flex items-center justify-center gap-2 text-gray-400 cursor-pointer" onClick={copyAddress}>

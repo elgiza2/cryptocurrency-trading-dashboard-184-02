@@ -118,7 +118,7 @@ const ActivityRewardsPage = ({
 
   return (
     <ScrollArea className="h-screen bg-gradient-to-b from-slate-900 to-black">
-      <div className="min-h-screen text-white p-3 space-y-4">
+      <div className="min-h-screen text-foreground p-3 space-y-4">
         
         {/* Header */}
         <div className="flex items-center gap-3 pt-4">

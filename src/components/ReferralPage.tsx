@@ -56,7 +56,7 @@ const ReferralPage = ({ onBack, referralCount = 0 }: ReferralPageProps) => {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-b from-blue-900 via-blue-950 to-black text-white">
+    <div className="h-screen text-foreground">
       <div className="flex flex-col h-full">
         
         {/* Header */}

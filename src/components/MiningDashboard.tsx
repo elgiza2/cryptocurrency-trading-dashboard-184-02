@@ -124,7 +124,7 @@ const MiningDashboard = ({
 
   return (
     <ScrollArea className="h-screen bg-background unified-black-bg">
-      <div className="min-h-screen text-white p-3 space-y-3">
+      <div className="min-h-screen text-foreground p-3 space-y-3">
         
         {/* Get Gifts Header with Glass Effect */}
         <Card 
