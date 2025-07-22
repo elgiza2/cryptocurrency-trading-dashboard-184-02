@@ -15,6 +15,8 @@ import {
   ChevronRight
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useApp } from "@/contexts/AppContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MiningDashboardProps {
   onNavigateToNFT?: () => void;
@@ -34,38 +36,101 @@ const MiningDashboard = ({
   onNavigateToExchange,
   onNavigateToAboutServers,
   onNavigateToWallet,
-  userBalance = { space: 0.8001, ton: 0.1175, si: 1000 },
+  userBalance = { space: 0, ton: 0, si: 0 },
   userServers = []
 }: MiningDashboardProps) => {
-  const [dailyIncome, setDailyIncome] = useState(0);
-  const [telegramUser, setTelegramUser] = useState<any>(null);
+  const [realUserBalance, setRealUserBalance] = useState({ space: 0, ton: 0, si: 0 });
+  const [realUserServers, setRealUserServers] = useState<any[]>([]);
+  const [incomeSources, setIncomeSources] = useState<any[]>([]);
+  const [totalDailyIncome, setTotalDailyIncome] = useState(0);
+  const { telegramUser } = useApp();
   const { toast } = useToast();
 
-  // Sample income sources
-  const incomeSources = [
-    { source: "Server Mining", amount: 450, type: "server" },
-    { source: "NFT Mining", amount: 125, type: "nft" },
-    { source: "Referral Bonus", amount: 50, type: "referral" },
-    { source: "Activity Rewards", amount: 25, type: "activity" }
-  ];
-
+  // Fetch real user data
   useEffect(() => {
-    // Get Telegram user data
-    if ((window as any).Telegram?.WebApp?.initDataUnsafe?.user) {
-      setTelegramUser((window as any).Telegram.WebApp.initDataUnsafe.user);
-    } else {
-      setTelegramUser({
-        id: 123456789,
-        first_name: "Demo",
-        last_name: "User",
-        username: "demo_user"
-      });
-    }
+    const fetchUserData = async () => {
+      if (!telegramUser?.id) return;
 
-    // Load user servers and calculate income
-    const income = userServers.reduce((total: number, server: any) => total + (server.income || 0), 0);
-    setDailyIncome(income);
-  }, []);
+      try {
+        // Fetch user balance
+        const { data: walletData } = await supabase
+          .from('wallet_holdings')
+          .select('balance, cryptocurrencies(symbol)')
+          .eq('user_id', telegramUser.id.toString());
+
+        if (walletData) {
+          const balances = { space: 0, ton: 0, si: 0 };
+          walletData.forEach((holding: any) => {
+            const symbol = holding.cryptocurrencies?.symbol?.toLowerCase();
+            if (symbol === 'space') balances.space = Number(holding.balance);
+            if (symbol === 'ton') balances.ton = Number(holding.balance);
+            if (symbol === 'si') balances.si = Number(holding.balance);
+          });
+          setRealUserBalance(balances);
+        }
+
+        // Fetch user servers
+        const { data: serversData } = await supabase
+          .from('user_servers')
+          .select(`
+            *,
+            servers(name, mining_power, price_ton)
+          `)
+          .eq('user_id', telegramUser.id.toString())
+          .eq('is_active', true);
+
+        setRealUserServers(serversData || []);
+
+        // Calculate income sources
+        const sources = [];
+        let totalIncome = 0;
+
+        // Server income
+        const serverIncome = (serversData || []).reduce((total, server) => {
+          return total + (server.mining_power * 24); // Daily income
+        }, 0);
+        if (serverIncome > 0) {
+          sources.push({ source: "Server Mining", amount: serverIncome, type: "server" });
+          totalIncome += serverIncome;
+        }
+
+        // NFT income
+        const { data: nftData } = await supabase
+          .from('user_nfts')
+          .select('mining_power')
+          .eq('user_id', telegramUser.id.toString());
+
+        const nftIncome = (nftData || []).reduce((total, nft) => {
+          return total + (nft.mining_power * 24);
+        }, 0);
+        if (nftIncome > 0) {
+          sources.push({ source: "NFT Mining", amount: nftIncome, type: "nft" });
+          totalIncome += nftIncome;
+        }
+
+        // Referral income
+        const { data: referralData } = await supabase
+          .from('referrals')
+          .select('reward_amount')
+          .eq('referrer_user_id', telegramUser.id.toString())
+          .eq('is_claimed', true);
+
+        const referralIncome = (referralData || []).reduce((total, ref) => {
+          return total + Number(ref.reward_amount);
+        }, 0);
+        if (referralIncome > 0) {
+          sources.push({ source: "Referral Bonus", amount: referralIncome, type: "referral" });
+        }
+
+        setIncomeSources(sources);
+        setTotalDailyIncome(totalIncome);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, [telegramUser?.id]);
 
   const handleGetGifts = () => {
     if (onNavigateToActivityRewards) {
@@ -155,14 +220,14 @@ const MiningDashboard = ({
               className="flex-1 cursor-pointer hover:bg-white/10 rounded-lg p-2 transition-colors"
               onClick={handleSpaceBalanceClick}
             >
-              <div className="text-lg font-bold text-white">{userBalance.space.toFixed(4)}</div>
+              <div className="text-lg font-bold text-white">{realUserBalance.space.toFixed(4)}</div>
               <div className="text-xs text-gray-300">
                 $SPACE balance
               </div>
             </div>
             <ChevronRight className="h-4 w-4 text-blue-300 mx-2" />
             <div className="flex-1 text-right">
-              <div className="text-lg font-bold text-white">{userBalance.ton.toFixed(4)}</div>
+              <div className="text-lg font-bold text-white">{realUserBalance.ton.toFixed(4)}</div>
               <div className="text-xs text-gray-300">
                 TON balance
               </div>
@@ -208,33 +273,48 @@ const MiningDashboard = ({
           <h3 className="text-lg font-semibold mb-3 text-blue-100">Your Servers</h3>
           <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl">
             <div className="p-3">
-              {userServers.length > 0 ? (
+              {realUserServers.length > 0 ? (
                 <div className="space-y-3 mb-3">
-                  <div className="bg-white/10 backdrop-blur-sm p-3 rounded-xl">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
-                      <div>
-                        <div className="font-semibold text-sm text-blue-100">Flux</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-lg font-bold text-white">28d 12h 46m</div>
-                        <div className="text-xs text-blue-200">Time Left</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-bold flex items-center gap-1 text-white">
-                          ~ 0.02 
-                          <img 
-                            src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" 
-                            alt="TON" 
-                            className="w-4 h-4"
-                          />
+                  {realUserServers.map((userServer, index) => {
+                    const server = userServer.servers;
+                    const timeLeft = userServer.end_time 
+                      ? Math.max(0, new Date(userServer.end_time).getTime() - new Date().getTime())
+                      : 0;
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const dailyIncome = userServer.mining_power * 0.02; // Example calculation
+
+                    return (
+                      <div key={index} className="bg-white/10 backdrop-blur-sm p-3 rounded-xl">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
+                          <div>
+                            <div className="font-semibold text-sm text-blue-100">{server?.name || 'Server'}</div>
+                          </div>
                         </div>
-                        <div className="text-xs text-blue-200">Income Per Day</div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="text-lg font-bold text-white">
+                              {timeLeft > 0 ? `${days}d ${hours}h ${minutes}m` : 'Expired'}
+                            </div>
+                            <div className="text-xs text-blue-200">Time Left</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-lg font-bold flex items-center gap-1 text-white">
+                              ~ {dailyIncome.toFixed(2)}
+                              <img 
+                                src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" 
+                                alt="TON" 
+                                className="w-4 h-4"
+                              />
+                            </div>
+                            <div className="text-xs text-blue-200">Income Per Day</div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-4 mb-3">
@@ -281,7 +361,7 @@ const MiningDashboard = ({
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-base text-blue-100">Total Daily Income</span>
                   <span className="font-bold text-green-300 text-base">
-                    +{incomeSources.reduce((total, income) => total + income.amount, 0)} SPACE
+                    +{totalDailyIncome} SPACE
                   </span>
                 </div>
               </div>
