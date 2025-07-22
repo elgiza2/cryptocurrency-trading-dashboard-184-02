@@ -114,26 +114,15 @@ const NavButton = ({ item, isActive, onClick }: NavButtonProps) => {
   return (
     <Button
       variant="ghost"
-      className={cn(
-        "flex flex-col items-center gap-1 h-auto p-1 rounded-lg transition-all duration-300 group",
-        "hover:scale-105 active:scale-95"
-      )}
+      className="flex flex-col items-center gap-0.5 h-auto p-1 rounded-lg transition-all duration-300 group hover:scale-105 active:scale-95"
       onClick={onClick}
     >
       
       {/* Icon without background */}
-      <Icon className={cn(
-        "h-4 w-4 transition-all duration-300",
-        isActive 
-          ? "text-white"
-          : "text-gray-400 group-hover:text-white"
-      )} />
+      <Icon className="h-4 w-4 text-gray-400 group-hover:text-white transition-all duration-300" />
       
       {/* Label */}
-      <span className={cn(
-        "text-xs font-medium transition-colors duration-300 relative z-10",
-        isActive ? "text-white" : "text-gray-400 group-hover:text-white"
-      )}>
+      <span className="text-xs font-medium text-gray-400 group-hover:text-white transition-colors duration-300">
         {label}
       </span>
     </Button>
