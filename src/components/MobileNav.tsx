@@ -93,29 +93,29 @@ const MobileNav = ({
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-black p-1">
-      <div className="flex justify-center items-end max-w-sm mx-auto px-1">
+    <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-sm border-t border-white/10 p-1">
+      <div className="flex justify-center items-end max-w-xs mx-auto px-1">
         {navItems.map(({ id, icon: Icon, label, special }) => (
-          <div key={id} className={`flex flex-col items-center ${special ? 'mx-1' : 'flex-1'}`}>
+          <div key={id} className={`flex flex-col items-center ${special ? 'mx-0.5' : 'flex-1'}`}>
             <Button
               variant="ghost"
               size="sm"
-              className={`flex flex-col gap-0.5 transition-all duration-300 rounded-none border-none bg-transparent hover:bg-transparent ${
+              className={`flex flex-col gap-0.5 transition-all duration-300 rounded-lg border-none bg-transparent hover:bg-transparent ${
                 special 
                   ? activeTab === id 
-                    ? 'text-pink-500 h-10 w-10 p-0' 
-                    : 'text-white/70 hover:text-white h-8 w-8 p-0'
+                    ? 'text-pink-500 h-8 w-8 p-0' 
+                    : 'text-white/70 hover:text-white h-7 w-7 p-0'
                   : activeTab === id
-                    ? 'text-pink-500 h-auto p-0.5 min-h-8'
-                    : 'text-white/70 hover:text-white h-auto p-0.5 min-h-8'
+                    ? 'text-pink-500 h-auto p-0.5 min-h-7'
+                    : 'text-white/70 hover:text-white h-auto p-0.5 min-h-7'
               }`}
               onClick={id === 'wallet' ? handleWalletClick : () => onTabChange(id)}
             >
-              <Icon className={special ? "h-5 w-5" : "h-3.5 w-3.5"} />
-              {!special && <span className="text-xs font-medium">{label}</span>}
+              <Icon className={special ? "h-4 w-4" : "h-3 w-3"} />
+              {!special && <span className="text-[10px] font-medium">{label}</span>}
             </Button>
             {special && (
-              <span className="text-xs font-medium text-white/80 mt-0.5">{label}</span>
+              <span className="text-[10px] font-medium text-white/80 mt-0.5">{label}</span>
             )}
           </div>
         ))}

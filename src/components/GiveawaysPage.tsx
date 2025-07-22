@@ -223,19 +223,10 @@ const GiveawaysPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-center mb-4 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-          Giveaways & Prizes
-        </h1>
-        <p className="text-center text-muted-foreground max-w-2xl mx-auto">
-          Join giveaways and win valuable prizes! Each giveaway has different rewards and limited participation time
-        </p>
-      </div>
-
       <Tabs defaultValue="active" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
-          <TabsTrigger value="active">Active Giveaways ({activeGiveaways.length})</TabsTrigger>
-          <TabsTrigger value="finished">Finished Giveaways ({finishedGiveaways.length})</TabsTrigger>
+          <TabsTrigger value="active">Active ({activeGiveaways.length})</TabsTrigger>
+          <TabsTrigger value="finished">Finished ({finishedGiveaways.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="active" className="space-y-6">
