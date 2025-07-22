@@ -4,6 +4,8 @@ import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTonConnectUI } from '@tonconnect/ui-react';
+import { TonTransactionService } from '@/services/tonTransactionService';
 import UnifiedBackButton from "./UnifiedBackButton";
 
 interface RoulettePageProps {
@@ -23,6 +25,7 @@ const RoulettePage = ({
   const [selectedSpinPrice, setSelectedSpinPrice] = useState(0.5);
   const [hasFreeSpins, setHasFreeSpins] = useState(false);
   const [showAllPrizes, setShowAllPrizes] = useState(false);
+  const [tonConnectUI] = useTonConnectUI();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -72,13 +75,6 @@ const RoulettePage = ({
 
     if (!isFree) {
       try {
-        // Import required modules
-        const { useTonConnectUI } = await import('@tonconnect/ui-react');
-        const { TonTransactionService } = await import('@/services/tonTransactionService');
-        
-        // Get TonConnect instance (this would need to be passed as prop or from context)
-        const tonConnectUI = (window as any).tonConnectUI; // Temporary solution
-        
         if (!tonConnectUI?.wallet) {
           toast({
             title: "Wallet Required",

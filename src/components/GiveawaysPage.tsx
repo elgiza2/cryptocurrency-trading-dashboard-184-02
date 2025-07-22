@@ -99,15 +99,8 @@ const GiveawaysPage = () => {
       return;
     }
 
-    // Check if transaction service is available
-    if (!transactionService) {
-      toast({
-        title: "Service Unavailable",
-        description: "Transaction service is not ready. Please try again.",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Create transaction service on demand
+    const currentTransactionService = new TonTransactionService(tonConnectUI);
 
     try {
       // Show loading state
@@ -117,7 +110,7 @@ const GiveawaysPage = () => {
       });
 
       // Create TON transaction for the entry fee
-      const tonTransactionResult = await transactionService.sendTransaction(
+      const tonTransactionResult = await currentTransactionService.sendTransaction(
         "UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq", // Destination address
         giveaway.entry_fee_ton, // Amount in TON
         `Giveaway Entry: ${giveaway.title}` // Comment
