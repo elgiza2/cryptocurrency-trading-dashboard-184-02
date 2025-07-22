@@ -9,9 +9,8 @@ interface Transaction {
   id: string;
   transaction_type: string;
   amount: number;
-  price_per_token: number;
-  total_value_usd: number;
-  fee_amount: number;
+  price_usd: number;
+  total_usd: number;
   status: string;
   created_at: string;
   cryptocurrency: {
@@ -31,7 +30,7 @@ export const TransactionHistory = () => {
         if (!user.user) return;
 
         const { data, error } = await supabase
-          .from('detailed_transactions')
+          .from('transactions')
           .select(`
             *,
             cryptocurrency:cryptocurrencies(symbol, name)
@@ -134,7 +133,7 @@ export const TransactionHistory = () => {
                   {transaction.amount.toFixed(4)} {transaction.cryptocurrency?.symbol}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  ${transaction.total_value_usd.toFixed(2)}
+                  ${(transaction.total_usd || 0).toFixed(2)}
                 </div>
                 <Badge 
                   variant={transaction.status === 'completed' ? 'default' : 'secondary'}

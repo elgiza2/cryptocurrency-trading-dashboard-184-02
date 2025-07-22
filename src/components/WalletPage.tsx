@@ -62,23 +62,14 @@ const WalletPage = ({ userBalance: propUserBalance }: WalletPageProps) => {
           
         realUserBalance = userData?.total_balance || 0;
       } else if (walletAddress) {
-        // Fallback: try to get user by wallet address in profiles table
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('user_id')
-          .eq('ton_wallet_address', walletAddress)
+        // Fallback: use wallet address as user_id for now
+        const { data: userData } = await supabase
+          .from('users')
+          .select('total_balance')
+          .eq('telegram_id', walletAddress || '')
           .single();
-
-        if (profile) {
-          // Get user's total balance from users table
-          const { data: userData } = await supabase
-            .from('users')
-            .select('total_balance')
-            .eq('id', profile.user_id)
-            .single();
           
-          realUserBalance = userData?.total_balance || 0;
-        }
+        realUserBalance = userData?.total_balance || 0;
       }
       
       setInternalUserBalance(realUserBalance);

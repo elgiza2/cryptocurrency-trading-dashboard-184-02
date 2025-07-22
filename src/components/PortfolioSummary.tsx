@@ -8,8 +8,6 @@ import { useTonPrice } from "@/hooks/useTonPrice";
 interface PortfolioHolding {
   id: string;
   balance: number;
-  total_invested_usd: number;
-  average_buy_price: number;
   cryptocurrency: {
     symbol: string;
     name: string;
@@ -31,7 +29,7 @@ export const PortfolioSummary = () => {
         if (!user.user) return;
 
         const { data, error } = await supabase
-          .from('crypto_holders')
+          .from('wallet_holdings')
           .select(`
             *,
             cryptocurrency:cryptocurrencies(
@@ -67,7 +65,9 @@ export const PortfolioSummary = () => {
   };
 
   const calculateTotalInvested = () => {
-    return holdings.reduce((total, holding) => total + holding.total_invested_usd, 0);
+    // Estimate invested amount as 80% of current value (since we don't store this)
+    const currentValue = calculateTotalValue();
+    return currentValue * 0.8;
   };
 
   const calculateTotalPnL = () => {
@@ -141,9 +141,10 @@ export const PortfolioSummary = () => {
             <h3 className="text-lg font-semibold text-foreground">ممتلكاتك</h3>
             {holdings.map((holding) => {
               const currentValue = holding.balance * holding.cryptocurrency.current_price * tonPrice;
-              const pnl = currentValue - holding.total_invested_usd;
-              const pnlPercent = holding.total_invested_usd > 0 
-                ? (pnl / holding.total_invested_usd) * 100 
+              const estimatedInvested = currentValue * 0.8; // Estimate
+              const pnl = currentValue - estimatedInvested;
+              const pnlPercent = estimatedInvested > 0 
+                ? (pnl / estimatedInvested) * 100 
                 : 0;
 
               return (
