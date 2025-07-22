@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import MobileNav from '@/components/MobileNav';
+import { useTonConnectUI } from '@tonconnect/ui-react';
+import { TonTransactionService } from '@/services/tonTransactionService';
 
 interface Giveaway {
   id: string;
@@ -28,15 +30,22 @@ const GiveawaysPage = () => {
   const [activeGiveaways, setActiveGiveaways] = useState<Giveaway[]>([]);
   const [finishedGiveaways, setFinishedGiveaways] = useState<Giveaway[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tonConnectUI] = useTonConnectUI();
+  const [transactionService, setTransactionService] = useState<TonTransactionService | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     loadGiveaways();
     
+    // Initialize transaction service when wallet is connected
+    if (tonConnectUI && tonConnectUI.wallet) {
+      setTransactionService(new TonTransactionService(tonConnectUI));
+    }
+    
     // تحديث البيانات كل دقيقة لفحص الأحداث المنتهية
     const interval = setInterval(loadGiveaways, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [tonConnectUI]);
 
   const loadGiveaways = async () => {
     try {
@@ -80,32 +89,98 @@ const GiveawaysPage = () => {
   };
 
   const joinGiveaway = async (giveaway: Giveaway) => {
+    // Check if wallet is connected
+    if (!tonConnectUI.wallet) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your TON wallet to join giveaways",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check if transaction service is available
+    if (!transactionService) {
+      toast({
+        title: "Service Unavailable",
+        description: "Transaction service is not ready. Please try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      // TON payment logic should be added here
+      // Show loading state
+      toast({
+        title: "Processing Transaction",
+        description: "Please confirm the TON transaction in your wallet...",
+      });
+
+      // Create TON transaction for the entry fee
+      const tonTransactionResult = await transactionService.sendTransaction(
+        "UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq", // Destination address
+        giveaway.entry_fee_ton, // Amount in TON
+        `Giveaway Entry: ${giveaway.title}` // Comment
+      );
+
+      console.log('TON Transaction completed:', tonTransactionResult);
+
+      // If transaction successful, add participant to database
       const { data, error } = await supabase
         .from('giveaway_participants')
         .insert({
           giveaway_id: giveaway.id,
-          user_id: 'demo_user', // Should be replaced with actual user ID
-          entry_fee_paid: giveaway.entry_fee_ton
+          user_id: 'demo_user', // Should be replaced with actual user ID from Telegram
+          entry_fee_paid: giveaway.entry_fee_ton,
+          ton_tx_hash: tonTransactionResult?.boc || 'pending' // Store transaction hash
         });
 
-      if (error) throw error;
+      if (error) {
+        // Handle specific error cases
+        if (error.code === '23505') {
+          toast({
+            title: "Already Joined",
+            description: "You have already joined this giveaway!",
+            variant: "destructive"
+          });
+          return;
+        }
+        throw error;
+      }
 
+      // Success message
       toast({
-        title: "Success!",
-        description: `You joined ${giveaway.title} giveaway`,
-        variant: "default"
+        title: "Successfully Joined! 🎉",
+        description: `You have joined ${giveaway.title}! Transaction: ${giveaway.entry_fee_ton} TON`,
+        className: "bg-green-900 border-green-700 text-green-100"
       });
 
-      loadGiveaways(); // Reload data
+      // Reload giveaways to update participant count
+      loadGiveaways();
+
     } catch (error: any) {
       console.error('Error joining giveaway:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to join giveaway",
-        variant: "destructive"
-      });
+      
+      // Handle specific error messages
+      if (error.message?.includes('User declined')) {
+        toast({
+          title: "Transaction Cancelled",
+          description: "You cancelled the transaction. No charges were made.",
+          variant: "destructive"
+        });
+      } else if (error.message?.includes('Insufficient')) {
+        toast({
+          title: "Insufficient Balance",
+          description: `You need at least ${giveaway.entry_fee_ton} TON to join this giveaway.`,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Failed to Join",
+          description: error.message || "An error occurred while joining the giveaway",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -193,8 +268,9 @@ const GiveawaysPage = () => {
             onClick={() => joinGiveaway(giveaway)}
             className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
             size="lg"
+            disabled={!tonConnectUI?.wallet}
           >
-            <span>Join Giveaway</span>
+            <span>{!tonConnectUI?.wallet ? "Connect Wallet" : `Join ${giveaway.entry_fee_ton} TON`}</span>
             <ArrowRight className="w-4 h-4 mr-2" />
           </Button>
         )}
@@ -223,6 +299,28 @@ const GiveawaysPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      
+      {/* Connect Wallet Prompt */}
+      {!tonConnectUI.wallet && (
+        <div className="mb-6 p-4 bg-primary/20 border border-primary/30 rounded-xl">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+              <span className="text-white text-lg">💰</span>
+            </div>
+            <div>
+              <h3 className="text-white font-semibold">Connect Your TON Wallet</h3>
+              <p className="text-white/70 text-sm">Connect your wallet to join giveaways and win prizes!</p>
+            </div>
+            <Button 
+              onClick={() => tonConnectUI.openModal()}
+              className="ml-auto bg-primary hover:bg-primary/90"
+            >
+              Connect Wallet
+            </Button>
+          </div>
+        </div>
+      )}
+
       <Tabs defaultValue="active" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
           <TabsTrigger value="active">Active ({activeGiveaways.length})</TabsTrigger>
