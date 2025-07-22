@@ -5,37 +5,37 @@
 
 @layer base {
   :root {
-    /* Vibrant Gaming Color System */
-    --background: 220 70% 10%; /* Deep Blue */
-    --foreground: 0 0% 98%; /* #FAFAFA */
+    /* Arabic Gaming Color System */
+    --background: 222 84% 5%; /* #0F172A - أزرق فحمي داكن */
+    --foreground: 210 40% 95%; /* #F1F5F9 - نصوص بيضاء */
     
-    --primary: 320 85% 60%; /* Hot Pink */
-    --primary-foreground: 0 0% 98%;
+    --primary: 265 89% 58%; /* #7C3AED - بنفسجي ملكي */
+    --primary-foreground: 210 40% 95%;
     
-    --secondary: 280 100% 70%; /* Electric Purple */
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 215 28% 17%; /* #1E293B - رمادي مزرق داكن */
+    --secondary-foreground: 210 40% 95%;
     
-    --accent: 200 100% 60%; /* Cyan Blue */
-    --accent-foreground: 0 0% 98%;
+    --accent: 330 81% 60%; /* #EC4899 - وردي نيون ناعم */
+    --accent-foreground: 210 40% 95%;
     
-    --muted: 240 20% 20%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 215 28% 17%;
+    --muted-foreground: 214 32% 67%; /* #CBD5E1 - نصوص رمادية */
     
-    --border: 240 30% 25%;
-    --input: 240 25% 15%;
-    --ring: 320 85% 60%;
+    --border: 215 28% 20%;
+    --input: 215 28% 17%;
+    --ring: 265 89% 58%;
     
     --success: 150 70% 50%;
     --warning: 35 85% 55%;
     --destructive: 0 70% 55%;
     
-    --card: 240 25% 15%;
-    --card-foreground: 0 0% 98%;
+    --card: 215 28% 17%; /* #1E293B - كروت رمادي مزرق داكن */
+    --card-foreground: 210 40% 95%;
     
     /* Glow effects */
-    --glow-primary: 0 0 25px hsl(320 85% 60% / 0.6);
-    --glow-secondary: 0 0 25px hsl(280 100% 70% / 0.6);
-    --glow-accent: 0 0 25px hsl(200 100% 60% / 0.6);
+    --glow-primary: 0 0 25px hsl(265 89% 58% / 0.6);
+    --glow-secondary: 0 0 25px hsl(215 28% 17% / 0.6);
+    --glow-accent: 0 0 25px hsl(330 81% 60% / 0.6);
   }
   
   body {
