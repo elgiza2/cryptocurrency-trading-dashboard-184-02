@@ -312,13 +312,25 @@ const ServerPage = ({
                     </div>
                   )}
 
-                  <Button 
-                    onClick={confirmPurchase}
-                    className="w-full bg-purple-600 hover:bg-purple-700 h-12 text-base font-medium rounded-2xl"
-                    disabled={!hasSufficientBalance}
-                  >
-                    {hasSufficientBalance ? "Confirm" : "Top Up Balance"}
-                  </Button>
+                  {hasSufficientBalance ? (
+                    <Button 
+                      onClick={confirmPurchase}
+                      className="w-full bg-purple-600 hover:bg-purple-700 h-12 text-base font-medium rounded-2xl"
+                    >
+                      Confirm
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={() => {
+                        setSelectedServer(null);
+                        // This will open the deposit dialog when Top Up Balance is clicked
+                        window.dispatchEvent(new CustomEvent('openDepositDialog'));
+                      }}
+                      className="w-full bg-purple-600 hover:bg-purple-700 h-12 text-base font-medium rounded-2xl"
+                    >
+                      Top Up Balance
+                    </Button>
+                  )}
                 </div>
               </Card>
             </div>

@@ -92,51 +92,51 @@ const CurrencyExchange = ({
         {/* Unified Header */}
         {onBack && <UnifiedBackButton onBack={onBack} title="تبديل العملات" />}
 
-        <div className="px-3 space-y-4">
-          {/* Price Indicator Box - Enhanced Blue Design */}
-          <Card className="bg-gradient-to-r from-blue-600/90 to-blue-700/90 backdrop-blur-xl border-blue-500/30 rounded-2xl p-5">
+        <div className="px-3 space-y-3 max-w-md mx-auto">
+          {/* Price Indicator Box - Black Background with Yellow Signals */}
+          <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl p-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center">
-                  <span className="text-white text-lg font-bold">S</span>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
+                  <span className="text-black text-sm font-bold">S</span>
                 </div>
                 <div>
-                  <div className="text-xl font-bold text-white">$SPACE</div>
-                  <div className="text-base text-blue-100">
+                  <div className="text-lg font-bold text-white">$SPACE</div>
+                  <div className="text-sm text-gray-300">
                     ${spacePrice.toFixed(6)}
                   </div>
                 </div>
               </div>
               <div className="text-right">
-                <div className={`flex items-center gap-2 text-base font-medium ${priceChange24h > 0 ? 'text-blue-100' : 'text-blue-200'}`}>
+                <div className={`flex items-center gap-2 text-sm font-medium`}>
                   {priceChange24h > 0 ? 
-                    <TrendingUp className="h-5 w-5 text-blue-100" /> : 
-                    <TrendingDown className="h-5 w-5 text-blue-200" />
+                    <TrendingUp className="h-4 w-4 text-yellow-500" /> : 
+                    <TrendingDown className="h-4 w-4 text-yellow-500" />
                   }
-                  <span className="text-white">
+                  <span className="text-yellow-500">
                     {priceChange24h > 0 ? '+' : ''}{priceChange24h}%
                   </span>
                 </div>
-                <div className="text-sm text-blue-300 mt-1">24h</div>
+                <div className="text-xs text-gray-400 mt-1">24h</div>
               </div>
             </div>
           </Card>
 
-          {/* Chart - Enhanced Blue Theme */}
-          <Card className="bg-gradient-to-r from-blue-600/90 to-blue-700/90 backdrop-blur-xl border-blue-500/30 rounded-2xl h-48 p-3">
+          {/* Chart - Black Background */}
+          <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl h-40 p-3">
             <CryptoChart currentPrice={spacePrice} />
           </Card>
 
           {/* Balance Card */}
-          <Card className="bg-white/10 backdrop-blur-xl border-white/20 rounded-2xl p-4">
-            <div className="flex items-center justify-between mb-3">
+          <Card className="bg-white/10 backdrop-blur-xl border-white/20 rounded-2xl p-3">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-purple-500 rounded-full"></div>
+                <div className="w-8 h-8 bg-purple-500 rounded-full"></div>
                 <div>
-                  <div className="text-xl font-bold text-white">
+                  <div className="text-lg font-bold text-white">
                     {(isSwapDirection ? userBalance.space : userBalance.ton).toFixed(4)} {isSwapDirection ? '$SPACE' : 'TON'}
                   </div>
-                  <div className="text-blue-200 text-sm">رصيدك</div>
+                  <div className="text-blue-200 text-xs">رصيدك</div>
                 </div>
               </div>
               <Button
@@ -144,49 +144,49 @@ const CurrencyExchange = ({
                 size="sm"
                 className="text-green-400 hover:bg-white/10"
               >
-                <TrendingUp className="h-4 w-4" />
+                <TrendingUp className="h-3 w-3" />
               </Button>
             </div>
 
-            <hr className="border-white/20 mb-3" />
+            <hr className="border-white/20 mb-2" />
 
             <div className="space-y-1">
-              <div className="text-blue-200 text-sm">
+              <div className="text-blue-200 text-xs">
                 سعر {isSwapDirection ? '$SPACE' : 'TON'}
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-lg font-bold text-white">
+                <span className="text-sm font-bold text-white">
                   {isSwapDirection 
                     ? `${exchangeRate.toFixed(8)} TON` 
                     : `${(1/exchangeRate).toFixed(2)} SPACE`
                   }
                 </span>
-                <span className="text-green-400 text-sm">+ {priceChange24h}%</span>
+                <span className="text-green-400 text-xs">+ {priceChange24h}%</span>
               </div>
             </div>
           </Card>
 
           {/* Swap Section */}
-          <div className="space-y-4 mb-6">
-            <h2 className="text-lg font-semibold text-blue-100">
+          <div className="space-y-3 mb-4">
+            <h2 className="text-base font-semibold text-blue-100">
               تبديل {isSwapDirection ? '$SPACE' : 'TON'} إلى {isSwapDirection ? 'TON' : '$SPACE'}
             </h2>
 
             {/* Give Input */}
             <div className="relative">
-              <div className="bg-white/10 backdrop-blur-xl rounded-xl p-4 border border-white/20">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-blue-200 text-sm">إعطاء</span>
+              <div className="bg-white/10 backdrop-blur-xl rounded-xl p-3 border border-white/20">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-blue-200 text-xs">إعطاء</span>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <Input
                     type="number"
                     value={giveAmount}
                     onChange={(e) => setGiveAmount(e.target.value)}
                     placeholder="0"
-                    className="bg-transparent border-none text-xl font-bold p-0 h-auto focus-visible:ring-0 text-white"
+                    className="bg-transparent border-none text-lg font-bold p-0 h-auto focus-visible:ring-0 text-white"
                   />
-                  <span className="text-blue-200 font-medium text-lg">
+                  <span className="text-blue-200 font-medium text-sm">
                     {isSwapDirection ? '$SPACE' : 'TON'}
                   </span>
                 </div>
@@ -199,23 +199,23 @@ const CurrencyExchange = ({
                 onClick={switchDirection}
                 variant="ghost"
                 size="sm"
-                className="rounded-full bg-white/10 hover:bg-white/20 w-10 h-10 p-0 backdrop-blur-sm"
+                className="rounded-full bg-white/10 hover:bg-white/20 w-8 h-8 p-0 backdrop-blur-sm"
               >
-                <ArrowDownUp className="h-4 w-4 text-white" />
+                <ArrowDownUp className="h-3 w-3 text-white" />
               </Button>
             </div>
 
             {/* Receive Input */}
             <div className="relative">
-              <div className="bg-white/10 backdrop-blur-xl rounded-xl p-4 border border-white/20">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-blue-200 text-sm">استلام</span>
+              <div className="bg-white/10 backdrop-blur-xl rounded-xl p-3 border border-white/20">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-blue-200 text-xs">استلام</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-xl font-bold flex-1 text-white">
+                <div className="flex items-center gap-2">
+                  <div className="text-lg font-bold flex-1 text-white">
                     {giveAmount ? calculateReceiveAmount().toFixed(6) : '0'}
                   </div>
-                  <span className="text-blue-200 font-medium text-lg">
+                  <span className="text-blue-200 font-medium text-sm">
                     {isSwapDirection ? 'TON' : '$SPACE'}
                   </span>
                 </div>
@@ -226,7 +226,7 @@ const CurrencyExchange = ({
           {/* Swap Button */}
           <Button 
             onClick={handleSwap}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 h-14 text-lg font-medium rounded-2xl shadow-lg"
+            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 h-12 text-base font-medium rounded-2xl shadow-lg"
             disabled={!giveAmount || parseFloat(giveAmount) <= 0}
           >
             تبديل

@@ -143,10 +143,14 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
             <div className="ml-2">
               <Button
                 size="sm"
-                onClick={handleTaskAction}
+                onClick={() => {
+                  if (task.url) {
+                    window.open(task.url, '_blank');
+                  }
+                }}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-xs px-3 py-1 h-7"
               >
-                {showUrl ? "Go" : "Complete"}
+                Go
               </Button>
             </div>
           </div>

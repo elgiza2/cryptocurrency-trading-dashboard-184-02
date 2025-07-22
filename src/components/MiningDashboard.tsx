@@ -148,22 +148,22 @@ const MiningDashboard = ({
           </div>
         </Card>
 
-        {/* User Balance - Compact Design */}
-        <Card className="bg-white/10 backdrop-blur-xl border-white/20 p-3 rounded-xl">
+        {/* User Balance - Black Design */}
+        <Card className="bg-black backdrop-blur-xl border-white/20 p-3 rounded-xl">
           <div className="flex items-center justify-between">
             <div 
               className="flex-1 cursor-pointer hover:bg-white/10 rounded-lg p-2 transition-colors"
               onClick={handleSpaceBalanceClick}
             >
-              <div className="text-lg font-bold text-foreground">{userBalance.space.toFixed(4)}</div>
-              <div className="text-xs text-muted-foreground flex items-center gap-1">
+              <div className="text-lg font-bold text-white">{userBalance.space.toFixed(4)}</div>
+              <div className="text-xs text-gray-300">
                 $SPACE balance
               </div>
             </div>
             <ChevronRight className="h-4 w-4 text-blue-300 mx-2" />
             <div className="flex-1 text-right">
-              <div className="text-lg font-bold text-blue-100">{userBalance.ton.toFixed(4)}</div>
-              <div className="text-xs text-blue-200 flex items-center justify-end gap-1">
+              <div className="text-lg font-bold text-white">{userBalance.ton.toFixed(4)}</div>
+              <div className="text-xs text-gray-300">
                 TON balance
               </div>
             </div>
@@ -203,10 +203,10 @@ const MiningDashboard = ({
           </div>
         </Card>
 
-        {/* Your Servers - Compact Design */}
+        {/* Your Servers - Black Design */}
         <div>
           <h3 className="text-lg font-semibold mb-3 text-blue-100">Your Servers</h3>
-          <Card className="bg-white/10 backdrop-blur-xl border-white/20 rounded-2xl">
+          <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl">
             <div className="p-3">
               {userServers.length > 0 ? (
                 <div className="space-y-3 mb-3">
@@ -245,14 +245,9 @@ const MiningDashboard = ({
               
               <div className="flex gap-2">
                 <Button 
-                  onClick={handleTopUpBalance}
-                  className="flex-1 bg-primary hover:bg-primary/90 h-12 text-base rounded-2xl font-medium"
-                >
-                  Top Up Balance
-                </Button>
-                <Button 
                   onClick={handleRentServer}
-                  className="flex-1 bg-purple-600 hover:bg-purple-700 h-12 text-base rounded-2xl font-medium"
+                  className="w-full bg-transparent hover:bg-white/10 border-0 h-12 text-base rounded-2xl font-medium text-white"
+                  variant="outline"
                 >
                   Rent Server
                 </Button>
