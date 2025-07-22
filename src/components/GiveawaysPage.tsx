@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, Trophy, ArrowRight, Home, Settings } from 'lucide-react';
+import { Calendar, Clock, Users, Trophy, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import MobileNav from '@/components/MobileNav';
 
 interface Giveaway {
   id: string;
@@ -224,7 +225,7 @@ const GiveawaysPage = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-center mb-4 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-          🎁 Giveaways & Prizes
+          Giveaways & Prizes
         </h1>
         <p className="text-center text-muted-foreground max-w-2xl mx-auto">
           Join giveaways and win valuable prizes! Each giveaway has different rewards and limited participation time
@@ -270,21 +271,21 @@ const GiveawaysPage = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Bottom Navigation Buttons */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm border-t border-border p-4">
-        <div className="container mx-auto flex justify-center gap-4">
-          <Button variant="outline" size="lg" className="flex-1 max-w-32">
-            <Home className="w-4 h-4 mr-2" />
-            Home
-          </Button>
-          <Button variant="outline" size="lg" className="flex-1 max-w-32">
-            <Settings className="w-4 h-4 mr-2" />
-            Settings
-          </Button>
-        </div>
-      </div>
+      {/* Mobile Navigation */}
+      <MobileNav 
+        activeTab="giveaways" 
+        onTabChange={(tab) => {
+          // Handle navigation to other pages
+          if (tab === 'home') window.location.hash = '';
+          else if (tab === 'referral') window.location.hash = 'referral';
+          else if (tab === 'roulette') window.location.hash = 'roulette';
+          else if (tab === 'missions') window.location.hash = 'missions';
+          else if (tab === 'nft') window.location.hash = 'nft';
+          else if (tab === 'wallet') window.location.hash = 'wallet';
+        }}
+      />
       
-      {/* Bottom spacing for fixed navigation */}
+      {/* Bottom spacing for mobile navigation */}
       <div className="h-20"></div>
     </div>
   );
