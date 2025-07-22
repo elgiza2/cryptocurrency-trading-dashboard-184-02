@@ -126,31 +126,31 @@ const CurrencyExchange = ({
         {onBack && <UnifiedBackButton onBack={onBack} title="Currency Exchange" />}
 
         <div className="px-3 space-y-3 max-w-md mx-auto">
-          {/* Price Indicator Box - Larger to contain signals */}
-          <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl p-6">
+          {/* Price Indicator Box - Larger and more proportional */}
+          <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl p-8">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-14 h-14 rounded-full flex items-center justify-center overflow-hidden">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden">
                   <img src={spaceLogoUrl} alt="$SPACE" className="w-full h-full object-cover" />
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-white">$SPACE</div>
-                  <div className="text-sm text-gray-300">
+                  <div className="text-xl font-bold text-white">$SPACE</div>
+                  <div className="text-base text-gray-300">
                     ${loading ? '0.000000' : spacePrice.toFixed(6)}
                   </div>
                 </div>
               </div>
-              <div className="text-right min-w-[100px]">
-                <div className={`flex items-center gap-2 text-sm font-medium justify-end`}>
+              <div className="text-right min-w-[120px]">
+                <div className={`flex items-center gap-2 text-base font-medium justify-end`}>
                   {priceChange24h > 0 ? 
-                    <TrendingUp className="h-4 w-4 text-yellow-500" /> : 
-                    <TrendingDown className="h-4 w-4 text-yellow-500" />
+                    <TrendingUp className="h-5 w-5 text-yellow-500" /> : 
+                    <TrendingDown className="h-5 w-5 text-yellow-500" />
                   }
                   <span className="text-yellow-500">
                     {priceChange24h > 0 ? '+' : ''}{priceChange24h.toFixed(2)}%
                   </span>
                 </div>
-                <div className="text-xs text-gray-400 mt-1">24h</div>
+                <div className="text-sm text-gray-400 mt-1">24h</div>
               </div>
             </div>
           </Card>
