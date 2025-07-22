@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, Trophy, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, Users, Trophy, ArrowRight, Home, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -41,10 +41,10 @@ const GiveawaysPage = () => {
     try {
       setLoading(true);
       
-      // تحديث الأحداث المنتهية أولاً
+      // Update expired giveaways first
       await supabase.rpc('finish_expired_giveaways');
       
-      // جلب الأحداث النشطة
+      // Fetch active giveaways
       const { data: active, error: activeError } = await supabase
         .from('giveaways')
         .select('*')
@@ -54,7 +54,7 @@ const GiveawaysPage = () => {
 
       if (activeError) throw activeError;
 
-      // جلب الأحداث المنتهية
+      // Fetch finished giveaways
       const { data: finished, error: finishedError } = await supabase
         .from('giveaways')
         .select('*')
@@ -69,8 +69,8 @@ const GiveawaysPage = () => {
     } catch (error) {
       console.error('Error loading giveaways:', error);
       toast({
-        title: "خطأ",
-        description: "فشل في تحميل المسابقات",
+        title: "Error",
+        description: "Failed to load giveaways",
         variant: "destructive"
       });
     } finally {
@@ -80,29 +80,29 @@ const GiveawaysPage = () => {
 
   const joinGiveaway = async (giveaway: Giveaway) => {
     try {
-      // هنا يجب إضافة منطق الدفع بـ TON
+      // TON payment logic should be added here
       const { data, error } = await supabase
         .from('giveaway_participants')
         .insert({
           giveaway_id: giveaway.id,
-          user_id: 'demo_user', // يجب استبدال هذا بمعرف المستخدم الحقيقي
+          user_id: 'demo_user', // Should be replaced with actual user ID
           entry_fee_paid: giveaway.entry_fee_ton
         });
 
       if (error) throw error;
 
       toast({
-        title: "تم بنجاح!",
-        description: `تم انضمامك لمسابقة ${giveaway.title}`,
+        title: "Success!",
+        description: `You joined ${giveaway.title} giveaway`,
         variant: "default"
       });
 
-      loadGiveaways(); // إعادة تحميل البيانات
+      loadGiveaways(); // Reload data
     } catch (error: any) {
       console.error('Error joining giveaway:', error);
       toast({
-        title: "خطأ",
-        description: error.message || "فشل في الانضمام للمسابقة",
+        title: "Error",
+        description: error.message || "Failed to join giveaway",
         variant: "destructive"
       });
     }
@@ -113,15 +113,15 @@ const GiveawaysPage = () => {
     const end = new Date(endTime);
     const diff = end.getTime() - now.getTime();
 
-    if (diff <= 0) return "انتهت";
+    if (diff <= 0) return "Ended";
 
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
-    if (days > 0) return `${days} يوم و ${hours} ساعة`;
-    if (hours > 0) return `${hours} ساعة و ${minutes} دقيقة`;
-    return `${minutes} دقيقة`;
+    if (days > 0) return `${days}d ${hours}h`;
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
   };
 
   const GiveawayCard = ({ giveaway, isFinished = false }: { giveaway: Giveaway; isFinished?: boolean }) => (
@@ -130,7 +130,7 @@ const GiveawaysPage = () => {
         <div className="flex items-start justify-between">
           <CardTitle className="text-lg font-bold text-primary">{giveaway.title}</CardTitle>
           <Badge variant={isFinished ? "secondary" : "default"} className="shrink-0">
-            {isFinished ? "انتهت" : "نشطة"}
+            {isFinished ? "Ended" : "Active"}
           </Badge>
         </div>
         {giveaway.description && (
@@ -153,7 +153,7 @@ const GiveawaysPage = () => {
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-1 text-muted-foreground">
               <Users className="w-4 h-4" />
-              <span>المشاركين</span>
+              <span>Participants</span>
             </div>
             <span className="font-medium">{giveaway.current_participants}/{giveaway.max_participants}</span>
           </div>
@@ -161,7 +161,7 @@ const GiveawaysPage = () => {
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-1 text-muted-foreground">
               <Clock className="w-4 h-4" />
-              <span>الوقت المتبقي</span>
+              <span>Time Left</span>
             </div>
             <span className="font-medium">{formatTimeRemaining(giveaway.end_time)}</span>
           </div>
@@ -169,7 +169,7 @@ const GiveawaysPage = () => {
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-1 text-muted-foreground">
               <Calendar className="w-4 h-4" />
-              <span>رسوم الانضمام</span>
+              <span>Entry Fee</span>
             </div>
             <span className="font-bold text-primary">{giveaway.entry_fee_ton} TON</span>
           </div>
@@ -193,14 +193,14 @@ const GiveawaysPage = () => {
             className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
             size="lg"
           >
-            <span>انضم للمسابقة</span>
+            <span>Join Giveaway</span>
             <ArrowRight className="w-4 h-4 mr-2" />
           </Button>
         )}
 
         {!isFinished && giveaway.current_participants >= giveaway.max_participants && (
           <Button disabled className="w-full" size="lg">
-            امتلأت المسابقة
+            Giveaway Full
           </Button>
         )}
       </CardContent>
@@ -213,7 +213,7 @@ const GiveawaysPage = () => {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">جاري تحميل المسابقات...</p>
+            <p className="text-muted-foreground">Loading giveaways...</p>
           </div>
         </div>
       </div>
@@ -224,25 +224,25 @@ const GiveawaysPage = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-center mb-4 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-          🎁 المسابقات والجوائز
+          🎁 Giveaways & Prizes
         </h1>
         <p className="text-center text-muted-foreground max-w-2xl mx-auto">
-          شارك في المسابقات واربح جوائز قيمة! كل مسابقة لها جائزة مختلفة ووقت محدد للمشاركة
+          Join giveaways and win valuable prizes! Each giveaway has different rewards and limited participation time
         </p>
       </div>
 
       <Tabs defaultValue="active" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
-          <TabsTrigger value="active">المسابقات النشطة ({activeGiveaways.length})</TabsTrigger>
-          <TabsTrigger value="finished">المسابقات المنتهية ({finishedGiveaways.length})</TabsTrigger>
+          <TabsTrigger value="active">Active Giveaways ({activeGiveaways.length})</TabsTrigger>
+          <TabsTrigger value="finished">Finished Giveaways ({finishedGiveaways.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="active" className="space-y-6">
           {activeGiveaways.length === 0 ? (
             <div className="text-center py-12">
               <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">لا توجد مسابقات نشطة حالياً</h3>
-              <p className="text-muted-foreground">تابعنا للحصول على إشعارات حول المسابقات الجديدة</p>
+              <h3 className="text-xl font-semibold mb-2">No Active Giveaways</h3>
+              <p className="text-muted-foreground">Follow us to get notifications about new giveaways</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -257,8 +257,8 @@ const GiveawaysPage = () => {
           {finishedGiveaways.length === 0 ? (
             <div className="text-center py-12">
               <Calendar className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">لا توجد مسابقات منتهية</h3>
-              <p className="text-muted-foreground">ستظهر هنا المسابقات التي انتهت مؤخراً</p>
+              <h3 className="text-xl font-semibold mb-2">No Finished Giveaways</h3>
+              <p className="text-muted-foreground">Recently finished giveaways will appear here</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -269,6 +269,23 @@ const GiveawaysPage = () => {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Bottom Navigation Buttons */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm border-t border-border p-4">
+        <div className="container mx-auto flex justify-center gap-4">
+          <Button variant="outline" size="lg" className="flex-1 max-w-32">
+            <Home className="w-4 h-4 mr-2" />
+            Home
+          </Button>
+          <Button variant="outline" size="lg" className="flex-1 max-w-32">
+            <Settings className="w-4 h-4 mr-2" />
+            Settings
+          </Button>
+        </div>
+      </div>
+      
+      {/* Bottom spacing for fixed navigation */}
+      <div className="h-20"></div>
     </div>
   );
 };

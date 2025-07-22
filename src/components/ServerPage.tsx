@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import AboutServersPage from "./AboutServersPage";
 import UnifiedBackButton from "./UnifiedBackButton";
+import { EnhancedDepositDialog } from "./EnhancedDepositDialog";
 
 interface ServerPageProps {
   onBack?: () => void;
@@ -27,6 +28,7 @@ const ServerPage = ({
 }: ServerPageProps) => {
   const [selectedServer, setSelectedServer] = useState<any>(null);
   const [showAboutServers, setShowAboutServers] = useState(false);
+  const [showDepositDialog, setShowDepositDialog] = useState(false);
   const [tonConnectUI] = useTonConnectUI();
   const { toast } = useToast();
 
@@ -323,8 +325,7 @@ const ServerPage = ({
                     <Button 
                       onClick={() => {
                         setSelectedServer(null);
-                        // This will open the deposit dialog when Top Up Balance is clicked
-                        window.dispatchEvent(new CustomEvent('openDepositDialog'));
+                        setShowDepositDialog(true);
                       }}
                       className="w-full bg-purple-600 hover:bg-purple-700 h-12 text-base font-medium rounded-2xl"
                     >
@@ -339,6 +340,21 @@ const ServerPage = ({
           <div className="h-20"></div>
         </div>
       </div>
+
+      {/* Deposit Dialog */}
+      <EnhancedDepositDialog 
+        isOpen={showDepositDialog}
+        onClose={() => setShowDepositDialog(false)}
+        onDeposit={async (amount) => {
+          toast({
+            title: "Deposit Successful",
+            description: `${amount} TON deposited successfully`,
+            className: "bg-green-900 border-green-700 text-green-100"
+          });
+          setShowDepositDialog(false);
+        }}
+        isProcessing={false}
+      />
     </ScrollArea>
   );
 };
