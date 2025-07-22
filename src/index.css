@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -54,6 +53,10 @@
     --glow-secondary: 0 0 25px hsl(185 85% 60% / 0.4);
     --glow-accent: 0 0 25px hsl(45 95% 60% / 0.6);
     --glow-success: 0 0 25px hsl(142 76% 55% / 0.5);
+    
+    /* Telegram Mini App Safe Area */
+    --telegram-safe-area-top: env(safe-area-inset-top, 0px);
+    --telegram-viewport-height: 100vh;
   }
   
   * {
@@ -75,12 +78,15 @@
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     touch-action: pan-y;
+    
+    /* Support for iOS safe area */
+    padding-top: env(safe-area-inset-top);
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-    height: 100vh;
+    height: var(--telegram-viewport-height);
     background: hsl(var(--background));
     color: hsl(var(--foreground));
     
@@ -92,7 +98,21 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    
+    /* Safe area support */
+    padding-top: var(--telegram-safe-area-top);
   }
+}
+
+/* Telegram Mini App Full Screen Support */
+.telegram-safe-area {
+  padding-top: var(--telegram-safe-area-top);
+  transition: padding-top 0.3s ease;
+}
+
+.telegram-full-height {
+  height: var(--telegram-viewport-height);
+  min-height: var(--telegram-viewport-height);
 }
 
 /* Animated Background */

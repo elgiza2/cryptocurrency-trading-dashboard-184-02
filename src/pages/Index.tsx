@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import MobileNav from "@/components/MobileNav";
 import MiningDashboard from "@/components/MiningDashboard";
@@ -15,6 +14,7 @@ import RoulettePage from "@/components/RoulettePage";
 import CurrencyExchange from "@/components/CurrencyExchange";
 import GiveawaysPage from "@/components/GiveawaysPage";
 import CongratulationsDialog from "@/components/CongratulationsDialog";
+import { useTelegramViewport } from "@/hooks/useTelegramViewport";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
@@ -29,6 +29,9 @@ const Index = () => {
     lastRewardClaim: null,
     referralCount: 0
   });
+
+  // استخدام hook الخاص بـ Telegram viewport
+  const viewport = useTelegramViewport();
 
   // Handle URL hash navigation
   useEffect(() => {
@@ -185,7 +188,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen unified-gaming-bg relative">
+    <div className={`telegram-full-height unified-gaming-bg relative ${viewport.isExpanded ? 'telegram-safe-area' : ''}`}>
       {/* Main Content */}
       <div className={`${!shouldHideNavigation ? 'pb-20' : ''}`}>
         {renderContent()}
