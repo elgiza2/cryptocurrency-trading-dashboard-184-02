@@ -129,7 +129,7 @@ export const useTonTransactions = () => {
         const { data: userData } = await supabase
           .from('users')
           .select('total_balance')
-          .eq('id', user.data.user.id)
+          .eq('id', userId)
           .single();
 
         if (userData) {
@@ -138,16 +138,14 @@ export const useTonTransactions = () => {
             .update({
               total_balance: userData.total_balance + tokenAmount
             })
-            .eq('id', user.data.user.id);
+            .eq('id', userId);
         }
-
-        // This section is no longer needed as we'll use wallet_holdings directly
 
         // Update wallet_holdings table automatically
         const { data: existingWalletHolding } = await supabase
           .from('wallet_holdings')
           .select()
-          .eq('user_id', user.data.user.id)
+          .eq('user_id', userId)
           .eq('cryptocurrency_id', token.id)
           .single();
 
@@ -161,13 +159,11 @@ export const useTonTransactions = () => {
             .eq('id', existingWalletHolding.id);
         } else {
           await supabase.from('wallet_holdings').insert({
-            user_id: user.data.user.id,
+            user_id: userId,
             cryptocurrency_id: token.id,
             balance: tokenAmount
           });
         }
-
-        // Trading volume updates will be handled separately if needed
       }
       
       return { tokenAmount, tonAmount };

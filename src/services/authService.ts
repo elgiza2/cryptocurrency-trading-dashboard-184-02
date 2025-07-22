@@ -105,7 +105,7 @@ export class AuthService {
         return 0;
       }
 
-      return parseFloat(data.total_balance) || 0;
+      return Number(data.total_balance) || 0;
     } catch (error) {
       console.error('Error getting user balance:', error);
       return 0;
@@ -118,7 +118,7 @@ export class AuthService {
       const { error } = await supabase
         .from('users')
         .update({ 
-          total_balance: newBalance.toString(),
+          total_balance: newBalance,
           updated_at: new Date().toISOString()
         })
         .eq('id', userId);
