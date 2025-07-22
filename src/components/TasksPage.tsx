@@ -17,6 +17,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
   const [tasks, setTasks] = useState<any[]>([]);
   const [userTasks, setUserTasks] = useState<any[]>([]);
   const [telegramUser, setTelegramUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -49,6 +50,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
 
   const loadTasks = async () => {
     try {
+      setIsLoading(true);
       // Load missions from database
       const { data: missions, error } = await DatabaseService.getMissions();
       if (error) throw error;
@@ -64,6 +66,8 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
       }
     } catch (error) {
       console.error('Error loading tasks:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -176,26 +180,42 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
             </TabsList>
             
             <TabsContent value="main" className="space-y-2 mt-4">
-              {tasks.filter(task => task.mission_type === 'main' || task.mission_type === 'daily').filter(task => !completedTasks.includes(task.id)).map(task => (
-                <TaskCard key={task.id} task={task} onComplete={completeTask} />
-              ))}
-              
-              {tasks.filter(task => task.mission_type === 'main' || task.mission_type === 'daily').filter(task => !completedTasks.includes(task.id)).length === 0 && (
+              {isLoading ? (
                 <div className="text-center text-muted-foreground py-6 text-sm">
-                  All tasks completed! Check back later for new tasks.
+                  Loading tasks...
                 </div>
+              ) : (
+                <>
+                  {tasks.filter(task => task.mission_type === 'main' || task.mission_type === 'daily').filter(task => !completedTasks.includes(task.id)).map(task => (
+                    <TaskCard key={task.id} task={task} onComplete={completeTask} />
+                  ))}
+                  
+                  {tasks.filter(task => task.mission_type === 'main' || task.mission_type === 'daily').filter(task => !completedTasks.includes(task.id)).length === 0 && (
+                    <div className="text-center text-muted-foreground py-6 text-sm">
+                      All tasks completed! Check back later for new tasks.
+                    </div>
+                  )}
+                </>
               )}
             </TabsContent>
             
             <TabsContent value="social" className="space-y-2 mt-4">
-              {tasks.filter(task => task.mission_type === 'social').filter(task => !completedTasks.includes(task.id)).map(task => (
-                <TaskCard key={task.id} task={task} onComplete={completeTask} showUrl={true} />
-              ))}
-              
-              {tasks.filter(task => task.mission_type === 'social').filter(task => !completedTasks.includes(task.id)).length === 0 && (
-                <div className="text-center text-gray-400 py-6 text-sm">
-                  All tasks completed! Check back later for new tasks.
+              {isLoading ? (
+                <div className="text-center text-muted-foreground py-6 text-sm">
+                  Loading tasks...
                 </div>
+              ) : (
+                <>
+                  {tasks.filter(task => task.mission_type === 'social').filter(task => !completedTasks.includes(task.id)).map(task => (
+                    <TaskCard key={task.id} task={task} onComplete={completeTask} showUrl={true} />
+                  ))}
+                  
+                  {tasks.filter(task => task.mission_type === 'social').filter(task => !completedTasks.includes(task.id)).length === 0 && (
+                    <div className="text-center text-muted-foreground py-6 text-sm">
+                      All tasks completed! Check back later for new tasks.
+                    </div>
+                  )}
+                </>
               )}
             </TabsContent>
             
