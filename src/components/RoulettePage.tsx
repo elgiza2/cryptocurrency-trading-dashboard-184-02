@@ -38,10 +38,6 @@ const RoulettePage = ({
     return () => onHideNavigation?.(false);
   }, [onHideNavigation]);
   const gifts = [{
-    name: "Nothing",
-    image: "/nothing-icon.png",
-    price: 0
-  }, {
     name: "Plush Pepe",
     image: "https://nft.fragment.com/collection/plushpepe.webp",
     price: 4950
@@ -141,6 +137,10 @@ const RoulettePage = ({
     name: "0.0005 TON",
     image: "https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png",
     price: 0.0005
+  }, {
+    name: "Nothing",
+    image: "/nothing-icon.png",
+    price: 0
   }];
   const spinPrices = [0.25, 0.5, 1, 2.5, 5];
   const handleSpin = async (isFree = false) => {
@@ -202,8 +202,8 @@ const RoulettePage = ({
     }
     setIsSpinning(true);
     setTimeout(() => {
-      // Always give "Nothing" prize (first item in gifts array)
-      const selectedGift = gifts[0]; // "Nothing" is always at index 0
+      // Always give "Nothing" prize (last item in gifts array)
+      const selectedGift = gifts[gifts.length - 1]; // "Nothing" is now at the last index
       setIsSpinning(false);
       if (isFree) {
         setHasFreeSpins(false);
