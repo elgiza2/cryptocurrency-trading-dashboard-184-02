@@ -47,6 +47,7 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          glow: "hsl(var(--primary-glow))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -76,6 +77,13 @@ export default {
         link: {
           DEFAULT: "hsl(var(--link))",
         },
+        // Gaming colors
+        'blue-gaming': "hsl(var(--blue-gaming))",
+        'purple-gaming': "hsl(var(--purple-gaming))",
+        'pink-gaming': "hsl(var(--pink-gaming))",
+        'cyan-gaming': "hsl(var(--cyan-gaming))",
+        'green-gaming': "hsl(var(--green-gaming))",
+        'orange-gaming': "hsl(var(--orange-gaming))",
       },
       borderRadius: {
         lg: "1rem",

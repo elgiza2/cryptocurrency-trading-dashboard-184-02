@@ -5,47 +5,63 @@
 
 @layer base {
   :root {
-    /* Dark Modern Color System */
-    --background: 222 84% 5%; /* #0F172A - dark blue background */
-    --foreground: 210 40% 95%; /* #F1F5F9 - light text */
+    /* Enhanced Dark Gaming Color System - All HSL */
+    --background: 220 84% 5%; /* Deep dark blue background */
+    --foreground: 210 40% 98%; /* Pure white text */
     
-    --primary: 265 89% 58%; /* #7C3AED - purple primary */
-    --primary-foreground: 210 40% 95%; /* #F1F5F9 - light text on primary */
+    --primary: 250 95% 65%; /* Vibrant purple primary */
+    --primary-foreground: 210 40% 98%; /* Pure white on primary */
+    --primary-glow: 250 95% 75%; /* Lighter primary for glows */
     
-    --secondary: 215 28% 17%; /* #1E293B - dark gray cards */
-    --secondary-foreground: 210 40% 95%; /* #F1F5F9 - light text on secondary */
+    --secondary: 220 30% 8%; /* Very dark cards */
+    --secondary-foreground: 210 40% 95%; /* Light text on secondary */
     
-    --accent: 330 81% 60%; /* #EC4899 - pink accent */
-    --accent-foreground: 210 40% 95%; /* #F1F5F9 - light text on accent */
+    --accent: 45 95% 60%; /* Golden yellow accent */
+    --accent-foreground: 220 84% 5%; /* Dark text on accent */
     
-    --muted: 215 28% 17%;
-    --muted-foreground: 214 32% 67%;
+    --success: 142 76% 55%; /* Bright green */
+    --warning: 35 85% 55%; /* Orange warning */
+    --destructive: 0 84% 60%; /* Red destructive */
     
-    --border: 215 28% 20%;
-    --input: 215 28% 17%;
-    --ring: 265 89% 58%;
+    --muted: 220 30% 12%;
+    --muted-foreground: 220 15% 65%;
     
-    --success: 150 70% 50%;
-    --warning: 35 85% 55%;
-    --destructive: 0 70% 55%;
+    --border: 220 30% 15%;
+    --input: 220 30% 8%;
+    --ring: 250 95% 65%;
     
-    --card: 215 28% 17%; /* #1E293B - dark gray cards */
-    --card-foreground: 210 40% 95%; /* #F1F5F9 - light text on cards */
+    --card: 220 30% 8%; /* Very dark cards */
+    --card-foreground: 210 40% 98%; /* Pure white text on cards */
+    
+    /* Gaming colors */
+    --blue-gaming: 215 95% 60%;
+    --purple-gaming: 270 95% 65%;
+    --pink-gaming: 320 85% 65%;
+    --cyan-gaming: 185 85% 60%;
+    --green-gaming: 142 76% 55%;
+    --orange-gaming: 25 95% 60%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(250 95% 65%), hsl(270 95% 65%));
+    --gradient-secondary: linear-gradient(135deg, hsl(185 85% 60%), hsl(215 95% 60%));
+    --gradient-accent: linear-gradient(135deg, hsl(320 85% 65%), hsl(45 95% 60%));
     
     /* Link color */
-    --link: 262 83% 78%; /* #A78BFA - purple links */
+    --link: 250 85% 78%; /* Purple links */
     
-    /* Glow effects */
-    --glow-primary: 0 0 25px hsl(265 89% 58% / 0.4);
-    --glow-secondary: 0 0 25px hsl(215 28% 17% / 0.3);
-    --glow-accent: 0 0 25px hsl(330 81% 60% / 0.4);
+    /* Enhanced glow effects */
+    --glow-primary: 0 0 30px hsl(250 95% 65% / 0.5);
+    --glow-secondary: 0 0 25px hsl(185 85% 60% / 0.4);
+    --glow-accent: 0 0 25px hsl(45 95% 60% / 0.6);
+    --glow-success: 0 0 25px hsl(142 76% 55% / 0.5);
   }
   
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
     height: 100vh;
-    background-color: #0F172A;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 }
 
@@ -75,15 +91,17 @@
   box-shadow: var(--glow-accent);
 }
 
-/* Primary Button Styles */
+/* Enhanced Gaming Button Styles */
 .btn-gaming {
   @apply bg-primary text-primary-foreground font-semibold rounded-2xl transition-all duration-300;
-  background-color: #7C3AED;
+  background: var(--gradient-primary);
+  box-shadow: var(--glow-primary);
 }
 
 .btn-gaming:hover {
-  background-color: #6D28D9;
-  transform: translateY(-1px);
+  background: hsl(var(--primary-glow));
+  transform: translateY(-2px);
+  box-shadow: 0 0 40px hsl(var(--primary) / 0.7);
 }
 
 .btn-gaming.active {
@@ -92,33 +110,37 @@
 
 .btn-secondary {
   @apply bg-accent text-accent-foreground font-semibold rounded-2xl transition-all duration-300;
-  background-color: #EC4899;
+  background: var(--gradient-secondary);
+  box-shadow: var(--glow-secondary);
 }
 
 .btn-secondary:hover {
-  background-color: #DB2777;
-  transform: translateY(-1px);
+  background: hsl(var(--cyan-gaming));
+  transform: translateY(-2px);
+  box-shadow: 0 0 40px hsl(var(--cyan-gaming) / 0.7);
 }
 
-/* Card Styles */
+/* Enhanced Card Styles */
 .glass-card {
-  @apply backdrop-blur-sm border shadow-lg;
-  background-color: #1E293B;
+  @apply backdrop-blur-xl border shadow-2xl;
+  background: hsl(var(--card) / 0.95);
   border: 1px solid hsl(var(--border));
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 8px 32px hsl(var(--background) / 0.8);
 }
 
-/* Roulette Button Special */
+/* Enhanced Roulette Button */
 .btn-roulette {
-  @apply bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white font-bold rounded-full transition-all duration-300;
-  box-shadow: 0 0 25px hsl(320 85% 60% / 0.5);
+  @apply text-white font-bold rounded-full transition-all duration-300;
+  background: var(--gradient-accent);
+  box-shadow: var(--glow-accent);
   background-size: 200% 200%;
   animation: roulette-gradient 3s ease infinite;
 }
 
 .btn-roulette:hover {
-  box-shadow: 0 0 35px hsl(320 85% 60% / 0.7);
+  box-shadow: 0 0 50px hsl(var(--accent) / 0.8);
   transform: scale(1.05);
 }
 
@@ -139,13 +161,13 @@
   @apply h-[300px] w-full;
 }
 
-/* Gaming Animation */
+/* Enhanced Gaming Animation */
 @keyframes gaming-pulse {
   0%, 100% {
-    box-shadow: 0 0 20px hsl(320 85% 60% / 0.4);
+    box-shadow: 0 0 25px hsl(var(--primary) / 0.5);
   }
   50% {
-    box-shadow: 0 0 40px hsl(320 85% 60% / 0.8);
+    box-shadow: 0 0 50px hsl(var(--primary) / 0.9);
   }
 }
 
@@ -173,14 +195,17 @@
   @apply glass-card p-4 rounded-3xl transition-all duration-300 hover:scale-105;
 }
 
-/* Token Card Styles */
+/* Enhanced Token Card Styles */
 .token-card {
-  @apply glass-card p-4 rounded-2xl transition-all duration-300;
+  @apply glass-card p-6 rounded-3xl transition-all duration-300;
+  background: hsl(var(--card) / 0.8);
+  border: 2px solid hsl(var(--border));
 }
 
 .token-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 32px hsl(var(--primary) / 0.3);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px hsl(var(--primary) / 0.4);
+  border-color: hsl(var(--primary) / 0.6);
 }
 
 /* Progress Bar */
@@ -188,19 +213,26 @@
   @apply w-full bg-muted rounded-full h-3 overflow-hidden;
 }
 
+/* Enhanced Progress Bar */
 .progress-gaming-fill {
-  @apply h-full bg-gradient-to-r from-primary via-secondary to-accent transition-all duration-1000 ease-out;
-  box-shadow: 0 0 15px hsl(320 85% 60% / 0.6);
+  @apply h-full transition-all duration-1000 ease-out;
+  background: var(--gradient-primary);
+  box-shadow: var(--glow-primary);
 }
 
-/* Unified Gaming Background */
+/* Enhanced Unified Gaming Background */
 .unified-gaming-bg {
   background: linear-gradient(-45deg, 
-    hsl(220 80% 20%), 
-    hsl(230 70% 15%), 
-    hsl(240 80% 10%), 
-    hsl(0 0% 0%)
+    hsl(var(--background)), 
+    hsl(220 50% 8%), 
+    hsl(250 40% 10%), 
+    hsl(270 30% 8%)
   );
   background-size: 400% 400%;
-  animation: gradientShift 8s ease infinite;
+  animation: gradientShift 12s ease infinite;
+}
+
+/* Black Background Class for specific elements */
+.unified-black-bg {
+  background: hsl(220 84% 3%);
 }
