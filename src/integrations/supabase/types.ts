@@ -106,6 +106,101 @@ export type Database = {
         }
         Relationships: []
       }
+      giveaway_participants: {
+        Row: {
+          created_at: string | null
+          entry_fee_paid: number
+          giveaway_id: string
+          id: string
+          joined_at: string | null
+          ton_tx_hash: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          entry_fee_paid: number
+          giveaway_id: string
+          id?: string
+          joined_at?: string | null
+          ton_tx_hash?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          entry_fee_paid?: number
+          giveaway_id?: string
+          id?: string
+          joined_at?: string | null
+          ton_tx_hash?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "giveaway_participants_giveaway_id_fkey"
+            columns: ["giveaway_id"]
+            isOneToOne: false
+            referencedRelation: "giveaways"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      giveaways: {
+        Row: {
+          created_at: string | null
+          current_participants: number | null
+          description: string | null
+          end_time: string
+          entry_fee_ton: number
+          id: string
+          is_active: boolean | null
+          is_finished: boolean | null
+          max_participants: number | null
+          prize_image_url: string
+          prize_value_ton: number
+          start_time: string
+          title: string
+          total_pool_ton: number | null
+          updated_at: string | null
+          winner_user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_participants?: number | null
+          description?: string | null
+          end_time: string
+          entry_fee_ton: number
+          id?: string
+          is_active?: boolean | null
+          is_finished?: boolean | null
+          max_participants?: number | null
+          prize_image_url: string
+          prize_value_ton: number
+          start_time?: string
+          title: string
+          total_pool_ton?: number | null
+          updated_at?: string | null
+          winner_user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_participants?: number | null
+          description?: string | null
+          end_time?: string
+          entry_fee_ton?: number
+          id?: string
+          is_active?: boolean | null
+          is_finished?: boolean | null
+          max_participants?: number | null
+          prize_image_url?: string
+          prize_value_ton?: number
+          start_time?: string
+          title?: string
+          total_pool_ton?: number | null
+          updated_at?: string | null
+          winner_user_id?: string | null
+        }
+        Relationships: []
+      }
       mining_sessions: {
         Row: {
           created_at: string | null
@@ -561,7 +656,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      finish_expired_giveaways: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
