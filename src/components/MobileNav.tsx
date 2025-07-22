@@ -1,5 +1,5 @@
 
-import { Home, UserPlus, Zap, Gamepad2, Gift } from "lucide-react";
+import { Home, Users, Zap, Gamepad2, Gift, UserPlus, Trophy, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface MobileNavProps {
@@ -21,18 +21,18 @@ const MobileNav = ({
     },
     {
       id: 'referral',
-      icon: UserPlus,
+      icon: Users,
       label: 'Friends'
     },
     {
       id: 'roulette',
-      icon: Gamepad2,
+      icon: Target,
       label: 'Roulette',
       special: true
     },
     {
       id: 'missions',
-      icon: Zap,
+      icon: Trophy,
       label: 'Tasks'
     },
     {
@@ -77,7 +77,7 @@ const MobileNav = ({
             onClick={() => onTabChange('roulette')}
           >
             <div className="h-16 w-16 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 shadow-xl shadow-pink-500/50 flex items-center justify-center animate-pulse">
-              <Gamepad2 className="h-8 w-8 text-white" />
+              <Target className="h-8 w-8 text-white" />
             </div>
           </Button>
         </div>
