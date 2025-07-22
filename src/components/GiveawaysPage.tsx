@@ -146,10 +146,6 @@ const GiveawaysPage = () => {
             alt={giveaway.title}
             className="w-full h-full object-contain rounded-lg border border-primary/10"
           />
-          <div className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-            <Trophy className="w-3 h-3 inline mr-1" />
-            {giveaway.prize_value_ton} TON
-          </div>
         </div>
 
         {/* معلومات المسابقة */}
@@ -178,13 +174,6 @@ const GiveawaysPage = () => {
             <span className="font-bold text-primary">{giveaway.entry_fee_ton} TON</span>
           </div>
 
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Trophy className="w-4 h-4" />
-              <span>إجمالي الجوائز</span>
-            </div>
-            <span className="font-bold text-amber-600">{giveaway.total_pool_ton} TON</span>
-          </div>
         </div>
 
         {/* شريط التقدم */}
