@@ -38,6 +38,10 @@ const RoulettePage = ({
     return () => onHideNavigation?.(false);
   }, [onHideNavigation]);
   const gifts = [{
+    name: "Nothing",
+    image: "https://cdn-icons-png.flaticon.com/512/1828/1828843.png",
+    price: 0
+  }, {
     name: "Plush Pepe",
     image: "https://nft.fragment.com/collection/plushpepe.webp",
     price: 4950
@@ -198,14 +202,15 @@ const RoulettePage = ({
     }
     setIsSpinning(true);
     setTimeout(() => {
-      const randomGift = gifts[Math.floor(Math.random() * gifts.length)];
+      // Always give "Nothing" prize (first item in gifts array)
+      const selectedGift = gifts[0]; // "Nothing" is always at index 0
       setIsSpinning(false);
       if (isFree) {
         setHasFreeSpins(false);
       }
       toast({
         title: "Congratulations!",
-        description: `You won ${randomGift.name}!`
+        description: `You won ${selectedGift.name}!`
       });
     }, 3000);
   };
@@ -223,7 +228,7 @@ const RoulettePage = ({
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-bold mb-1 text-blue-100">Free spin</h3>
-                  <p className="text-xs text-blue-200">You need to invite 1 friends to spin for free</p>
+                  <p className="text-xs text-blue-200">You need to invite 1 friend to spin for free</p>
                 </div>
                 <ChevronRight className="h-4 w-4 text-blue-300" />
               </div>
@@ -243,8 +248,14 @@ const RoulettePage = ({
                           <img src={gift.image} alt={gift.name} className="w-full h-full object-contain" />
                         </div>
                         <div className="bg-blue-600/80 backdrop-blur-sm text-blue-100 px-2 py-1 rounded-lg text-xs flex items-center gap-1">
-                          <img src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" alt="TON" className="w-3 h-3" />
-                          <span>{gift.price}</span>
+                          {gift.name === "Nothing" ? (
+                            <span>0</span>
+                          ) : (
+                            <>
+                              <img src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" alt="TON" className="w-3 h-3" />
+                              <span>{gift.price}</span>
+                            </>
+                          )}
                         </div>
                       </div>)}
                   </div>
@@ -262,8 +273,14 @@ const RoulettePage = ({
                         <img src={gift.image} alt={gift.name} className="w-full h-full object-contain" />
                       </div>
                       <div className="bg-blue-600/80 backdrop-blur-sm text-blue-100 px-2 py-1 rounded-lg text-xs flex items-center gap-1">
-                        <img src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" alt="TON" className="w-3 h-3" />
-                        <span>{gift.price}</span>
+                        {gift.name === "Nothing" ? (
+                          <span>0</span>
+                        ) : (
+                          <>
+                            <img src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" alt="TON" className="w-3 h-3" />
+                            <span>{gift.price}</span>
+                          </>
+                        )}
                       </div>
                     </div>)}
                 </div>
