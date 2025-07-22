@@ -20,6 +20,7 @@ export default {
     },
     extend: {
       fontFamily: {
+        'poppins': ['Poppins', 'sans-serif'],
         'matrix': ['Share Tech Mono', 'monospace'],
         'cyber': ['Orbitron', 'sans-serif'],
         'neon': ['Electrolize', 'sans-serif'],
