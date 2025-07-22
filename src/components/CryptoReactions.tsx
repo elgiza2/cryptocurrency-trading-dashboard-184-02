@@ -33,19 +33,21 @@ const CryptoReactions = ({ cryptoId, userId = "anonymous_user" }: CryptoReaction
 
   const loadReactionCounts = async () => {
     try {
-      const { data, error } = await supabase.rpc('get_crypto_reaction_counts', {
-        crypto_id: cryptoId
-      });
+      const { data, error } = await supabase
+        .from('crypto_reactions')
+        .select('reaction_type')
+        .eq('cryptocurrency_id', cryptoId);
 
       if (error) throw error;
-      
-      if (data && data.length > 0) {
-        setCounts({
-          love_count: Number(data[0].love_count) || 0,
-          fire_count: Number(data[0].fire_count) || 0,
-          broken_heart_count: Number(data[0].broken_heart_count) || 0
-        });
-      }
+
+      const counts = { love_count: 0, fire_count: 0, broken_heart_count: 0 };
+      data?.forEach(reaction => {
+        if (reaction.reaction_type === 'love') counts.love_count++;
+        else if (reaction.reaction_type === 'fire') counts.fire_count++;
+        else if (reaction.reaction_type === 'broken_heart') counts.broken_heart_count++;
+      });
+
+      setCounts(counts);
     } catch (error) {
       console.error('Error loading reaction counts:', error);
     }
@@ -97,21 +99,51 @@ const CryptoReactions = ({ cryptoId, userId = "anonymous_user" }: CryptoReaction
     setLoading(true);
     
     try {
-      const { data, error } = await supabase.rpc('toggle_crypto_reaction', {
-        crypto_id: cryptoId,
-        user_identifier: userId,
-        reaction: reactionType
-      });
+      // Check if reaction exists
+      const { data: existing, error: checkError } = await supabase
+        .from('crypto_reactions')
+        .select('*')
+        .eq('cryptocurrency_id', cryptoId)
+        .eq('user_id', userId)
+        .eq('reaction_type', reactionType)
+        .maybeSingle();
 
-      if (error) throw error;
+      if (checkError) throw checkError;
 
-      const action = data ? 'added' : 'removed';
+      let action = '';
+      if (existing) {
+        // Remove reaction
+        const { error: deleteError } = await supabase
+          .from('crypto_reactions')
+          .delete()
+          .eq('id', existing.id);
+
+        if (deleteError) throw deleteError;
+        action = 'removed';
+      } else {
+        // Add reaction
+        const { error: insertError } = await supabase
+          .from('crypto_reactions')
+          .insert({
+            cryptocurrency_id: cryptoId,
+            user_id: userId,
+            reaction_type: reactionType
+          });
+
+        if (insertError) throw insertError;
+        action = 'added';
+      }
+
       const emoji = reactionType === 'love' ? '♥️' : reactionType === 'fire' ? '🔥' : '💔';
       
       toast({
         title: `Reaction ${action}`,
         description: `${emoji} reaction ${action} successfully`,
       });
+
+      // Refresh data
+      loadReactionCounts();
+      loadUserReactions();
 
     } catch (error) {
       console.error('Error toggling reaction:', error);

@@ -14,7 +14,548 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      crypto_reactions: {
+        Row: {
+          created_at: string | null
+          cryptocurrency_id: string
+          id: string
+          reaction_type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          cryptocurrency_id: string
+          id?: string
+          reaction_type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          cryptocurrency_id?: string
+          id?: string
+          reaction_type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crypto_reactions_cryptocurrency_id_fkey"
+            columns: ["cryptocurrency_id"]
+            isOneToOne: false
+            referencedRelation: "cryptocurrencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cryptocurrencies: {
+        Row: {
+          created_at: string | null
+          current_price: number | null
+          description: string | null
+          icon_url: string | null
+          id: string
+          last_trade_at: string | null
+          market_cap: number | null
+          name: string
+          price_change_24h: number | null
+          symbol: string
+          telegram_url: string | null
+          trade_count_24h: number | null
+          twitter_url: string | null
+          updated_at: string | null
+          volume_24h: number | null
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_price?: number | null
+          description?: string | null
+          icon_url?: string | null
+          id?: string
+          last_trade_at?: string | null
+          market_cap?: number | null
+          name: string
+          price_change_24h?: number | null
+          symbol: string
+          telegram_url?: string | null
+          trade_count_24h?: number | null
+          twitter_url?: string | null
+          updated_at?: string | null
+          volume_24h?: number | null
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_price?: number | null
+          description?: string | null
+          icon_url?: string | null
+          id?: string
+          last_trade_at?: string | null
+          market_cap?: number | null
+          name?: string
+          price_change_24h?: number | null
+          symbol?: string
+          telegram_url?: string | null
+          trade_count_24h?: number | null
+          twitter_url?: string | null
+          updated_at?: string | null
+          volume_24h?: number | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      mining_sessions: {
+        Row: {
+          created_at: string | null
+          duration_hours: number | null
+          end_time: string | null
+          id: string
+          is_active: boolean | null
+          is_claimed: boolean | null
+          is_completed: boolean | null
+          reward_amount: number | null
+          start_time: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          duration_hours?: number | null
+          end_time?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_claimed?: boolean | null
+          is_completed?: boolean | null
+          reward_amount?: number | null
+          start_time?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          duration_hours?: number | null
+          end_time?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_claimed?: boolean | null
+          is_completed?: boolean | null
+          reward_amount?: number | null
+          start_time?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      missions: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          is_active: boolean | null
+          mission_type: string
+          reward_amount: number
+          reward_cryptocurrency_id: string
+          title: string
+          updated_at: string | null
+          url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          is_active?: boolean | null
+          mission_type: string
+          reward_amount: number
+          reward_cryptocurrency_id: string
+          title: string
+          updated_at?: string | null
+          url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          is_active?: boolean | null
+          mission_type?: string
+          reward_amount?: number
+          reward_cryptocurrency_id?: string
+          title?: string
+          updated_at?: string | null
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "missions_reward_cryptocurrency_id_fkey"
+            columns: ["reward_cryptocurrency_id"]
+            isOneToOne: false
+            referencedRelation: "cryptocurrencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nft_collections: {
+        Row: {
+          base_price: number
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          mining_power: number | null
+          name: string
+          rarity: string | null
+          remaining_supply: number | null
+          total_supply: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          base_price: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          mining_power?: number | null
+          name: string
+          rarity?: string | null
+          remaining_supply?: number | null
+          total_supply?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          base_price?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          mining_power?: number | null
+          name?: string
+          rarity?: string | null
+          remaining_supply?: number | null
+          total_supply?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_claimed: boolean | null
+          referred_user_id: string
+          referrer_user_id: string
+          reward_amount: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_claimed?: boolean | null
+          referred_user_id: string
+          referrer_user_id: string
+          reward_amount?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_claimed?: boolean | null
+          referred_user_id?: string
+          referrer_user_id?: string
+          reward_amount?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      servers: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          duration_hours: number
+          icon_url: string | null
+          id: string
+          is_active: boolean | null
+          mining_power: number
+          name: string
+          price_ton: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          duration_hours?: number
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          mining_power?: number
+          name: string
+          price_ton: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          duration_hours?: number
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          mining_power?: number
+          name?: string
+          price_ton?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          cryptocurrency_id: string
+          id: string
+          price_usd: number | null
+          status: string | null
+          ton_tx_hash: string | null
+          total_usd: number | null
+          transaction_type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          cryptocurrency_id: string
+          id?: string
+          price_usd?: number | null
+          status?: string | null
+          ton_tx_hash?: string | null
+          total_usd?: number | null
+          transaction_type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          cryptocurrency_id?: string
+          id?: string
+          price_usd?: number | null
+          status?: string | null
+          ton_tx_hash?: string | null
+          total_usd?: number | null
+          transaction_type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_cryptocurrency_id_fkey"
+            columns: ["cryptocurrency_id"]
+            isOneToOne: false
+            referencedRelation: "cryptocurrencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_missions: {
+        Row: {
+          completed_at: string | null
+          id: string
+          mission_id: string
+          reward_claimed: boolean | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          mission_id: string
+          reward_claimed?: boolean | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          mission_id?: string
+          reward_claimed?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_missions_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_nfts: {
+        Row: {
+          created_at: string | null
+          id: string
+          mining_power: number | null
+          nft_id: string
+          purchase_price: number
+          purchased_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          mining_power?: number | null
+          nft_id: string
+          purchase_price: number
+          purchased_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          mining_power?: number | null
+          nft_id?: string
+          purchase_price?: number
+          purchased_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_nfts_nft_id_fkey"
+            columns: ["nft_id"]
+            isOneToOne: false
+            referencedRelation: "nft_collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_servers: {
+        Row: {
+          created_at: string | null
+          end_time: string | null
+          id: string
+          is_active: boolean | null
+          mining_power: number
+          purchase_price: number
+          server_id: string
+          start_time: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          end_time?: string | null
+          id?: string
+          is_active?: boolean | null
+          mining_power: number
+          purchase_price: number
+          server_id: string
+          start_time?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          end_time?: string | null
+          id?: string
+          is_active?: boolean | null
+          mining_power?: number
+          purchase_price?: number
+          server_id?: string
+          start_time?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_servers_server_id_fkey"
+            columns: ["server_id"]
+            isOneToOne: false
+            referencedRelation: "servers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          created_at: string | null
+          first_name: string | null
+          id: string
+          is_premium: boolean | null
+          language_code: string | null
+          last_name: string | null
+          photo_url: string | null
+          telegram_id: string
+          telegram_username: string | null
+          total_balance: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          first_name?: string | null
+          id?: string
+          is_premium?: boolean | null
+          language_code?: string | null
+          last_name?: string | null
+          photo_url?: string | null
+          telegram_id: string
+          telegram_username?: string | null
+          total_balance?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          first_name?: string | null
+          id?: string
+          is_premium?: boolean | null
+          language_code?: string | null
+          last_name?: string | null
+          photo_url?: string | null
+          telegram_id?: string
+          telegram_username?: string | null
+          total_balance?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      wallet_holdings: {
+        Row: {
+          balance: number | null
+          created_at: string | null
+          cryptocurrency_id: string
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          balance?: number | null
+          created_at?: string | null
+          cryptocurrency_id: string
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          balance?: number | null
+          created_at?: string | null
+          cryptocurrency_id?: string
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_holdings_cryptocurrency_id_fkey"
+            columns: ["cryptocurrency_id"]
+            isOneToOne: false
+            referencedRelation: "cryptocurrencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

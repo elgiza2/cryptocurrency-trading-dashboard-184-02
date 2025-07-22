@@ -30,26 +30,8 @@ const CryptoChart = ({ cryptoId, currentPrice }: CryptoChartProps) => {
     try {
       setLoading(true);
       
-      // Load price history from database
-      const { data: priceHistory } = await supabase
-        .from('price_history')
-        .select('*')
-        .eq('cryptocurrency_id', cryptoId)
-        .order('created_at', { ascending: true })
-        .limit(getDataPointsForTimeframe());
-
-      if (priceHistory && priceHistory.length > 0) {
-        const formattedData = priceHistory.map((record, index) => ({
-          time: formatTimeForChart(record.created_at),
-          price: Number(record.new_price),
-          volume: Math.random() * 1000000 // Can add real volume field later
-        }));
-        
-        setChartData(formattedData);
-      } else {
-        // If no historical data, create one point with current price
-        generateDataWithCurrentPrice();
-      }
+      // Since price_history table doesn't exist, generate data with current price
+      generateDataWithCurrentPrice();
     } catch (error) {
       console.error('Error loading price history:', error);
       generateDataWithCurrentPrice();
@@ -115,17 +97,17 @@ const CryptoChart = ({ cryptoId, currentPrice }: CryptoChartProps) => {
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: 'UPDATE',
           schema: 'public',
-          table: 'price_history',
-          filter: `cryptocurrency_id=eq.${cryptoId}`
+          table: 'cryptocurrencies',
+          filter: `id=eq.${cryptoId}`
         },
         (payload) => {
           const newRecord = payload.new;
           const newDataPoint = {
-            time: formatTimeForChart(newRecord.created_at),
-            price: Number(newRecord.new_price),
-            volume: Number(newRecord.transaction_volume)
+            time: formatTimeForChart(new Date().toISOString()),
+            price: Number(newRecord.current_price),
+            volume: Math.random() * 1000000
           };
           
           setChartData(prev => [...prev.slice(-23), newDataPoint]);

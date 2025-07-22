@@ -19,61 +19,56 @@ const MarketStats = () => {
 
   const loadMarketStats = async () => {
     try {
-      // Get daily statistics data
-      const { data: dailyStats } = await supabase
-        .from('crypto_daily_stats')
-        .select('market_cap, volume_usd_24h, transactions_count, holders_count')
-        .eq('date', new Date().toISOString().split('T')[0]);
-
       // Get total cryptocurrencies
       const { data: cryptos } = await supabase
         .from('cryptocurrencies')
-        .select('id');
+        .select('market_cap, volume_24h, trade_count_24h');
 
-      // Get total holders
+      // Get total holders from wallet_holdings
       const { data: holders } = await supabase
-        .from('crypto_holders')
-        .select('id')
+        .from('wallet_holdings')
+        .select('user_id')
         .gt('balance', 0);
 
-      // Get trading volumes for current day
-      const { data: volumes } = await supabase
-        .from('trading_volumes')
-        .select('buy_volume_usd, sell_volume_usd, transactions_count')
-        .gte('hour_timestamp', new Date().toISOString().split('T')[0]);
+      // Get total transactions count
+      const { data: transactions } = await supabase
+        .from('transactions')
+        .select('id');
 
-      if (dailyStats && dailyStats.length > 0) {
-        const totalMarketCap = dailyStats.reduce((sum, stat) => sum + (stat.market_cap || 0), 0);
-        const totalVolume = dailyStats.reduce((sum, stat) => sum + (stat.volume_usd_24h || 0), 0);
-        const totalTrades = dailyStats.reduce((sum, stat) => sum + (stat.transactions_count || 0), 0);
-        const totalHoldersCount = dailyStats.reduce((sum, stat) => sum + (stat.holders_count || 0), 0);
+      if (cryptos && cryptos.length > 0) {
+        const totalMarketCap = cryptos.reduce((sum, crypto) => sum + (Number(crypto.market_cap) || 0), 0);
+        const totalVolume = cryptos.reduce((sum, crypto) => sum + (Number(crypto.volume_24h) || 0), 0);
+        const totalTrades = cryptos.reduce((sum, crypto) => sum + (crypto.trade_count_24h || 0), 0);
+
+        // Get unique holders
+        const uniqueHolders = new Set(holders?.map(h => h.user_id) || []);
 
         setMarketData({
           totalMarketCap,
           totalVolume,
-          totalCryptos: cryptos?.length || 0,
-          activeTrades: totalTrades,
-          totalHolders: totalHoldersCount
+          totalCryptos: cryptos.length,
+          activeTrades: Math.max(totalTrades, transactions?.length || 0),
+          totalHolders: uniqueHolders.size
         });
       } else {
-        // If no daily data found, use basic data
-        let totalVolumeFromHours = 0;
-        if (volumes && volumes.length > 0) {
-          totalVolumeFromHours = volumes.reduce((sum, vol) => 
-            sum + (vol.buy_volume_usd || 0) + (vol.sell_volume_usd || 0), 0
-          );
-        }
-
         setMarketData({
           totalMarketCap: 2100000000000, // Default value
-          totalVolume: totalVolumeFromHours || 84200000000,
-          totalCryptos: cryptos?.length || 0,
-          activeTrades: volumes?.reduce((sum, vol) => sum + (vol.transactions_count || 0), 0) || 0,
+          totalVolume: 84200000000,
+          totalCryptos: 5,
+          activeTrades: transactions?.length || 0,
           totalHolders: holders?.length || 0
         });
       }
     } catch (error) {
       console.error('Error loading market stats:', error);
+      // Set default values on error
+      setMarketData({
+        totalMarketCap: 2100000000000,
+        totalVolume: 84200000000,
+        totalCryptos: 5,
+        activeTrades: 0,
+        totalHolders: 0
+      });
     }
   };
 
@@ -85,7 +80,7 @@ const MarketStats = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'crypto_daily_stats'
+          table: 'cryptocurrencies'
         },
         () => {
           loadMarketStats();
@@ -96,7 +91,7 @@ const MarketStats = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'trading_volumes'
+          table: 'transactions'
         },
         () => {
           loadMarketStats();
@@ -107,7 +102,7 @@ const MarketStats = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'crypto_holders'
+          table: 'wallet_holdings'
         },
         () => {
           loadMarketStats();
