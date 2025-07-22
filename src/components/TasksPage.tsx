@@ -128,7 +128,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
     if (isCompleted) return null;
     
     return (
-      <Card className="bg-gray-900 border-gray-800 p-2">
+      <Card className="bg-secondary border-border p-2">
         <CardContent className="p-2">
             <div className="flex items-center justify-between">
               <div className="flex-1">
@@ -144,7 +144,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
               <Button
                 size="sm"
                 onClick={handleTaskAction}
-                className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium text-xs px-3 py-1 h-7"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-xs px-3 py-1 h-7"
               >
                 {showUrl ? "Go" : "Complete"}
               </Button>
@@ -162,14 +162,14 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
           <h1 className="text-xl font-bold mb-4 text-center">Tasks</h1>
           
           <Tabs defaultValue="main" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-gray-900 h-8">
-              <TabsTrigger value="main" className="text-white data-[state=active]:bg-yellow-500 data-[state=active]:text-black text-xs">
+            <TabsList className="grid w-full grid-cols-3 bg-secondary h-8">
+              <TabsTrigger value="main" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs">
                 Main
               </TabsTrigger>
-              <TabsTrigger value="social" className="text-white data-[state=active]:bg-yellow-500 data-[state=active]:text-black text-xs">
+              <TabsTrigger value="social" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs">
                 Social
               </TabsTrigger>
-              <TabsTrigger value="referral" className="text-white data-[state=active]:bg-yellow-500 data-[state=active]:text-black text-xs">
+              <TabsTrigger value="referral" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs">
                 Referral
               </TabsTrigger>
             </TabsList>
@@ -180,7 +180,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
               ))}
               
               {tasks.filter(task => task.mission_type === 'main' || task.mission_type === 'daily').filter(task => !completedTasks.includes(task.id)).length === 0 && (
-                <div className="text-center text-gray-400 py-6 text-sm">
+                <div className="text-center text-muted-foreground py-6 text-sm">
                   All tasks completed! Check back later for new tasks.
                 </div>
               )}
@@ -238,7 +238,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
                         readOnly 
                         className="flex-1 p-2 bg-black border-0 rounded text-white text-xs" 
                       />
-                      <Button size="sm" onClick={copyReferralLink} className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium px-2 py-1 h-7">
+                      <Button size="sm" onClick={copyReferralLink} className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-2 py-1 h-7">
                         <Copy className="w-3 h-3" />
                       </Button>
                     </div>

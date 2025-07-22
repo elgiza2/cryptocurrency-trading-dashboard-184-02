@@ -86,7 +86,7 @@ const CurrencyExchange = ({
   };
 
   return (
-    <ScrollArea className="h-screen bg-gradient-to-b from-blue-900 via-blue-800 to-blue-950">
+    <ScrollArea className="h-screen">
       <div className="min-h-screen text-white">
         
         {/* Unified Header */}

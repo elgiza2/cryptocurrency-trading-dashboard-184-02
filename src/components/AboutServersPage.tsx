@@ -9,7 +9,7 @@ interface AboutServersPageProps {
 const AboutServersPage = ({ onBack }: AboutServersPageProps) => {
   return (
     <ScrollArea className="h-screen">
-      <div className="min-h-screen bg-gradient-to-b from-blue-900 via-blue-800 to-blue-950 text-white">
+      <div className="min-h-screen text-foreground">
         
         {/* Unified Header */}
         {onBack && <UnifiedBackButton onBack={onBack} title="Space Verse" />}

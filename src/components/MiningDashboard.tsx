@@ -155,9 +155,9 @@ const MiningDashboard = ({
               className="flex-1 cursor-pointer hover:bg-white/10 rounded-lg p-2 transition-colors"
               onClick={handleSpaceBalanceClick}
             >
-              <div className="text-lg font-bold text-blue-100">{userBalance.space.toFixed(4)}</div>
-              <div className="text-xs text-blue-200 flex items-center gap-1">
-                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+              <div className="text-lg font-bold text-foreground">{userBalance.space.toFixed(4)}</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
                 $SPACE balance
               </div>
             </div>
@@ -177,11 +177,11 @@ const MiningDashboard = ({
         </Card>
 
         {/* Quick Actions with Glass Effect */}
-        <Card className="bg-white/10 backdrop-blur-xl border-white/20 p-2 rounded-2xl">
+        <Card className="bg-secondary border-border p-2 rounded-2xl">
           <div className="space-y-2">
             <Button 
               onClick={onNavigateToNFT}
-              className="w-full h-12 bg-black/80 backdrop-blur-sm border-none text-white hover:bg-black/60 justify-between rounded-xl"
+              className="w-full h-12 bg-secondary border-border text-foreground hover:bg-secondary/80 justify-between rounded-xl"
               variant="outline"
             >
               <div className="flex items-center gap-3">

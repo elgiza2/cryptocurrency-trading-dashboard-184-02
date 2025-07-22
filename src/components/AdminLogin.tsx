@@ -22,7 +22,7 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-muted/10 border-white/10 p-6">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-white mb-2">Admin Access</h1>
@@ -41,7 +41,7 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
           
           <Button 
             onClick={handleLogin}
-            className="w-full bg-yellow-500 text-black hover:bg-yellow-600"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
           >
             Access Admin Panel
           </Button>

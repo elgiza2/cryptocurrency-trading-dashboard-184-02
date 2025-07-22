@@ -127,7 +127,7 @@ const ActivityRewardsPage = ({
               variant="ghost" 
               size="sm" 
               onClick={onBack}
-              className="text-white hover:bg-slate-800"
+              className="text-foreground hover:bg-secondary"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -141,7 +141,7 @@ const ActivityRewardsPage = ({
         </div>
 
         {/* Countdown Timer */}
-        <Card className="bg-slate-800/50 border-slate-700 p-4 rounded-2xl">
+        <Card className="bg-secondary border-border p-4 rounded-2xl">
           <div className="grid grid-cols-4 gap-3 text-center">
             <div>
               <div className="text-2xl font-bold">{timeLeft.days}</div>
@@ -234,7 +234,7 @@ const ActivityRewardsPage = ({
               
               <Button 
                 onClick={handleTaskConfirm}
-                className="w-full mt-4 bg-purple-600 hover:bg-purple-700 h-12 text-base rounded-2xl font-medium"
+                className="w-full mt-4 bg-primary hover:bg-primary/90 h-12 text-base rounded-2xl font-medium"
               >
                 Confirm
               </Button>

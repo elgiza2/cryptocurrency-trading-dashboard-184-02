@@ -41,7 +41,7 @@ export const EnhancedDepositDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-gray-900 border-gray-800">
+      <DialogContent className="sm:max-w-md bg-secondary border-border">
         <DialogHeader>
         <DialogTitle className="text-xl font-bold text-center text-white">
           Deposit TON
