@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle, Gift, Users, ExternalLink, Copy, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DatabaseService } from "@/lib/database";
+import AdminPage from "./AdminPage";
 
 interface TasksPageProps {
   onNavigateToReferral?: () => void;
@@ -18,6 +19,8 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
   const [userTasks, setUserTasks] = useState<any[]>([]);
   const [telegramUser, setTelegramUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [clickCount, setClickCount] = useState(0);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -110,6 +113,18 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
     });
   };
 
+  const handleMainTabClick = () => {
+    setClickCount(prev => {
+      const newCount = prev + 1;
+      if (newCount >= 5) {
+        setShowAdminPanel(true);
+        setClickCount(0);
+        return 0;
+      }
+      return newCount;
+    });
+  };
+
   const TaskCard = ({ task, onComplete, showUrl = false }: any) => {
     const isCompleted = completedTasks.includes(task.id);
     
@@ -163,6 +178,10 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
     );
   };
 
+  if (showAdminPanel) {
+    return <AdminPage onBack={() => setShowAdminPanel(false)} />;
+  }
+
   return (
     <ScrollArea className="h-screen">
       <div className="min-h-screen unified-gaming-bg text-foreground p-2">
@@ -171,7 +190,11 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
           
           <Tabs defaultValue="main" className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-secondary/60 h-8 border border-white/10">
-              <TabsTrigger value="main" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs">
+              <TabsTrigger 
+                value="main" 
+                className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs"
+                onClick={handleMainTabClick}
+              >
                 Main
               </TabsTrigger>
               <TabsTrigger value="social" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs">
