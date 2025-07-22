@@ -243,7 +243,7 @@ const ServerPage = ({
                           className="w-4 h-4"
                         />
                       </div>
-                      <div className="text-xs text-blue-200">Income Per Day</div>
+                      <div className="text-xs text-blue-200">Daily TON Income</div>
                     </div>
                   </div>
                 </Card>
@@ -266,7 +266,7 @@ const ServerPage = ({
                         <span>{server.duration} days</span>
                       </div>
                       <div className="text-xs text-blue-300 mt-1">
-                        Total Income | Mining Time
+                        Income In TON | Mining Time
                       </div>
                     </div>
                   </div>
