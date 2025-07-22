@@ -1,5 +1,5 @@
 
-import { Home, Users, Zap, Gamepad2, Gift } from "lucide-react";
+import { Home, UserPlus, Zap, Gamepad2, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface MobileNavProps {
@@ -21,7 +21,7 @@ const MobileNav = ({
     },
     {
       id: 'referral',
-      icon: Users,
+      icon: UserPlus,
       label: 'Friends'
     },
     {
