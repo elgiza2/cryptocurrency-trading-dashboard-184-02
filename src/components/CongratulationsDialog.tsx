@@ -62,7 +62,7 @@ export default function CongratulationsDialog({
     tonConnectUI.openModal();
   };
   return <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-xs w-[90vw] mx-auto bg-card/95 backdrop-blur-lg border-2 border-primary/30 p-3 rounded-2xl shadow-2xl z-50">
+      <DialogContent className="max-w-[250px] w-[80vw] mx-auto bg-card/95 backdrop-blur-lg border-2 border-primary/30 p-2 rounded-xl shadow-2xl z-50">
         <DialogHeader className="text-center space-y-4">
           {/* Header with celebration icons */}
           
