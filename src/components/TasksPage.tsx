@@ -201,12 +201,13 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
     const handleTaskAction = () => {
       if (isCompleted) return;
       
-      if (showUrl && task.url) {
-        // Just open URL without completing task
+      // Open URL if available
+      if (task.url) {
         window.open(task.url, '_blank');
-      } else {
-        onComplete(task.id, task.reward_amount);
       }
+      
+      // Always complete the task and add points
+      onComplete(task.id, task.reward_amount);
     };
 
     return (
@@ -242,7 +243,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
                   Done
                 </>
               ) : (
-                showUrl ? 'Go' : 'Claim'
+                'Go'
               )}
             </Button>
           </div>
