@@ -162,8 +162,8 @@ const ServerPage = ({
   const hasSufficientBalance = selectedServer ? userBalance.ton >= selectedServer.price : true;
 
   return (
-    <ScrollArea className="h-screen bg-gradient-to-b from-blue-900 via-blue-800 to-blue-950">
-      <div className="min-h-screen text-white space-y-4">
+    <ScrollArea className="h-screen">
+      <div className="min-h-screen unified-gaming-bg text-white space-y-4">
         
         {/* Unified Header */}
         {onBack && <UnifiedBackButton onBack={onBack} title="Rent Server" />}
@@ -172,7 +172,7 @@ const ServerPage = ({
           {/* About Servers Button */}
           <Button 
             onClick={() => setShowAboutServers(true)}
-            className="w-full h-12 bg-black/80 backdrop-blur-sm border border-white/20 text-white hover:bg-black/60 justify-between rounded-2xl"
+            className="w-full h-12 bg-secondary/80 backdrop-blur-sm border border-white/20 text-white hover:bg-secondary/60 justify-between rounded-2xl"
             variant="outline"
           >
             <div className="flex items-center gap-3">
@@ -189,7 +189,7 @@ const ServerPage = ({
             <div className="space-y-3">
               <h3 className="text-lg font-semibold text-blue-100">Your Active Servers ({userServers.length})</h3>
               {userServers.map((server, index) => (
-                <Card key={index} className="bg-white/10 backdrop-blur-xl border-white/20 p-4 rounded-2xl">
+                <Card key={index} className="bg-secondary/60 backdrop-blur-xl border-white/20 p-4 rounded-2xl">
                   <div className="flex items-center gap-3 mb-3">
                     <div className={`w-10 h-10 ${server.color} rounded-full`}></div>
                     <div>
@@ -222,7 +222,7 @@ const ServerPage = ({
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-blue-100">Available Servers</h3>
             {servers.map((server, index) => (
-              <Card key={index} className="bg-white/10 backdrop-blur-xl border-white/20 p-4 rounded-2xl hover:border-purple-500/50 transition-colors">
+              <Card key={index} className="bg-secondary/60 backdrop-blur-xl border-white/20 p-4 rounded-2xl hover:border-primary/50 transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className={`w-12 h-12 ${server.color} rounded-full`}></div>
@@ -239,7 +239,7 @@ const ServerPage = ({
                   </div>
                   <Button 
                     onClick={() => handleRentServer(server)}
-                    className="bg-purple-600 hover:bg-purple-700 px-4 py-2 text-sm font-medium rounded-xl"
+                    className="bg-primary hover:bg-primary/90 px-4 py-2 text-sm font-medium rounded-xl"
                   >
                     Rent {server.price} TON
                   </Button>
@@ -251,7 +251,7 @@ const ServerPage = ({
           {/* Purchase Dialog */}
           {selectedServer && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-              <Card className="bg-blue-900/95 backdrop-blur-xl border-blue-700 p-5 w-full max-w-sm rounded-3xl">
+              <Card className="bg-secondary/95 backdrop-blur-xl border-white/20 p-5 w-full max-w-sm rounded-3xl">
                 <div className="space-y-4">
                   <div className="text-center">
                     <div className="flex justify-end mb-3">
@@ -259,7 +259,7 @@ const ServerPage = ({
                         onClick={() => setSelectedServer(null)}
                         variant="ghost"
                         size="sm"
-                        className="text-blue-200 hover:text-white"
+                        className="text-white/70 hover:text-white"
                       >
                         <X className="h-5 w-5" />
                       </Button>
@@ -306,9 +306,9 @@ const ServerPage = ({
                   </div>
 
                   {!hasSufficientBalance && (
-                    <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-3">
-                      <h4 className="text-red-400 font-semibold mb-1 text-base">You don't have enough TON!</h4>
-                      <p className="text-xs text-blue-200 leading-relaxed">
+                    <div className="bg-destructive/20 border border-destructive/30 rounded-xl p-3">
+                      <h4 className="text-destructive font-semibold mb-1 text-base">You don't have enough TON!</h4>
+                      <p className="text-xs text-white/70 leading-relaxed">
                         Top up your balance by {(selectedServer.price - userBalance.ton).toFixed(8)} TON to rent this server.
                       </p>
                     </div>
@@ -317,7 +317,7 @@ const ServerPage = ({
                   {hasSufficientBalance ? (
                     <Button 
                       onClick={confirmPurchase}
-                      className="w-full bg-purple-600 hover:bg-purple-700 h-12 text-base font-medium rounded-2xl"
+                      className="w-full bg-primary hover:bg-primary/90 h-12 text-base font-medium rounded-2xl"
                     >
                       Confirm
                     </Button>
@@ -327,7 +327,7 @@ const ServerPage = ({
                         setSelectedServer(null);
                         setShowDepositDialog(true);
                       }}
-                      className="w-full bg-purple-600 hover:bg-purple-700 h-12 text-base font-medium rounded-2xl"
+                      className="w-full bg-primary hover:bg-primary/90 h-12 text-base font-medium rounded-2xl"
                     >
                       Top Up Balance
                     </Button>

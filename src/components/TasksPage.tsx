@@ -128,7 +128,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
     if (isCompleted) return null;
     
     return (
-      <Card className="bg-secondary border-border p-2">
+      <Card className="bg-secondary/60 border-white/10 p-2 backdrop-blur-sm">
         <CardContent className="p-2">
             <div className="flex items-center justify-between">
               <div className="flex-1">
@@ -161,12 +161,12 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
 
   return (
     <ScrollArea className="h-screen">
-      <div className="min-h-screen text-foreground p-2">
+      <div className="min-h-screen unified-gaming-bg text-foreground p-2">
         <div className="max-w-md mx-auto">
           <h1 className="text-xl font-bold mb-4 text-center">Tasks</h1>
           
           <Tabs defaultValue="main" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-secondary h-8">
+            <TabsList className="grid w-full grid-cols-2 bg-secondary/60 h-8 border border-white/10">
               <TabsTrigger value="main" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs">
                 Main
               </TabsTrigger>

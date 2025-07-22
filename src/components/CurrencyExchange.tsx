@@ -90,14 +90,14 @@ const CurrencyExchange = ({
       <div className="min-h-screen text-white">
         
         {/* Unified Header */}
-        {onBack && <UnifiedBackButton onBack={onBack} title="تبديل العملات" />}
+        {onBack && <UnifiedBackButton onBack={onBack} title="Currency Exchange" />}
 
         <div className="px-3 space-y-3 max-w-md mx-auto">
           {/* Price Indicator Box - Black Background with Yellow Signals */}
-          <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl p-4">
+          <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl p-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center">
                   <span className="text-black text-sm font-bold">S</span>
                 </div>
                 <div>
@@ -136,7 +136,7 @@ const CurrencyExchange = ({
                   <div className="text-lg font-bold text-white">
                     {(isSwapDirection ? userBalance.space : userBalance.ton).toFixed(4)} {isSwapDirection ? '$SPACE' : 'TON'}
                   </div>
-                  <div className="text-blue-200 text-xs">رصيدك</div>
+                  <div className="text-blue-200 text-xs">Your Balance</div>
                 </div>
               </div>
               <Button
@@ -152,7 +152,7 @@ const CurrencyExchange = ({
 
             <div className="space-y-1">
               <div className="text-blue-200 text-xs">
-                سعر {isSwapDirection ? '$SPACE' : 'TON'}
+                {isSwapDirection ? '$SPACE' : 'TON'} Price
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-sm font-bold text-white">
@@ -169,14 +169,14 @@ const CurrencyExchange = ({
           {/* Swap Section */}
           <div className="space-y-3 mb-4">
             <h2 className="text-base font-semibold text-blue-100">
-              تبديل {isSwapDirection ? '$SPACE' : 'TON'} إلى {isSwapDirection ? 'TON' : '$SPACE'}
+              Swap {isSwapDirection ? '$SPACE' : 'TON'} to {isSwapDirection ? 'TON' : '$SPACE'}
             </h2>
 
             {/* Give Input */}
             <div className="relative">
               <div className="bg-white/10 backdrop-blur-xl rounded-xl p-3 border border-white/20">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-blue-200 text-xs">إعطاء</span>
+                  <span className="text-blue-200 text-xs">Give</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Input
@@ -209,7 +209,7 @@ const CurrencyExchange = ({
             <div className="relative">
               <div className="bg-white/10 backdrop-blur-xl rounded-xl p-3 border border-white/20">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-blue-200 text-xs">استلام</span>
+                  <span className="text-blue-200 text-xs">Receive</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="text-lg font-bold flex-1 text-white">
@@ -229,7 +229,7 @@ const CurrencyExchange = ({
             className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 h-12 text-base font-medium rounded-2xl shadow-lg"
             disabled={!giveAmount || parseFloat(giveAmount) <= 0}
           >
-            تبديل
+            Swap
           </Button>
 
           <div className="h-16"></div>

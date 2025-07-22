@@ -158,14 +158,14 @@ const NFTPage = ({ onBack }: NFTPageProps) => {
 
   return (
     <ScrollArea className="h-screen">
-      <div className="min-h-screen text-foreground">
+      <div className="min-h-screen unified-gaming-bg text-foreground">
         {/* Unified Header */}
         {onBack && <UnifiedBackButton onBack={onBack} title="NFT Miners" />}
 
         <div className="p-6">
           {/* Title */}
           <div className="mb-8">
-            <p className="text-blue-200 text-lg">
+            <p className="text-white/70 text-lg">
               Presale of characters that will soon let you mine even more TON
             </p>
           </div>
@@ -183,7 +183,7 @@ const NFTPage = ({ onBack }: NFTPageProps) => {
                     {nft.name}
                   </h3>
                   
-                  <p className="text-blue-200 text-sm">
+                  <p className="text-white/70 text-sm">
                     {nft.remaining} NFT left
                   </p>
                 </div>
@@ -193,10 +193,10 @@ const NFTPage = ({ onBack }: NFTPageProps) => {
 
           {/* Connect Wallet Button */}
           {!tonConnectUI.wallet && (
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-blue-950 to-transparent">
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background to-transparent">
               <Button 
                 onClick={() => tonConnectUI.openModal()} 
-                className="w-full bg-blue-700 hover:bg-blue-600 text-white py-4 text-lg font-medium rounded-2xl border border-blue-500"
+                className="w-full bg-primary hover:bg-primary/90 text-white py-4 text-lg font-medium rounded-2xl border border-primary/50"
               >
                 Connect Wallet
               </Button>

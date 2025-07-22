@@ -67,14 +67,14 @@ const ReferralPage = ({ onBack, referralCount = 0 }: ReferralPageProps) => {
         {/* Subtitle */}
         <div className="px-4 pb-4">
           <p className="text-gray-400 text-base">
-            Get a TON for every server rental by your friends!
+            Get TON for every server rental by your friends!
           </p>
         </div>
 
         {/* Friends Level Info */}
         <div className="px-4 pb-4">
-          <div className="bg-slate-800/60 rounded-xl p-4">
-            <h3 className="text-white font-semibold text-lg mb-1">Friends 1 level</h3>
+          <div className="bg-secondary/60 rounded-xl p-4 border border-white/10">
+            <h3 className="text-white font-semibold text-lg mb-1">Level 1 Friends</h3>
             <p className="text-gray-400 text-sm">Reward: 7% of each server rental</p>
           </div>
         </div>
@@ -84,7 +84,7 @@ const ReferralPage = ({ onBack, referralCount = 0 }: ReferralPageProps) => {
           <ScrollArea className="h-full">
             <div className="space-y-3 pr-2">
               {friends.map((friend) => (
-                <div key={friend.id} className="flex items-center justify-between bg-slate-800/40 rounded-xl p-3">
+                <div key={friend.id} className="flex items-center justify-between bg-secondary/40 rounded-xl p-3 border border-white/10">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 ${friend.color} rounded-full flex items-center justify-center text-white font-semibold text-sm`}>
                       {friend.avatar}
@@ -101,11 +101,11 @@ const ReferralPage = ({ onBack, referralCount = 0 }: ReferralPageProps) => {
         </div>
 
         {/* Fixed Bottom Button above navigation */}
-        <div className="fixed bottom-12 left-0 right-0 p-4 bg-gradient-to-t from-black via-blue-950/50 to-transparent">
+        <div className="fixed bottom-12 left-0 right-0 p-4 bg-gradient-to-t from-background via-background/80 to-transparent">
           <div className="flex gap-2 items-center">
             <Button 
               onClick={handleShare}
-              className="flex-1 bg-purple-600 hover:bg-purple-700 h-14 text-lg rounded-2xl font-medium transition-all duration-300"
+              className="flex-1 bg-primary hover:bg-primary/90 h-14 text-lg rounded-2xl font-medium transition-all duration-300"
             >
               {buttonText}
             </Button>
@@ -114,7 +114,7 @@ const ReferralPage = ({ onBack, referralCount = 0 }: ReferralPageProps) => {
               onClick={handleCopyLink}
               variant="outline"
               size="icon"
-              className="h-14 w-14 rounded-2xl border-slate-600 text-white hover:bg-slate-700/50 shrink-0"
+              className="h-14 w-14 rounded-2xl border-border text-white hover:bg-secondary/50 shrink-0"
             >
               <Copy className="h-5 w-5" />
             </Button>
