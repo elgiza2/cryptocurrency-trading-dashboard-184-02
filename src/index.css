@@ -56,12 +56,42 @@
     --glow-success: 0 0 25px hsl(142 76% 55% / 0.5);
   }
   
+  * {
+    /* Prevent text selection */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    
+    /* Prevent drag operations */
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
+    user-drag: none;
+  }
+
+  html {
+    /* Disable zoom and horizontal scroll */
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    touch-action: pan-y;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
     height: 100vh;
     background: hsl(var(--background));
     color: hsl(var(--foreground));
+    
+    /* Prevent horizontal scroll and zoom */
+    overflow-x: hidden;
+    -webkit-touch-callout: none;
+    -webkit-text-size-adjust: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 }
 
