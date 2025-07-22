@@ -330,6 +330,36 @@
   }
 }
 
+/* Header Background to Match Gaming Theme */
+.unified-header-bg {
+  background: linear-gradient(135deg, 
+    hsl(220 84% 12%) 0%,    /* Slightly lighter deep blue */
+    hsl(210 90% 18%) 25%,   /* Medium blue */
+    hsl(230 75% 15%) 50%,   /* Dark navy */
+    hsl(200 85% 20%) 75%,   /* Lighter blue */
+    hsl(220 84% 12%) 100%   /* Back to deep blue */
+  );
+  background-size: 300% 300%;
+  animation: headerBlueWave 8s ease infinite;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid hsl(220 50% 25% / 0.3);
+}
+
+@keyframes headerBlueWave {
+  0% {
+    background-position: 0% 0%;
+  }
+  33% {
+    background-position: 100% 50%;
+  }
+  66% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
 /* Black Background Class for specific elements */
 .unified-black-bg {
   background: hsl(220 84% 3%);

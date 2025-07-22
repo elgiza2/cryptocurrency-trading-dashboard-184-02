@@ -95,18 +95,14 @@ const ReferralPage = ({
       handleCopyLink();
     }
   };
-  return <div className="h-screen text-foreground">
+  return <div className="h-screen text-foreground unified-gaming-bg">
       <div className="flex flex-col h-full">
         
-        {/* Header */}
-        <div className="flex items-center gap-3 p-4 pt-6">
-          <h1 className="text-3xl font-bold">Friends</h1>
+        {/* Header with matching background */}
+        <div className="unified-header-bg sticky top-0 z-10 p-4">
+          <h1 className="text-3xl font-bold text-white">Friends</h1>
+          <p className="text-gray-300 text-base mt-2">Get TON for every server rental by your friends!</p>
         </div>
-
-        {/* Subtitle */}
-          <div className="px-4 pb-4">
-            <p className="text-gray-400 text-base">Get TON for every server rental by your friends !</p>
-          </div>
 
         {/* Friends Level Info */}
         <div className="px-4 pb-4">
