@@ -4,26 +4,77 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Copy, Share } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useApp } from "@/contexts/AppContext";
 
 interface ReferralPageProps {
   onBack?: () => void;
   referralCount?: number;
 }
 
+interface ReferralFriend {
+  id: string;
+  referred_user_id: string;
+  reward_amount: number;
+  is_claimed: boolean;
+  created_at: string;
+  users?: {
+    first_name?: string;
+    telegram_username?: string;
+  };
+}
+
 const ReferralPage = ({ onBack, referralCount = 0 }: ReferralPageProps) => {
   const { toast } = useToast();
-  const referralLink = "https://t.me/YourBot?start=ref_123456";
+  const { telegramUser } = useApp();
   const [buttonText, setButtonText] = useState("Invite Your Friends");
+  const [friends, setFriends] = useState<ReferralFriend[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Generate referral link with user's username or ID
+  const referralLink = telegramUser?.username 
+    ? `https://t.me/Spacelbot?startapp=${telegramUser.username}`
+    : `https://t.me/Spacelbot?startapp=${telegramUser?.id || 'user'}`;
 
-  // Mock friends data
-  const friends = [
-    { id: 1, name: "M3works", avatar: "M", reward: 0.07, color: "bg-blue-500" },
-    { id: 2, name: "Maha9315i", avatar: "TH", reward: 0.07, color: "bg-green-500" },
-    { id: 3, name: "Kit204", avatar: "A", reward: 0, color: "bg-blue-400" },
-    { id: 4, name: "AboNagy", avatar: "G", reward: 0, color: "bg-red-500" },
-    { id: 5, name: "MaghonaL", avatar: "ML", reward: 0, color: "bg-gray-600" },
-    { id: 6, name: "bghan", avatar: "BG", reward: 0, color: "bg-gray-500" },
-  ];
+  // Fetch user's referrals
+  useEffect(() => {
+    const fetchReferrals = async () => {
+      if (!telegramUser?.id) return;
+      
+      try {
+        const { data: referralsData, error } = await supabase
+          .from('referrals')
+          .select('*')
+          .eq('referrer_user_id', telegramUser.id.toString());
+
+        if (error) throw error;
+
+        // Get user details for each referral
+        const referralsWithUsers = await Promise.all(
+          (referralsData || []).map(async (referral) => {
+            const { data: userData } = await supabase
+              .from('users')
+              .select('first_name, telegram_username')
+              .eq('telegram_id', referral.referred_user_id)
+              .single();
+
+            return {
+              ...referral,
+              users: userData
+            };
+          })
+        );
+
+        setFriends(referralsWithUsers);
+      } catch (error) {
+        console.error('Error fetching referrals:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReferrals();
+  }, [telegramUser?.id]);
 
   // Button text animation
   useEffect(() => {
@@ -83,19 +134,34 @@ const ReferralPage = ({ onBack, referralCount = 0 }: ReferralPageProps) => {
         <div className="flex-1 px-4 pb-24">
           <ScrollArea className="h-full">
             <div className="space-y-3 pr-2">
-              {friends.map((friend) => (
-                <div key={friend.id} className="flex items-center justify-between bg-secondary/40 rounded-xl p-3 border border-white/10">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 ${friend.color} rounded-full flex items-center justify-center text-white font-semibold text-sm`}>
-                      {friend.avatar}
-                    </div>
-                    <span className="text-white font-medium">{friend.name}</span>
-                  </div>
-                  <div className="text-gray-400 text-sm">
-                    + {friend.reward} TON
-                  </div>
+              {loading ? (
+                <div className="text-center text-gray-400 py-8">Loading...</div>
+              ) : friends.length === 0 ? (
+                <div className="text-center text-gray-400 py-8">
+                  No friends invited yet. Start sharing your referral link!
                 </div>
-              ))}
+              ) : (
+                friends.map((friend) => {
+                  const displayName = friend.users?.first_name || friend.users?.telegram_username || `User ${friend.referred_user_id.slice(-4)}`;
+                  const avatar = displayName.charAt(0).toUpperCase();
+                  const colors = ['bg-blue-500', 'bg-green-500', 'bg-blue-400', 'bg-red-500', 'bg-gray-600', 'bg-purple-500'];
+                  const color = colors[parseInt(friend.id.slice(-1), 16) % colors.length];
+                  
+                  return (
+                    <div key={friend.id} className="flex items-center justify-between bg-secondary/40 rounded-xl p-3 border border-white/10">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 ${color} rounded-full flex items-center justify-center text-white font-semibold text-sm`}>
+                          {avatar}
+                        </div>
+                        <span className="text-white font-medium">{displayName}</span>
+                      </div>
+                      <div className="text-gray-400 text-sm">
+                        + {friend.reward_amount} TON
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </ScrollArea>
         </div>
