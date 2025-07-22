@@ -42,7 +42,7 @@ const GiveawaysPage = () => {
       setTransactionService(new TonTransactionService(tonConnectUI));
     }
     
-    // تحديث البيانات كل دقيقة لفحص الأحداث المنتهية
+    // Update data every minute to check for finished events
     const interval = setInterval(loadGiveaways, 60000);
     return () => clearInterval(interval);
   }, [tonConnectUI]);
@@ -195,18 +195,18 @@ const GiveawaysPage = () => {
 
   const GiveawayCard = ({ giveaway, isFinished = false }: { giveaway: Giveaway; isFinished?: boolean }) => (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-primary/20">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2">
           <div className="flex items-start justify-between">
-            <CardTitle className="text-lg font-bold text-primary">{giveaway.title}</CardTitle>
-            <Badge variant={isFinished ? "secondary" : "default"} className="shrink-0">
+            <CardTitle className="text-base font-bold text-primary">{giveaway.title}</CardTitle>
+            <Badge variant={isFinished ? "secondary" : "default"} className="shrink-0 text-xs">
               {isFinished ? "Ended" : "Active"}
             </Badge>
           </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
-        {/* صورة الجائزة */}
-        <div className="relative aspect-square w-32 mx-auto">
+      <CardContent className="space-y-3">
+        {/* Prize Image */}
+        <div className="relative aspect-square w-20 mx-auto">
           <img 
             src={giveaway.prize_image_url} 
             alt={giveaway.title}
@@ -214,64 +214,59 @@ const GiveawaysPage = () => {
           />
         </div>
 
-        {/* معلومات المسابقة */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between text-sm">
+        {/* Giveaway Info */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
-              <Users className="w-4 h-4" />
+              <Users className="w-3 h-3" />
               <span>Participants</span>
             </div>
             <span className="font-medium">{giveaway.current_participants}/{giveaway.max_participants}</span>
           </div>
 
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
-              <Clock className="w-4 h-4" />
+              <Clock className="w-3 h-3" />
               <span>Time Left</span>
             </div>
             <span className="font-medium">{formatTimeRemaining(giveaway.end_time)}</span>
           </div>
 
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-3 h-3" />
               <span>Entry Fee</span>
             </div>
             <span className="font-bold text-primary">{giveaway.entry_fee_ton} TON</span>
           </div>
-
         </div>
 
-        {/* شريط التقدم */}
-        <div className="space-y-2">
-          <div className="w-full bg-secondary rounded-full h-2">
-            <div 
-              className="bg-gradient-to-r from-primary to-primary/80 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(giveaway.current_participants / giveaway.max_participants) * 100}%` }}
-            />
-          </div>
+        {/* Progress Bar */}
+        <div className="w-full bg-secondary rounded-full h-1.5">
+          <div 
+            className="bg-gradient-to-r from-primary to-primary/80 h-1.5 rounded-full transition-all duration-300"
+            style={{ width: `${(giveaway.current_participants / giveaway.max_participants) * 100}%` }}
+          />
         </div>
 
-        {/* زر الانضمام */}
+        {/* Join Button */}
         {!isFinished && giveaway.current_participants < giveaway.max_participants && (
           <Button 
             onClick={() => !tonConnectUI?.wallet ? tonConnectUI.openModal() : joinGiveaway(giveaway)}
             className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-            size="lg"
+            size="sm"
           >
             {!tonConnectUI?.wallet ? (
-              <div className="flex items-center gap-2">
-                <span>Connect Wallet</span>
-              </div>
+              <span>Connect Wallet</span>
             ) : (
               <span>Join {giveaway.entry_fee_ton} TON</span>
             )}
-            <ArrowRight className="w-4 h-4 mr-2" />
+            <ArrowRight className="w-3 h-3 ml-1" />
           </Button>
         )}
 
         {!isFinished && giveaway.current_participants >= giveaway.max_participants && (
-          <Button disabled className="w-full" size="lg">
+          <Button disabled className="w-full" size="sm">
             Giveaway Full
           </Button>
         )}

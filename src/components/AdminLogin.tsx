@@ -9,7 +9,7 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
   const { toast } = useToast();
 
   const handleLogin = () => {
-    if (password === "admin123") {
+    if (password === "00") {
       onLogin();
       toast({ title: "Welcome Admin!" });
     } else {
