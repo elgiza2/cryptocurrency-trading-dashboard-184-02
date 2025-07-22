@@ -42,45 +42,45 @@ const MobileNav = ({
     }
   ];
 
-  const getItemStyle = (id: string, special = false) => {
-    if (special) {
-      return activeTab === id 
-        ? 'btn-roulette shadow-lg shadow-pink-500/50 h-14 w-14 p-0' 
-        : 'btn-roulette opacity-70 hover:opacity-100 h-12 w-12 p-0';
-    }
-    
-    if (activeTab === id) {
-      return 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-pink-500/30';
-    }
-    
-    return 'bg-white/10 text-white/70 hover:text-white hover:bg-white/20 border border-white/20';
-  };
-
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-sm border-t border-white/10 p-1">
-      <div className="flex justify-center items-end max-w-xs mx-auto px-1">
+    <div className="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800 p-2">
+      <div className="flex justify-around items-center max-w-md mx-auto">
         {navItems.map(({ id, icon: Icon, label, special }) => (
-          <div key={id} className={`flex flex-col items-center ${special ? 'mx-0.5' : 'flex-1'}`}>
+          <div key={id} className="flex flex-col items-center">
             <Button
               variant="ghost"
               size="sm"
-              className={`flex flex-col gap-0.5 transition-all duration-300 rounded-lg border-none bg-transparent hover:bg-transparent ${
+              className={`flex flex-col gap-1 transition-all duration-300 rounded-lg border-none bg-transparent hover:bg-transparent p-2 relative ${
                 special 
-                  ? activeTab === id 
-                    ? 'text-pink-500 h-8 w-8 p-0' 
-                    : 'text-white/70 hover:text-white h-7 w-7 p-0'
-                  : activeTab === id
-                    ? 'text-pink-500 h-auto p-0.5 min-h-7'
-                    : 'text-white/70 hover:text-white h-auto p-0.5 min-h-7'
+                  ? 'h-16 w-16' 
+                  : 'h-auto'
               }`}
               onClick={() => onTabChange(id)}
             >
-              <Icon className={special ? "h-4 w-4" : "h-3 w-3"} />
-              {!special && <span className="text-[10px] font-medium">{label}</span>}
+              <div className={`relative flex items-center justify-center ${
+                special 
+                  ? 'h-12 w-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 shadow-lg shadow-pink-500/50' 
+                  : ''
+              }`}>
+                <Icon className={`${special ? "h-6 w-6 text-white" : "h-5 w-5"} ${
+                  activeTab === id 
+                    ? special ? 'text-white' : 'text-pink-500'
+                    : 'text-gray-400'
+                }`} />
+                {id === 'missions' && (
+                  <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                    23
+                  </div>
+                )}
+              </div>
+              <span className={`text-xs font-medium ${
+                activeTab === id 
+                  ? special ? 'text-white' : 'text-pink-500'
+                  : 'text-gray-400'
+              }`}>
+                {label}
+              </span>
             </Button>
-            {special && (
-              <span className="text-[10px] font-medium text-white/80 mt-0.5">{label}</span>
-            )}
           </div>
         ))}
       </div>
