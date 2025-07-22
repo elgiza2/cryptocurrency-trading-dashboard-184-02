@@ -95,7 +95,7 @@ const ReferralPage = ({
       handleCopyLink();
     }
   };
-  return <div className="h-screen text-foreground">
+  return <div className="h-screen text-foreground unified-gaming-bg">
       <div className="flex flex-col h-full">
         
         {/* Header */}

@@ -269,7 +269,7 @@ const WalletPage = ({ userBalance: propUserBalance }: WalletPageProps) => {
 
   return (
     <ScrollArea className="h-screen">
-      <div className="min-h-screen text-foreground">
+      <div className="min-h-screen text-foreground unified-gaming-bg">
         {/* Header */}
         <div className="p-4 text-center space-y-2">
           <div className="flex items-center justify-center gap-2 text-gray-400 cursor-pointer" onClick={copyAddress}>
