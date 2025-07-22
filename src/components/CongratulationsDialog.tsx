@@ -130,9 +130,7 @@ export default function CongratulationsDialog({
                 Connect Wallet to Claim Reward
               </Button>}
             
-            <Button onClick={onClose} variant="outline" className="w-full border-gray-500 text-gray-300 hover:bg-gray-800/50">
-              Maybe Later
-            </Button>
+            
           </div>
         </div>
       </DialogContent>
