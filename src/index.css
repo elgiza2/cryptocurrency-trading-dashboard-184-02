@@ -87,19 +87,7 @@
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
     height: var(--telegram-viewport-height);
-    
-    /* Dark Blue Animated Background */
-    background: linear-gradient(-45deg, 
-      hsl(220 90% 8%),    /* Dark blue */
-      hsl(230 85% 12%),   /* Deeper blue */
-      hsl(240 80% 10%),   /* Navy blue */
-      hsl(210 90% 15%),   /* Medium blue */
-      hsl(250 75% 8%),    /* Dark purple-blue */
-      hsl(200 85% 12%),   /* Cyan-blue */
-      hsl(220 90% 8%)     /* Back to dark blue */
-    );
-    background-size: 800% 800%;
-    animation: darkBlueWave 18s ease infinite;
+    background: hsl(var(--background));
     color: hsl(var(--foreground));
     
     /* Prevent horizontal scroll and zoom */
@@ -164,25 +152,6 @@
   }
   100% {
     background-position: 100% 100%;
-  }
-}
-
-/* Dark Blue Wave Animation */
-@keyframes darkBlueWave {
-  0% {
-    background-position: 0% 50%;
-  }
-  25% {
-    background-position: 100% 50%;
-  }
-  50% {
-    background-position: 100% 100%;
-  }
-  75% {
-    background-position: 0% 100%;
-  }
-  100% {
-    background-position: 0% 50%;
   }
 }
 
@@ -328,21 +297,20 @@
   box-shadow: var(--glow-primary);
 }
 
-/* Unified Dark Blue Animated Background for All Pages */
+/* Enhanced Unified Gaming Background with 7 Animated Colors */
 .unified-gaming-bg {
   background: linear-gradient(-45deg, 
-    hsl(220 90% 8%),    /* Dark blue */
-    hsl(230 85% 12%),   /* Deeper blue */
-    hsl(240 80% 10%),   /* Navy blue */
-    hsl(210 90% 15%),   /* Medium blue */
-    hsl(250 75% 8%),    /* Dark purple-blue */
-    hsl(200 85% 12%),   /* Cyan-blue */
-    hsl(220 90% 8%)     /* Back to dark blue */
+    hsl(220 84% 5%),    /* Deep dark blue */
+    hsl(250 95% 15%),   /* Purple */
+    hsl(320 85% 20%),   /* Magenta */
+    hsl(185 85% 18%),   /* Cyan */
+    hsl(142 76% 15%),   /* Green */
+    hsl(35 85% 18%),    /* Orange */
+    hsl(270 95% 12%),   /* Violet */
+    hsl(220 84% 5%)     /* Back to dark blue */
   );
   background-size: 800% 800%;
-  animation: darkBlueWave 18s ease infinite;
-  min-height: 100vh;
-  padding: 1rem;
+  animation: colorWave 15s ease infinite;
 }
 
 /* Alternative Multi-Color Background for Variety */
@@ -356,28 +324,6 @@
               linear-gradient(135deg, hsl(220 84% 5%), hsl(220 50% 8%));
   background-size: 400% 400%, 300% 300%, 500% 500%, 350% 350%, 450% 450%, 380% 380%, 100% 100%;
   animation: gradientShift 20s ease infinite;
-}
-
-/* Unified Header Background to Match Main Background */
-.unified-header-bg {
-  background: linear-gradient(-45deg, 
-    hsl(220 90% 10%),   /* Slightly lighter for header */
-    hsl(230 85% 14%),   
-    hsl(240 80% 12%),   
-    hsl(210 90% 17%),   
-    hsl(250 75% 10%),   
-    hsl(200 85% 14%),   
-    hsl(220 90% 10%)    
-  );
-  background-size: 800% 800%;
-  animation: darkBlueWave 18s ease infinite;
-}
-
-/* Unified Page Container */
-.unified-page-container {
-  background: transparent;
-  min-height: 100vh;
-  padding: 1rem;
 }
 
 /* Black Background Class for specific elements */
