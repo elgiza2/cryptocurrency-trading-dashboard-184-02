@@ -20,7 +20,7 @@ const Index = () => {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [appState, setAppState] = useState({
-    userBalance: { space: 0.8001, ton: 0.1175 },
+    userBalance: { space: 0.8001, ton: 0.1175, si: 1000 },
     userServers: [],
     activityStreak: 0,
     lastRewardClaim: null,

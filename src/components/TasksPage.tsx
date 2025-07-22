@@ -86,7 +86,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
       
       toast({
         title: "Task completed!",
-        description: `You earned ${reward} VIREON`
+        description: `You earned ${reward} $SI`
       });
     } catch (error) {
       console.error('Error completing task:', error);
@@ -136,7 +136,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
                 <div className="flex items-center mt-1">
                   <Gift className="w-3 h-3 text-yellow-500 mr-1" />
                   <span className="text-yellow-500 font-medium text-xs">
-                    {task.reward_amount} {task.cryptocurrency?.symbol || 'VIREON'}
+                    {task.reward_amount} $SI
                   </span>
                 </div>
               </div>
@@ -213,7 +213,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
                   <div className="p-3 text-center">
                     <Gift className="w-6 h-6 text-yellow-500 mx-auto mb-1" />
                     <div className="text-lg font-bold text-yellow-500">{userTasks.filter(ut => ut.mission_type === 'referral').length * 10}</div>
-                    <div className="text-xs text-gray-400">VIREON Earned</div>
+                    <div className="text-xs text-gray-400">$SI Earned</div>
                   </div>
                 </div>
               </div>
@@ -297,9 +297,9 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
                     <div className="flex items-center justify-between p-2 bg-black rounded-lg border-0">
                       <div>
                         <div className="text-white font-medium text-sm">Invite 10 Friends</div>
-                        <div className="text-xs text-gray-400">Earn 50 VIREON</div>
+                        <div className="text-xs text-gray-400">Earn 50 $SI</div>
                       </div>
-                      <div className="text-yellow-500 font-bold text-sm">50 VIREON</div>
+                      <div className="text-yellow-500 font-bold text-sm">50 $SI</div>
                     </div>
                     
                     <div className="flex items-center justify-between p-2 bg-black rounded-lg border-0">
