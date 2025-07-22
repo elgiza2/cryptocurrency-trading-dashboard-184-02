@@ -14,12 +14,14 @@ import AboutServersPage from "@/components/AboutServersPage";
 import RoulettePage from "@/components/RoulettePage";
 import CurrencyExchange from "@/components/CurrencyExchange";
 import GiveawaysPage from "@/components/GiveawaysPage";
+import CongratulationsDialog from "@/components/CongratulationsDialog";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
   const [hideNavigation, setHideNavigation] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [showCongratulations, setShowCongratulations] = useState(true);
   const [appState, setAppState] = useState({
     userBalance: { space: 0.8001, ton: 0.1175, si: 1000 },
     userServers: [],
@@ -195,6 +197,12 @@ const Index = () => {
         onTabChange={handleTabChange}
         onAdminAccess={() => setShowAdminLogin(true)}
       />}
+
+      {/* Congratulations Dialog */}
+      <CongratulationsDialog 
+        isOpen={showCongratulations}
+        onClose={() => setShowCongratulations(false)}
+      />
     </div>
   );
 };
