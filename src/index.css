@@ -297,19 +297,40 @@
   box-shadow: var(--glow-primary);
 }
 
-/* Enhanced Unified Gaming Background - Blue Gradient Animated */
+/* Enhanced Unified Gaming Background - Dark Blue Gradient Animated */
 .unified-gaming-bg {
   background: linear-gradient(-45deg, 
-    hsl(220 84% 8%),    /* Deep blue */
-    hsl(240 70% 12%),   /* Darker blue */
-    hsl(210 90% 15%),   /* Medium blue */
-    hsl(200 85% 18%),   /* Lighter blue */
-    hsl(230 75% 10%),   /* Dark navy */
-    hsl(190 80% 20%),   /* Cyan blue */
-    hsl(220 84% 8%)     /* Back to deep blue */
+    hsl(220 100% 4%),    /* Very deep dark blue */
+    hsl(240 90% 6%),     /* Dark navy blue */
+    hsl(210 95% 8%),     /* Medium dark blue */
+    hsl(230 85% 5%),     /* Darkest blue */
+    hsl(200 80% 7%),     /* Dark blue with cyan hint */
+    hsl(250 75% 4%),     /* Deep purple-blue */
+    hsl(220 100% 4%)     /* Back to very deep dark blue */
   );
-  background-size: 600% 600%;
-  animation: blueWave 12s ease infinite;
+  background-size: 400% 400%;
+  animation: darkBlueWave 18s ease infinite;
+}
+
+@keyframes darkBlueWave {
+  0% {
+    background-position: 0% 50%;
+  }
+  20% {
+    background-position: 100% 30%;
+  }
+  40% {
+    background-position: 80% 70%;
+  }
+  60% {
+    background-position: 20% 80%;
+  }
+  80% {
+    background-position: 100% 20%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 @keyframes blueWave {
@@ -330,29 +351,32 @@
   }
 }
 
-/* Header Background to Match Gaming Theme */
+/* Header Background to Match Dark Blue Gaming Theme */
 .unified-header-bg {
   background: linear-gradient(135deg, 
-    hsl(220 84% 12%) 0%,    /* Slightly lighter deep blue */
-    hsl(210 90% 18%) 25%,   /* Medium blue */
-    hsl(230 75% 15%) 50%,   /* Dark navy */
-    hsl(200 85% 20%) 75%,   /* Lighter blue */
-    hsl(220 84% 12%) 100%   /* Back to deep blue */
+    hsl(220 100% 8%) 0%,    /* Slightly lighter very dark blue */
+    hsl(210 95% 12%) 25%,   /* Dark blue */
+    hsl(230 85% 9%) 50%,    /* Deep navy */
+    hsl(240 90% 10%) 75%,   /* Dark purple-blue */
+    hsl(220 100% 8%) 100%   /* Back to very dark blue */
   );
-  background-size: 300% 300%;
-  animation: headerBlueWave 8s ease infinite;
+  background-size: 200% 200%;
+  animation: darkHeaderWave 10s ease infinite;
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid hsl(220 50% 25% / 0.3);
+  border-bottom: 1px solid hsl(220 80% 15% / 0.4);
 }
 
-@keyframes headerBlueWave {
+@keyframes darkHeaderWave {
   0% {
     background-position: 0% 0%;
   }
-  33% {
-    background-position: 100% 50%;
+  25% {
+    background-position: 100% 25%;
   }
-  66% {
+  50% {
+    background-position: 100% 75%;
+  }
+  75% {
     background-position: 0% 100%;
   }
   100% {
