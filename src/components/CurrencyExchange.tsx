@@ -10,6 +10,7 @@ import { useTonPrice } from "@/hooks/useTonPrice";
 import { supabase } from "@/integrations/supabase/client";
 import CryptoChart from "./CryptoChart";
 import UnifiedBackButton from "./UnifiedBackButton";
+import WithdrawSection from "./WithdrawSection";
 import spaceLogoUrl from "@/assets/space-logo.png";
 
 interface CurrencyExchangeProps {
@@ -254,6 +255,15 @@ const CurrencyExchange = ({
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Withdraw Section */}
+          <div className="space-y-3 mb-4">
+            <h2 className="text-base font-semibold text-blue-100">
+              Withdraw TON
+            </h2>
+
+            <WithdrawSection userBalance={userBalance} />
           </div>
 
           {/* Swap Button */}
