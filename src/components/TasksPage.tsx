@@ -202,12 +202,8 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
       if (isCompleted) return;
       
       if (showUrl && task.url) {
-        // Open URL and then complete task
+        // Just open URL without completing task
         window.open(task.url, '_blank');
-        // Complete task immediately after opening URL
-        setTimeout(() => {
-          onComplete(task.id, task.reward_amount);
-        }, 1000);
       } else {
         onComplete(task.id, task.reward_amount);
       }
@@ -246,7 +242,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
                   Done
                 </>
               ) : (
-                showUrl ? 'Visit' : 'Claim'
+                showUrl ? 'Go' : 'Claim'
               )}
             </Button>
           </div>
