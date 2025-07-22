@@ -269,10 +269,10 @@ const WalletPage = ({ userBalance: propUserBalance }: WalletPageProps) => {
 
   return (
     <ScrollArea className="h-screen">
-      <div className="min-h-screen text-foreground unified-gaming-bg">
-        {/* Header with matching background */}
-        <div className="unified-header-bg sticky top-0 z-10 p-4 text-center space-y-2">
-          <div className="flex items-center justify-center gap-2 text-gray-300 cursor-pointer" onClick={copyAddress}>
+      <div className="min-h-screen text-foreground">
+        {/* Header */}
+        <div className="p-4 text-center space-y-2">
+          <div className="flex items-center justify-center gap-2 text-gray-400 cursor-pointer" onClick={copyAddress}>
             <span className="w-2 h-2 bg-primary rounded-full"></span>
             <span className="text-sm">{formatAddress(walletAddress)}</span>
             <Copy className="h-3 w-3" />
@@ -282,8 +282,8 @@ const WalletPage = ({ userBalance: propUserBalance }: WalletPageProps) => {
             <div className="text-2xl font-matrix font-bold text-white">
               ${totalValue < 0.01 ? "<0.01" : totalValue.toFixed(2)}
             </div>
-            <div className="text-xs text-gray-300">Total Value</div>
-            <div className="text-xs text-gray-400">
+            <div className="text-xs text-gray-400">Total Value</div>
+            <div className="text-xs text-gray-500">
               Real Balance: {(propUserBalance?.ton || internalUserBalance).toFixed(4)} TON
             </div>
           </div>

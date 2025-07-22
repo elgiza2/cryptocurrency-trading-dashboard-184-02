@@ -276,29 +276,23 @@ const GiveawaysPage = () => {
   }
 
   return (
-    <div className="unified-gaming-bg min-h-screen">
-      {/* Header with matching background */}
-      <div className="unified-header-bg sticky top-0 z-10 p-4 text-center">
-        <h1 className="text-2xl font-bold text-white">Giveaways</h1>
-        <p className="text-gray-300 text-sm mt-1">Join active giveaways and win amazing prizes!</p>
-      </div>
+    <div className="container mx-auto px-4 py-8">
       
-      <div className="container mx-auto px-4 py-6">
-        <div className="space-y-6">
-          {activeGiveaways.length === 0 ? (
-            <div className="text-center py-12">
-              <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Active Giveaways</h3>
-              <p className="text-muted-foreground">Follow us to get notifications about new giveaways</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {activeGiveaways.map((giveaway) => (
-                <GiveawayCard key={giveaway.id} giveaway={giveaway} />
-              ))}
-            </div>
-          )}
-        </div>
+
+      <div className="space-y-6">
+        {activeGiveaways.length === 0 ? (
+          <div className="text-center py-12">
+            <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No Active Giveaways</h3>
+            <p className="text-muted-foreground">Follow us to get notifications about new giveaways</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activeGiveaways.map((giveaway) => (
+              <GiveawayCard key={giveaway.id} giveaway={giveaway} />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Mobile Navigation */}

@@ -258,13 +258,10 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
 
   return (
     <ScrollArea className="h-screen">
-      <div className="min-h-screen unified-gaming-bg text-foreground">
-        {/* Header with matching background */}
-        <div className="unified-header-bg sticky top-0 z-10 p-4 text-center">
-          <h1 className="text-xl font-bold text-white">Tasks</h1>
-        </div>
-        
-        <div className="max-w-md mx-auto p-2">
+      <div className="min-h-screen unified-gaming-bg text-foreground p-2">
+        <div className="max-w-md mx-auto">
+          <h1 className="text-xl font-bold mb-4 text-center">Tasks</h1>
+          
           <Tabs defaultValue="main" className="w-full">
             <TabsList className="grid w-full grid-cols-4 bg-secondary/60 h-8 border border-white/10">
               <TabsTrigger 

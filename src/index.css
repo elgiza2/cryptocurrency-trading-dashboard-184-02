@@ -297,91 +297,33 @@
   box-shadow: var(--glow-primary);
 }
 
-/* Enhanced Unified Gaming Background - Dark Blue Gradient Animated */
+/* Enhanced Unified Gaming Background with 7 Animated Colors */
 .unified-gaming-bg {
   background: linear-gradient(-45deg, 
-    hsl(220 100% 4%),    /* Very deep dark blue */
-    hsl(240 90% 6%),     /* Dark navy blue */
-    hsl(210 95% 8%),     /* Medium dark blue */
-    hsl(230 85% 5%),     /* Darkest blue */
-    hsl(200 80% 7%),     /* Dark blue with cyan hint */
-    hsl(250 75% 4%),     /* Deep purple-blue */
-    hsl(220 100% 4%)     /* Back to very deep dark blue */
+    hsl(220 84% 5%),    /* Deep dark blue */
+    hsl(250 95% 15%),   /* Purple */
+    hsl(320 85% 20%),   /* Magenta */
+    hsl(185 85% 18%),   /* Cyan */
+    hsl(142 76% 15%),   /* Green */
+    hsl(35 85% 18%),    /* Orange */
+    hsl(270 95% 12%),   /* Violet */
+    hsl(220 84% 5%)     /* Back to dark blue */
   );
-  background-size: 400% 400%;
-  animation: darkBlueWave 18s ease infinite;
+  background-size: 800% 800%;
+  animation: colorWave 15s ease infinite;
 }
 
-@keyframes darkBlueWave {
-  0% {
-    background-position: 0% 50%;
-  }
-  20% {
-    background-position: 100% 30%;
-  }
-  40% {
-    background-position: 80% 70%;
-  }
-  60% {
-    background-position: 20% 80%;
-  }
-  80% {
-    background-position: 100% 20%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes blueWave {
-  0% {
-    background-position: 0% 50%;
-  }
-  25% {
-    background-position: 100% 25%;
-  }
-  50% {
-    background-position: 100% 75%;
-  }
-  75% {
-    background-position: 0% 75%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* Header Background to Match Dark Blue Gaming Theme */
-.unified-header-bg {
-  background: linear-gradient(135deg, 
-    hsl(220 100% 8%) 0%,    /* Slightly lighter very dark blue */
-    hsl(210 95% 12%) 25%,   /* Dark blue */
-    hsl(230 85% 9%) 50%,    /* Deep navy */
-    hsl(240 90% 10%) 75%,   /* Dark purple-blue */
-    hsl(220 100% 8%) 100%   /* Back to very dark blue */
-  );
-  background-size: 200% 200%;
-  animation: darkHeaderWave 10s ease infinite;
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid hsl(220 80% 15% / 0.4);
-}
-
-@keyframes darkHeaderWave {
-  0% {
-    background-position: 0% 0%;
-  }
-  25% {
-    background-position: 100% 25%;
-  }
-  50% {
-    background-position: 100% 75%;
-  }
-  75% {
-    background-position: 0% 100%;
-  }
-  100% {
-    background-position: 0% 0%;
-  }
+/* Alternative Multi-Color Background for Variety */
+.animated-gaming-bg {
+  background: radial-gradient(circle at 20% 80%, hsl(250 95% 15%) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, hsl(320 85% 20%) 0%, transparent 50%),
+              radial-gradient(circle at 40% 40%, hsl(185 85% 18%) 0%, transparent 50%),
+              radial-gradient(circle at 70% 70%, hsl(142 76% 15%) 0%, transparent 50%),
+              radial-gradient(circle at 10% 30%, hsl(35 85% 18%) 0%, transparent 50%),
+              radial-gradient(circle at 90% 60%, hsl(270 95% 12%) 0%, transparent 50%),
+              linear-gradient(135deg, hsl(220 84% 5%), hsl(220 50% 8%));
+  background-size: 400% 400%, 300% 300%, 500% 500%, 350% 350%, 450% 450%, 380% 380%, 100% 100%;
+  animation: gradientShift 20s ease infinite;
 }
 
 /* Black Background Class for specific elements */
