@@ -1,4 +1,4 @@
-import { Home, Users, Trophy, Target, Gift } from "lucide-react";
+import { Home, Users, Trophy, Target, Gift, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +28,7 @@ const MobileNav = ({
     },
     {
       id: 'roulette',
-      icon: Target,
+      icon: Zap,
       label: 'Roulette',
       special: true,
       gradient: 'from-pink-500 to-purple-600'
@@ -129,18 +129,13 @@ const NavButton = ({ item, isActive, onClick }: NavButtonProps) => {
         )} />
       )}
       
-      {/* Icon container */}
-      <div className={cn(
-        "relative p-2 rounded-lg transition-all duration-300",
+      {/* Icon without background */}
+      <Icon className={cn(
+        "h-6 w-6 transition-all duration-300",
         isActive 
-          ? `bg-gradient-to-br ${gradient} shadow-lg shadow-pink-500/25` 
-          : "bg-white/10 group-hover:bg-white/20"
-      )}>
-        <Icon className={cn(
-          "h-5 w-5 transition-colors duration-300",
-          isActive ? "text-white" : "text-gray-400 group-hover:text-white"
-        )} />
-      </div>
+          ? `text-transparent bg-gradient-to-br ${gradient} bg-clip-text drop-shadow-sm`
+          : "text-gray-400 group-hover:text-white"
+      )} />
       
       {/* Label */}
       <span className={cn(
