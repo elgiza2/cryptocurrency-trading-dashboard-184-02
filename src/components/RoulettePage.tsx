@@ -255,7 +255,7 @@ const RoulettePage = ({
             {/* Prize List */}
             <div className="space-y-3">
               <h3 className="text-lg font-bold text-blue-100">Prize List</h3>
-              <div className="bg-secondary/60 backdrop-blur-xl rounded-2xl p-4 border border-white/20">
+              <div className="backdrop-blur-xl rounded-2xl p-4 border border-white/20 bg-black">
                 <div className="grid grid-cols-4 gap-3 mb-4">
                   {displayedGifts.map((gift, index) => <div key={index} className="flex flex-col items-center">
                       <div className="w-16 h-16 bg-secondary/30 rounded-xl overflow-hidden mb-2">
