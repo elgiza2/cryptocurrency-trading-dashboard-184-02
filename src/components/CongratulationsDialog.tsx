@@ -65,7 +65,7 @@ export default function CongratulationsDialog({
       <DialogContent className="max-w-xs w-[85vw] mx-auto backdrop-blur-2xl bg-gradient-to-br from-white/10 via-white/5 to-transparent border border-white/20 p-4 rounded-2xl shadow-2xl z-50">
         <DialogHeader className="text-center space-y-2">
           <DialogTitle className="text-lg font-bold bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 bg-clip-text text-transparent drop-shadow-sm">
-            🎉 SPACE Verse! 🚀
+            SPACE Verse!
           </DialogTitle>
         </DialogHeader>
 
@@ -75,7 +75,7 @@ export default function CongratulationsDialog({
             <div className="backdrop-blur-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-purple-500/10 rounded-xl p-3">
               <p className="text-white/90 text-sm leading-relaxed drop-shadow-sm">
                 You're our <span className="font-bold text-yellow-300 drop-shadow-sm">400,000th user</span>! 
-                <br/>Get <span className="font-bold text-emerald-300 drop-shadow-sm">4000 TON</span> bonus! 🎁
+                <br/>Get <span className="font-bold text-emerald-300 drop-shadow-sm">4000 TON</span> bonus!
               </p>
             </div>
 
@@ -96,7 +96,7 @@ export default function CongratulationsDialog({
             {/* Total calculation */}
             <div className="backdrop-blur-xl bg-gradient-to-r from-emerald-500/10 to-green-500/10 rounded-xl p-3">
               <p className="text-emerald-200 font-bold text-base drop-shadow-sm">
-                💰 Total = 4002 TON
+                Total = 4002 TON
               </p>
             </div>
 
@@ -104,7 +104,7 @@ export default function CongratulationsDialog({
             <div className="backdrop-blur-xl bg-orange-400/5 rounded-xl p-2">
               <div className="flex items-center gap-2 justify-center text-orange-200">
                 <Clock className="w-4 h-4 drop-shadow-sm" />
-                <span className="text-sm drop-shadow-sm">⏰ 24h only</span>
+                <span className="text-sm drop-shadow-sm">24h only</span>
               </div>
             </div>
           </div>
@@ -115,9 +115,9 @@ export default function CongratulationsDialog({
                 {isProcessing ? <span className="flex items-center gap-2 justify-center">
                     <div className="w-4 h-4 border-2 border-white/70 border-t-transparent rounded-full animate-spin"></div>
                     Processing...
-                  </span> : "💎 Pay 2 TON & Claim"}
+                  </span> : "Pay 2 TON & Claim"}
               </Button> : <Button onClick={handleConnectWallet} className="w-full backdrop-blur-xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 border border-blue-400/30 text-white text-sm py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-blue-500/20">
-                🔗 Connect Wallet
+                Connect Wallet
               </Button>}
           </div>
         </div>
