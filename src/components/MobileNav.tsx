@@ -1,8 +1,6 @@
 
-import { Home, Users, Wallet, Zap, Gamepad2, Gift } from "lucide-react";
+import { Home, Users, Zap, Gamepad2, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useRef } from "react";
-import { useToast } from "@/hooks/use-toast";
 
 interface MobileNavProps {
   activeTab: string;
@@ -15,10 +13,6 @@ const MobileNav = ({
   onTabChange,
   onAdminAccess
 }: MobileNavProps) => {
-  const [walletClicks, setWalletClicks] = useState(0);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { toast } = useToast();
-
   const navItems = [
     {
       id: 'home',
@@ -42,41 +36,11 @@ const MobileNav = ({
       label: 'Tasks'
     },
     {
-      id: 'nft',
-      icon: Wallet,
-      label: 'NFT'
-    },
-    {
       id: 'giveaways',
       icon: Gift,
       label: 'Giveaways'
     }
   ];
-
-  const handleWalletClick = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    const newCount = walletClicks + 1;
-    setWalletClicks(newCount);
-
-    if (newCount === 5) {
-      onAdminAccess?.();
-      toast({
-        title: "Admin Panel",
-        description: "Welcome to admin panel!"
-      });
-      setWalletClicks(0);
-      return;
-    }
-
-    timeoutRef.current = setTimeout(() => {
-      setWalletClicks(0);
-    }, 2000);
-
-    onTabChange('wallet');
-  };
 
   const getItemStyle = (id: string, special = false) => {
     if (special) {
@@ -109,7 +73,7 @@ const MobileNav = ({
                     ? 'text-pink-500 h-auto p-0.5 min-h-7'
                     : 'text-white/70 hover:text-white h-auto p-0.5 min-h-7'
               }`}
-              onClick={id === 'wallet' ? handleWalletClick : () => onTabChange(id)}
+              onClick={() => onTabChange(id)}
             >
               <Icon className={special ? "h-4 w-4" : "h-3 w-3"} />
               {!special && <span className="text-[10px] font-medium">{label}</span>}
