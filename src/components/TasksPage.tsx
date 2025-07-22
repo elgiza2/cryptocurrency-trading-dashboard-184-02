@@ -28,81 +28,82 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
     if ((window as any).Telegram?.WebApp?.initDataUnsafe?.user) {
       const user = (window as any).Telegram.WebApp.initDataUnsafe.user;
       setTelegramUser(user);
-      setReferralLink(`https://t.me/Vlreonbot?startapp=${user.username || user.id}`);
+      setReferralLink(`https://t.me/SpaceVerseBot?start=${user.id}`);
     } else {
-      // Fallback for development/testing
-      const fallbackUser = {
-        id: 'fallback_user_123',
-        username: 'test_user',
-        first_name: 'Test',
-        last_name: 'User'
-      };
-      setTelegramUser(fallbackUser);
-      setReferralLink(`https://t.me/Vlreonbot?startapp=${fallbackUser.username}`);
+      // Fallback for testing
+      setReferralLink("https://t.me/SpaceVerseBot?start=123456");
     }
 
-    // Check for start param
-    const urlParams = new URLSearchParams(window.location.search);
-    const startParam = urlParams.get('tgWebAppStartParam');
-    if (startParam) {
-      // Handle referral registration
-      console.log('Referral from:', startParam);
-    }
-    loadTasks();
+    fetchTasks();
+    fetchUserTasks();
   }, []);
 
-  const loadTasks = async () => {
+  const fetchTasks = async () => {
     try {
-      setIsLoading(true);
-      // Load missions from database
-      const { data: missions, error } = await DatabaseService.getMissions();
-      if (error) throw error;
-      setTasks(missions || []);
-
-      // Load user completed missions
-      if (telegramUser?.id) {
-        const { data: userMissions, error: userError } = await DatabaseService.getUserMissions(telegramUser.id.toString());
-        if (!userError) {
-          setUserTasks(userMissions || []);
-          setCompletedTasks(userMissions?.map(um => um.mission_id) || []);
-        }
+      const response = await DatabaseService.getMissions();
+      if (response.data) {
+        setTasks(response.data);
       }
     } catch (error) {
-      console.error('Error loading tasks:', error);
+      console.error("Error fetching tasks:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const completeTask = async (taskId: string, reward: number) => {
-    if (!telegramUser?.id) {
-      toast({
-        title: "Error",
-        description: "User not found. Please refresh the page.",
-        variant: "destructive"
-      });
-      return;
-    }
+  const fetchUserTasks = async () => {
     try {
-      const { data, error } = await DatabaseService.completeMission(telegramUser.id.toString(), taskId);
-      if (error) throw error;
-      
-      // Update state to remove the task immediately
-      setCompletedTasks(prev => [...prev, taskId]);
-      setTasks(prev => prev.filter(task => task.id !== taskId));
-      
-      toast({
-        title: "Task completed!",
-        description: `You earned ${reward} $SI`
-      });
+      if (telegramUser) {
+        const response = await DatabaseService.getUserMissions(telegramUser.id.toString());
+        if (response.data) {
+          setUserTasks(response.data);
+          setCompletedTasks(response.data.map((ut: any) => ut.mission_id));
+        }
+      }
     } catch (error) {
-      console.error('Error completing task:', error);
+      console.error("Error fetching user tasks:", error);
+    }
+  };
+
+  const completeTask = async (taskId: string, reward: number) => {
+    try {
+      if (telegramUser) {
+        await DatabaseService.completeMission(telegramUser.id.toString(), taskId);
+        setCompletedTasks(prev => [...prev, taskId]);
+        
+        toast({
+          title: "Task Completed!",
+          description: `You earned ${reward} $SPACE tokens`,
+        });
+        
+        fetchUserTasks(); // Refresh user tasks
+      }
+    } catch (error) {
+      console.error("Error completing task:", error);
       toast({
         title: "Error",
-        description: "Failed to complete task",
+        description: "Failed to complete task. Please try again.",
         variant: "destructive"
       });
     }
+  };
+
+  const shareOnTelegram = () => {
+    const message = encodeURIComponent(`Join me on SPACE Verse and earn crypto rewards! ${referralLink}`);
+    const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${message}`;
+    window.open(telegramShareUrl, '_blank');
+  };
+
+  const shareOnTwitter = () => {
+    const message = encodeURIComponent(`Join me on SPACE Verse and earn crypto rewards! ${referralLink}`);
+    const twitterShareUrl = `https://twitter.com/intent/tweet?text=${message}`;
+    window.open(twitterShareUrl, '_blank');
+  };
+
+  const shareOnWhatsApp = () => {
+    const message = encodeURIComponent(`Join me on SPACE Verse and earn crypto rewards! ${referralLink}`);
+    const whatsappShareUrl = `https://wa.me/?text=${message}`;
+    window.open(whatsappShareUrl, '_blank');
   };
 
   const copyReferralLink = () => {
@@ -143,35 +144,42 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
       }
     };
 
-    // Don't render completed tasks
-    if (isCompleted) return null;
-    
     return (
-      <Card className="bg-secondary/60 border-white/10 p-2 backdrop-blur-sm">
-        <CardContent className="p-2">
-            <div className="flex items-center justify-between">
+      <Card className="bg-secondary/40 border-white/10 backdrop-blur-sm">
+        <CardContent className="p-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Gift className="w-5 h-5 text-primary" />
               <div className="flex-1">
-                <h3 className="text-white font-medium text-sm">{task.title}</h3>
-                <div className="flex items-center mt-1">
-                  <Gift className="w-3 h-3 text-yellow-500 mr-1" />
-                  <span className="text-yellow-500 font-medium text-xs">
-                    {task.reward_amount} $SI
-                  </span>
+                <h3 className="text-sm font-medium text-white">{task.title}</h3>
+                <p className="text-xs text-muted-foreground">{task.description}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-primary font-medium">+{task.reward_amount} $SPACE</span>
+                  {showUrl && task.url && (
+                    <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                  )}
                 </div>
               </div>
-            <div className="ml-2">
-              <Button
-                size="sm"
-                onClick={() => {
-                  if (task.url) {
-                    window.open(task.url, '_blank');
-                  }
-                }}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-xs px-3 py-1 h-7"
-              >
-                Go
-              </Button>
             </div>
+            <Button
+              size="sm"
+              onClick={handleTaskAction}
+              disabled={isCompleted}
+              className={`text-xs px-3 py-1 h-7 ${
+                isCompleted 
+                  ? 'bg-green-600 text-white' 
+                  : 'bg-primary hover:bg-primary/90'
+              }`}
+            >
+              {isCompleted ? (
+                <>
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                  Done
+                </>
+              ) : (
+                showUrl ? 'Visit' : 'Claim'
+              )}
+            </Button>
           </div>
         </CardContent>
       </Card>
