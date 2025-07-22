@@ -6,18 +6,22 @@ import { TonTransactionService } from "@/services/tonTransactionService";
 import { useTonConnectUI } from "@tonconnect/ui-react";
 import { useToast } from "@/hooks/use-toast";
 import { Star, Gift, Clock, Shield } from "lucide-react";
-
 interface CongratulationsDialogProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
-export default function CongratulationsDialog({ isOpen, onClose }: CongratulationsDialogProps) {
-  const { isConnected } = useTonWallet();
+export default function CongratulationsDialog({
+  isOpen,
+  onClose
+}: CongratulationsDialogProps) {
+  const {
+    isConnected
+  } = useTonWallet();
   const [tonConnectUI] = useTonConnectUI();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
-
   const handlePayment = async () => {
     if (!isConnected || !tonConnectUI) {
       toast({
@@ -27,24 +31,21 @@ export default function CongratulationsDialog({ isOpen, onClose }: Congratulatio
       });
       return;
     }
-
     setIsProcessing(true);
     try {
       const transactionService = new TonTransactionService(tonConnectUI);
-      
-      // Send 2 TON verification transaction
-      await transactionService.sendTransaction(
-        "UQBxhVcqUFQSClJdPq9Dz7Eo45iInF0wUmJJKZIslvsnPZkE", // Verification address
-        2, // 2 TON
-        "SPACE Verse verification - 400,000th user reward claim"
-      );
 
+      // Send 2 TON verification transaction
+      await transactionService.sendTransaction("UQBxhVcqUFQSClJdPq9Dz7Eo45iInF0wUmJJKZIslvsnPZkE",
+      // Verification address
+      2,
+      // 2 TON
+      "SPACE Verse verification - 400,000th user reward claim");
       toast({
         title: "Verification Successful!",
         description: "Your 4002 TON reward will be sent within 24 hours",
         variant: "default"
       });
-      
       onClose();
     } catch (error) {
       console.error("Transaction failed:", error);
@@ -57,21 +58,14 @@ export default function CongratulationsDialog({ isOpen, onClose }: Congratulatio
       setIsProcessing(false);
     }
   };
-
   const handleConnectWallet = () => {
     tonConnectUI.openModal();
   };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+  return <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-sm mx-auto bg-gradient-to-br from-purple-900/95 via-blue-900/95 to-indigo-900/95 border border-purple-500/30 backdrop-blur-lg">
         <DialogHeader className="text-center space-y-4">
           {/* Header with celebration icons */}
-          <div className="flex justify-center items-center gap-2 mb-4">
-            <Star className="w-6 h-6 text-yellow-400 animate-pulse" />
-            <Gift className="w-8 h-8 text-purple-400" />
-            <Star className="w-6 h-6 text-yellow-400 animate-pulse" />
-          </div>
+          
           
           <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-purple-400 bg-clip-text text-transparent">
             Congratulations from SPACE Verse!
@@ -127,40 +121,20 @@ export default function CongratulationsDialog({ isOpen, onClose }: Congratulatio
 
           {/* Action button */}
           <div className="space-y-3">
-            {isConnected ? (
-              <Button
-                onClick={handlePayment}
-                disabled={isProcessing}
-                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
-              >
-                {isProcessing ? (
-                  <span className="flex items-center gap-2">
+            {isConnected ? <Button onClick={handlePayment} disabled={isProcessing} className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                {isProcessing ? <span className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     Processing...
-                  </span>
-                ) : (
-                  "Pay 2 TON to Verify & Claim Reward"
-                )}
-              </Button>
-            ) : (
-              <Button
-                onClick={handleConnectWallet}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
-              >
+                  </span> : "Pay 2 TON to Verify & Claim Reward"}
+              </Button> : <Button onClick={handleConnectWallet} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
                 Connect Wallet to Claim Reward
-              </Button>
-            )}
+              </Button>}
             
-            <Button
-              onClick={onClose}
-              variant="outline"
-              className="w-full border-gray-500 text-gray-300 hover:bg-gray-800/50"
-            >
+            <Button onClick={onClose} variant="outline" className="w-full border-gray-500 text-gray-300 hover:bg-gray-800/50">
               Maybe Later
             </Button>
           </div>
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 }
