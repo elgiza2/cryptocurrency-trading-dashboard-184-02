@@ -311,10 +311,15 @@ const ServerPage = ({
                   
                   <div className="grid grid-cols-2 gap-3 text-center py-3">
                     <div>
-                      <div className="text-lg font-bold text-green-400">
-                        +{selectedServer.price * 130} SPACE
+                      <div className="text-lg font-bold text-white flex items-center justify-center gap-1">
+                        {selectedServer.totalIncome}
+                        <img 
+                          src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" 
+                          alt="TON" 
+                          className="w-4 h-4"
+                        />
                       </div>
-                      <div className="text-xs text-blue-200">Daily Income</div>
+                      <div className="text-xs text-blue-200">Total Income</div>
                     </div>
                     <div>
                       <div className="text-lg font-bold text-white">{selectedServer.duration} days</div>
