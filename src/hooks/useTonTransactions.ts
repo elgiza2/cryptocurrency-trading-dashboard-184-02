@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTonWallet } from './useTonWallet';
 import { useTonPrice } from './useTonPrice';
 import { useToast } from '@/hooks/use-toast';
+import { AuthService } from '@/services/authService';
 
 export const useTonTransactions = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -12,7 +13,49 @@ export const useTonTransactions = () => {
   const { toast } = useToast();
 
   const PLATFORM_ADDRESS = "UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq";
-  const NETWORK_FEE = 0.005; // Reduced network fee
+  const NETWORK_FEE = 0.005;
+
+  // Enhanced user ID resolution
+  const getUserId = useCallback(async (): Promise<string | null> => {
+    try {
+      const authUser = await AuthService.getCurrentUser();
+      if (authUser?.isAuthenticated) {
+        return authUser.id;
+      }
+
+      // Fallback to legacy auth method
+      const { data: { user } } = await supabase.auth.getUser();
+      return user?.id || null;
+    } catch (error) {
+      console.error('Error getting user ID:', error);
+      return null;
+    }
+  }, []);
+
+  // Enhanced error handling
+  const handleTransactionError = useCallback((error: string, context: string) => {
+    console.error(`Transaction error in ${context}:`, error);
+    
+    let userMessage = 'حدث خطأ في المعاملة';
+    let description = error;
+
+    if (error.includes('not connected')) {
+      userMessage = 'المحفظة غير متصلة';
+      description = 'يرجى ربط محفظة TON أولاً';
+    } else if (error.includes('insufficient')) {
+      userMessage = 'رصيد غير كافي';
+      description = 'الرصيد غير كافي لإتمام المعاملة';
+    } else if (error.includes('cancelled')) {
+      userMessage = 'تم إلغاء المعاملة';
+      description = 'تم إلغاء المعاملة من قبل المستخدم';
+    }
+
+    toast({
+      title: userMessage,
+      description: description,
+      variant: "destructive"
+    });
+  }, [toast]);
 
   // Buy cryptocurrency with TON using real-time prices
   const buyCrypto = useCallback(async (
@@ -65,11 +108,11 @@ export const useTonTransactions = () => {
       // Price updates will be handled by admin or automated system
       
       // Record transaction in database and update user balance
-      const user = await supabase.auth.getUser();
-      if (user.data.user) {
+      const userId = await getUserId();
+      if (userId) {
         // Insert transaction with available fields
         const { error: transactionError } = await supabase.from('transactions').insert({
-          user_id: user.data.user.id,
+          user_id: userId,
           cryptocurrency_id: token.id,
           transaction_type: 'buy',
           amount: tokenAmount,
