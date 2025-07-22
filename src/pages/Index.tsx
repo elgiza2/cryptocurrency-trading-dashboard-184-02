@@ -13,6 +13,7 @@ import ReferralPage from "@/components/ReferralPage";
 import AboutServersPage from "@/components/AboutServersPage";
 import RoulettePage from "@/components/RoulettePage";
 import CurrencyExchange from "@/components/CurrencyExchange";
+import GiveawaysPage from "@/components/GiveawaysPage";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
@@ -31,7 +32,7 @@ const Index = () => {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1);
-      if (hash && ['home', 'activity', 'missions', 'wallet', 'nft', 'servers', 'referral', 'about-servers', 'roulette', 'exchange'].includes(hash)) {
+      if (hash && ['home', 'activity', 'missions', 'wallet', 'nft', 'servers', 'referral', 'about-servers', 'roulette', 'exchange', 'giveaways'].includes(hash)) {
         setActiveTab(hash);
       }
     };
@@ -75,7 +76,7 @@ const Index = () => {
   };
 
   // Check if current page should hide navigation
-  const shouldHideNavigation = ['about-servers', 'roulette', 'nft', 'exchange', 'activity', 'servers'].includes(activeTab);
+  const shouldHideNavigation = ['about-servers', 'roulette', 'nft', 'exchange', 'activity', 'servers', 'giveaways'].includes(activeTab);
 
   const renderContent = () => {
     if (showAdminLogin && !isAdminLoggedIn) {
@@ -123,6 +124,8 @@ const Index = () => {
         );
       case "nft":
         return <NFTPage onBack={() => navigateToTab("home")} />;
+      case "giveaways":
+        return <GiveawaysPage />;
       case "missions":
         return <TasksPage onNavigateToReferral={() => navigateToTab("referral")} />;
       case "wallet":

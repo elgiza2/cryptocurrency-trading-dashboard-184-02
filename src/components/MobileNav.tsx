@@ -42,9 +42,14 @@ const MobileNav = ({
       label: 'Tasks'
     },
     {
-      id: 'wallet',
+      id: 'nft',
       icon: Wallet,
-      label: 'Wallet'
+      label: 'NFT'
+    },
+    {
+      id: 'giveaways',
+      icon: Wallet,
+      label: 'Giveaways'
     }
   ];
 
