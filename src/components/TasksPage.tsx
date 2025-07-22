@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle, Gift, Users, ExternalLink, Copy, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DatabaseService } from "@/lib/database";
+import { supabase } from "@/integrations/supabase/client";
 import AdminPage from "./AdminPage";
 
 interface TasksPageProps {
@@ -36,7 +37,47 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
 
     fetchTasks();
     fetchUserTasks();
-  }, []);
+
+    // Set up real-time subscription for missions
+    const channel = supabase
+      .channel('missions-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'missions'
+        },
+        (payload) => {
+          console.log('Mission change detected:', payload);
+          // Refresh tasks when any change occurs
+          fetchTasks();
+          
+          // Show toast notification for admin changes
+          if (payload.eventType === 'INSERT') {
+            toast({
+              title: "New Mission Added!",
+              description: "A new mission is now available.",
+            });
+          } else if (payload.eventType === 'DELETE') {
+            toast({
+              title: "Mission Removed",
+              description: "A mission has been removed.",
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            toast({
+              title: "Mission Updated",
+              description: "A mission has been updated.",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [toast]);
 
   const fetchTasks = async () => {
     try {
