@@ -1,5 +1,5 @@
 
-import { Home, Users, Wallet, Zap, Gamepad2 } from "lucide-react";
+import { Home, Users, Wallet, Zap, Gamepad2, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -48,7 +48,7 @@ const MobileNav = ({
     },
     {
       id: 'giveaways',
-      icon: Wallet,
+      icon: Gift,
       label: 'Giveaways'
     }
   ];
