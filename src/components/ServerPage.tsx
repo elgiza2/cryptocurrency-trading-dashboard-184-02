@@ -155,9 +155,10 @@ const ServerPage = ({
         onServerPurchase(newServer);
       }
 
+      const dailySpaceIncome = selectedServer.price * 130; // 130 SPACE per TON invested per day
       toast({
         title: "Server Purchased!",
-        description: `${selectedServer.name} has been added to your collection. Transaction: ${selectedServer.price} TON`,
+        description: `${selectedServer.name} purchased! You will earn ${dailySpaceIncome} $SPACE daily for ${selectedServer.duration} days.`,
         className: "bg-green-900 border-green-700 text-green-100"
       });
 
@@ -308,28 +309,12 @@ const ServerPage = ({
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-3 gap-3 text-center py-3">
+                  <div className="grid grid-cols-2 gap-3 text-center py-3">
                     <div>
-                      <div className="text-lg font-bold flex items-center justify-center gap-1 text-white">
-                        {selectedServer.totalIncome}
-                        <img 
-                          src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" 
-                          alt="TON" 
-                          className="w-4 h-4"
-                        />
+                      <div className="text-lg font-bold text-green-400">
+                        +{selectedServer.price * 130} SPACE
                       </div>
-                      <div className="text-xs text-blue-200">Total Income</div>
-                    </div>
-                    <div>
-                      <div className="text-lg font-bold flex items-center justify-center gap-1 text-white">
-                        {(selectedServer.income / selectedServer.duration).toFixed(2)}
-                        <img 
-                          src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" 
-                          alt="TON" 
-                          className="w-4 h-4"
-                        />
-                      </div>
-                      <div className="text-xs text-blue-200">Income Per Day</div>
+                      <div className="text-xs text-blue-200">Daily Income</div>
                     </div>
                     <div>
                       <div className="text-lg font-bold text-white">{selectedServer.duration} days</div>

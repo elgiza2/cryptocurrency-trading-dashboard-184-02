@@ -116,16 +116,16 @@ const ReferralPage = ({ onBack, referralCount = 0 }: ReferralPageProps) => {
         </div>
 
         {/* Subtitle */}
-        <div className="px-4 pb-4">
-          <p className="text-gray-400 text-base">
-            Get TON for every server rental by your friends!
-          </p>
-        </div>
+          <div className="px-4 pb-4">
+            <p className="text-gray-400 text-base">
+              Get TON for every server rental by your friends!
+            </p>
+          </div>
 
         {/* Friends Level Info */}
         <div className="px-4 pb-4">
           <div className="bg-secondary/60 rounded-xl p-4 border border-white/10">
-            <h3 className="text-white font-semibold text-lg mb-1">Level 1 Friends</h3>
+            <h3 className="text-white font-semibold text-lg mb-1">Friends</h3>
             <p className="text-gray-400 text-sm">Reward: 7% of each server rental</p>
           </div>
         </div>

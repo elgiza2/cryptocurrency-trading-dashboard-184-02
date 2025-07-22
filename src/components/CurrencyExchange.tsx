@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft, TrendingUp, TrendingDown, ArrowDownUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTonPrice } from "@/hooks/useTonPrice";
+import { supabase } from "@/integrations/supabase/client";
 import CryptoChart from "./CryptoChart";
 import UnifiedBackButton from "./UnifiedBackButton";
+import spaceLogoUrl from "@/assets/space-logo.png";
 
 interface CurrencyExchangeProps {
   onBack?: () => void;
@@ -23,12 +25,43 @@ const CurrencyExchange = ({
 }: CurrencyExchangeProps) => {
   const [giveAmount, setGiveAmount] = useState('');
   const [isSwapDirection, setIsSwapDirection] = useState(true);
+  const [spaceData, setSpaceData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { tonPrice } = useTonPrice();
 
-  const exchangeRate = 0.0006835;
+  // Load SPACE cryptocurrency data from database
+  useEffect(() => {
+    const loadSpaceData = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('cryptocurrencies')
+          .select('*')
+          .eq('symbol', 'SPACE')
+          .single();
+        
+        if (error) throw error;
+        setSpaceData(data);
+      } catch (error) {
+        console.error('Error loading SPACE data:', error);
+        // Fallback to default data
+        setSpaceData({
+          current_price: 0.0006835,
+          price_change_24h: 11.84,
+          name: 'SPACE',
+          symbol: 'SPACE'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadSpaceData();
+  }, []);
+
+  const exchangeRate = spaceData?.current_price || 0.0006835;
   const spacePrice = exchangeRate * tonPrice;
-  const priceChange24h = 11.84;
+  const priceChange24h = spaceData?.price_change_24h || 11.84;
   
   const calculateReceiveAmount = () => {
     const inputAmount = parseFloat(giveAmount);
@@ -93,28 +126,28 @@ const CurrencyExchange = ({
         {onBack && <UnifiedBackButton onBack={onBack} title="Currency Exchange" />}
 
         <div className="px-3 space-y-3 max-w-md mx-auto">
-          {/* Price Indicator Box - Black Background with Yellow Signals */}
-          <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl p-5">
+          {/* Price Indicator Box - Larger to contain signals */}
+          <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center">
-                  <span className="text-black text-sm font-bold">S</span>
+                <div className="w-14 h-14 rounded-full flex items-center justify-center overflow-hidden">
+                  <img src={spaceLogoUrl} alt="$SPACE" className="w-full h-full object-cover" />
                 </div>
                 <div>
                   <div className="text-lg font-bold text-white">$SPACE</div>
                   <div className="text-sm text-gray-300">
-                    ${spacePrice.toFixed(6)}
+                    ${loading ? '0.000000' : spacePrice.toFixed(6)}
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className={`flex items-center gap-2 text-sm font-medium`}>
+              <div className="text-right min-w-[100px]">
+                <div className={`flex items-center gap-2 text-sm font-medium justify-end`}>
                   {priceChange24h > 0 ? 
                     <TrendingUp className="h-4 w-4 text-yellow-500" /> : 
                     <TrendingDown className="h-4 w-4 text-yellow-500" />
                   }
                   <span className="text-yellow-500">
-                    {priceChange24h > 0 ? '+' : ''}{priceChange24h}%
+                    {priceChange24h > 0 ? '+' : ''}{priceChange24h.toFixed(2)}%
                   </span>
                 </div>
                 <div className="text-xs text-gray-400 mt-1">24h</div>

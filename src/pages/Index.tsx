@@ -135,6 +135,7 @@ const Index = () => {
           <ActivityRewardsPage 
             onNavigateToReferral={() => navigateToTab("referral")}
             onNavigateToServers={() => navigateToTab("servers")}
+            onNavigateToTasks={() => navigateToTab("missions")}
             onBack={() => navigateToTab("home")}
             activityStreak={appState.activityStreak}
           />

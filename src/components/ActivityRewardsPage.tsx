@@ -9,10 +9,13 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useApp } from "@/contexts/AppContext";
 
 interface ActivityRewardsPageProps {
   onNavigateToReferral?: () => void;
   onNavigateToServers?: () => void;
+  onNavigateToTasks?: () => void;
   onBack?: () => void;
   activityStreak?: number;
 }
@@ -20,11 +23,17 @@ interface ActivityRewardsPageProps {
 const ActivityRewardsPage = ({ 
   onNavigateToReferral, 
   onNavigateToServers,
+  onNavigateToTasks,
   onBack,
   activityStreak = 0 
 }: ActivityRewardsPageProps) => {
   const [timeLeft, setTimeLeft] = useState({ days: 2, hours: 22, minutes: 54, seconds: 3 });
-  const [telegramUser, setTelegramUser] = useState<any>(null);
+  const [missions, setMissions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [userMissions, setUserMissions] = useState<any[]>([]);
+  const [friendsCount, setFriendsCount] = useState(0);
+  const [miningEarnings, setMiningEarnings] = useState(0);
+  const { telegramUser } = useApp();
   const { toast } = useToast();
 
   const prizes = [
@@ -54,19 +63,64 @@ const ActivityRewardsPage = ({
     }
   ];
 
+  // Load missions and user data
   useEffect(() => {
-    // Get Telegram user data
-    if ((window as any).Telegram?.WebApp?.initDataUnsafe?.user) {
-      setTelegramUser((window as any).Telegram.WebApp.initDataUnsafe.user);
-    } else {
-      setTelegramUser({
-        id: 123456789,
-        first_name: "Demo",
-        last_name: "User",
-        username: "demo_user"
-      });
-    }
+    const loadData = async () => {
+      if (!telegramUser?.id) return;
+      
+      try {
+        setLoading(true);
+        
+        // Load missions
+        const { data: missionsData, error: missionsError } = await supabase
+          .from('missions')
+          .select('*')
+          .eq('is_active', true);
+        
+        if (missionsError) throw missionsError;
+        setMissions(missionsData || []);
+        
+        // Load user missions
+        const { data: userMissionsData, error: userMissionsError } = await supabase
+          .from('user_missions')
+          .select('*')
+          .eq('user_id', telegramUser.id.toString());
+        
+        if (userMissionsError) throw userMissionsError;
+        setUserMissions(userMissionsData || []);
+        
+        // Load friends count
+        const { data: referralsData, error: referralsError } = await supabase
+          .from('referrals')
+          .select('id')
+          .eq('referrer_user_id', telegramUser.id.toString());
+        
+        if (referralsError) throw referralsError;
+        setFriendsCount(referralsData?.length || 0);
+        
+        // Load mining earnings from user_servers
+        const { data: serversData, error: serversError } = await supabase
+          .from('user_servers')
+          .select('purchase_price')
+          .eq('user_id', telegramUser.id.toString())
+          .eq('is_active', true);
+        
+        if (serversError) throw serversError;
+        const totalInvestment = serversData?.reduce((sum, server) => sum + parseFloat(server.purchase_price.toString()), 0) || 0;
+        // Calculate daily earnings: 130 SPACE per TON invested
+        setMiningEarnings(totalInvestment * 130);
+        
+      } catch (error) {
+        console.error('Error loading activity data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
+  }, [telegramUser?.id]);
 
+  useEffect(() => {
     // Start countdown timer
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -109,11 +163,15 @@ const ActivityRewardsPage = ({
   };
 
   const handleTaskConfirm = () => {
-    toast({
-      title: "Tasks Completed!",
-      description: "Your daily streak has been updated.",
-      className: "bg-green-900 border-green-700 text-green-100"
-    });
+    if (onNavigateToTasks) {
+      onNavigateToTasks();
+    } else {
+      toast({
+        title: "Tasks Completed!",
+        description: "Your daily streak has been updated.",
+        className: "bg-green-900 border-green-700 text-green-100"
+      });
+    }
   };
 
   return (
@@ -213,30 +271,34 @@ const ActivityRewardsPage = ({
             {/* Tasks Section */}
             <div>
               <h3 className="text-base font-semibold mb-3">Tasks</h3>
-              <div className="space-y-2">
-                {[
-                  { name: "Share with friends", color: "bg-blue-500", completed: false },
-                  { name: "Watch ad #1", color: "bg-green-500", completed: false },
-                  { name: "Watch ad #2", color: "bg-gradient-to-r from-orange-500 to-red-500", completed: false },
-                  { name: "Watch ad #3", color: "bg-cyan-500", completed: false },
-                  { name: "Watch ad #4", color: "bg-gradient-to-r from-yellow-400 to-yellow-600", completed: false },
-                  { name: "Watch ad #5", color: "bg-pink-500", completed: false }
-                ].map((task, index) => (
-                  <Card key={index} className="bg-secondary/30 border-white/20 p-3 rounded-xl hover:bg-secondary/50 transition-colors cursor-pointer backdrop-blur-sm">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 ${task.color} rounded-full`}></div>
-                      <span className="flex-1 font-medium text-sm">{task.name}</span>
-                      <ChevronRight className="h-4 w-4 text-gray-400" />
-                    </div>
-                  </Card>
-                ))}
-              </div>
+              {loading ? (
+                <div className="text-center text-gray-400 py-4">Loading tasks...</div>
+              ) : (
+                <div className="space-y-2">
+                  {missions.slice(0, 6).map((mission, index) => {
+                    const isCompleted = userMissions.some(um => um.mission_id === mission.id);
+                    const colors = ["bg-blue-500", "bg-green-500", "bg-gradient-to-r from-orange-500 to-red-500", "bg-cyan-500", "bg-gradient-to-r from-yellow-400 to-yellow-600", "bg-pink-500"];
+                    
+                    return (
+                      <Card key={mission.id} className="bg-secondary/30 border-white/20 p-3 rounded-xl hover:bg-secondary/50 transition-colors cursor-pointer backdrop-blur-sm">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 ${colors[index % colors.length]} rounded-full flex items-center justify-center`}>
+                            {isCompleted && <span className="text-white text-xs">✓</span>}
+                          </div>
+                          <span className="flex-1 font-medium text-sm">{mission.title}</span>
+                          <ChevronRight className="h-4 w-4 text-gray-400" />
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
               
               <Button 
                 onClick={handleTaskConfirm}
                 className="w-full mt-4 bg-primary hover:bg-primary/90 h-12 text-base rounded-2xl font-medium"
               >
-                Confirm
+                View All Tasks
               </Button>
             </div>
 
@@ -291,7 +353,7 @@ const ActivityRewardsPage = ({
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-base">You</h3>
-                  <p className="text-gray-400 text-xs">0 friends</p>
+                  <p className="text-gray-400 text-xs">{friendsCount} friends</p>
                 </div>
               </div>
             </Card>
@@ -347,7 +409,7 @@ const ActivityRewardsPage = ({
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-base">You</h3>
-                  <p className="text-gray-400 text-xs">119.06 $SPACE</p>
+                  <p className="text-gray-400 text-xs">{miningEarnings.toFixed(2)} $SPACE</p>
                 </div>
               </div>
             </Card>

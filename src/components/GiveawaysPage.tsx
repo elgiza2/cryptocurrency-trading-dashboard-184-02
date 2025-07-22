@@ -196,15 +196,12 @@ const GiveawaysPage = () => {
   const GiveawayCard = ({ giveaway, isFinished = false }: { giveaway: Giveaway; isFinished?: boolean }) => (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-primary/20">
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-lg font-bold text-primary">{giveaway.title}</CardTitle>
-          <Badge variant={isFinished ? "secondary" : "default"} className="shrink-0">
-            {isFinished ? "Ended" : "Active"}
-          </Badge>
-        </div>
-        {giveaway.description && (
-          <p className="text-muted-foreground text-sm">{giveaway.description}</p>
-        )}
+          <div className="flex items-start justify-between">
+            <CardTitle className="text-lg font-bold text-primary">{giveaway.title}</CardTitle>
+            <Badge variant={isFinished ? "secondary" : "default"} className="shrink-0">
+              {isFinished ? "Ended" : "Active"}
+            </Badge>
+          </div>
       </CardHeader>
       
       <CardContent className="space-y-4">

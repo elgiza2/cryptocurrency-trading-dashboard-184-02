@@ -85,9 +85,10 @@ const MiningDashboard = ({
         const sources = [];
         let totalIncome = 0;
 
-        // Server income
+        // Server income - 130 SPACE per TON invested per day
         const serverIncome = (serversData || []).reduce((total, server) => {
-          return total + (server.mining_power * 24); // Daily income
+          const tonInvestment = server.servers?.price_ton || 1;
+          return total + (tonInvestment * 130); // 130 SPACE per TON per day
         }, 0);
         if (serverIncome > 0) {
           sources.push({ source: "Server Mining", amount: serverIncome, type: "server" });
@@ -283,7 +284,8 @@ const MiningDashboard = ({
                     const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
                     const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    const dailyIncome = userServer.mining_power * 0.02; // Example calculation
+                    const tonInvestment = userServer.servers?.price_ton || 1;
+                    const dailyIncome = tonInvestment * 130; // 130 SPACE per TON per day
 
                     return (
                       <div key={index} className="bg-white/10 backdrop-blur-sm p-3 rounded-xl">
@@ -302,12 +304,7 @@ const MiningDashboard = ({
                           </div>
                           <div className="text-right">
                             <div className="text-lg font-bold flex items-center gap-1 text-white">
-                              ~ {dailyIncome.toFixed(2)}
-                              <img 
-                                src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" 
-                                alt="TON" 
-                                className="w-4 h-4"
-                              />
+                              + {dailyIncome.toFixed(0)} SPACE
                             </div>
                             <div className="text-xs text-blue-200">Income Per Day</div>
                           </div>
@@ -326,8 +323,7 @@ const MiningDashboard = ({
               <div className="flex gap-2">
                 <Button 
                   onClick={handleRentServer}
-                  className="w-full bg-transparent hover:bg-white/10 border-0 h-12 text-base rounded-2xl font-medium text-white"
-                  variant="outline"
+                  className="w-full bg-blue-600 hover:bg-blue-700 border-0 h-12 text-base rounded-2xl font-medium text-white"
                 >
                   Rent Server
                 </Button>
