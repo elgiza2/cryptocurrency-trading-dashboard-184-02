@@ -28,6 +28,7 @@ interface Giveaway {
 
 const GiveawaysPage = () => {
   const [activeGiveaways, setActiveGiveaways] = useState<Giveaway[]>([]);
+  const [finishedGiveaways, setFinishedGiveaways] = useState<Giveaway[]>([]);
   const [loading, setLoading] = useState(true);
   const [tonConnectUI] = useTonConnectUI();
   const [transactionService, setTransactionService] = useState<TonTransactionService | null>(null);
@@ -63,7 +64,18 @@ const GiveawaysPage = () => {
 
       if (activeError) throw activeError;
 
+      // Fetch finished giveaways
+      const { data: finished, error: finishedError } = await supabase
+        .from('giveaways')
+        .select('*')
+        .eq('is_finished', true)
+        .order('end_time', { ascending: false })
+        .limit(10);
+
+      if (finishedError) throw finishedError;
+
       setActiveGiveaways(active || []);
+      setFinishedGiveaways(finished || []);
     } catch (error) {
       console.error('Error loading giveaways:', error);
       toast({
@@ -279,21 +291,44 @@ const GiveawaysPage = () => {
     <div className="container mx-auto px-4 py-8">
       
 
-      <div className="space-y-6">
-        {activeGiveaways.length === 0 ? (
-          <div className="text-center py-12">
-            <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No Active Giveaways</h3>
-            <p className="text-muted-foreground">Follow us to get notifications about new giveaways</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activeGiveaways.map((giveaway) => (
-              <GiveawayCard key={giveaway.id} giveaway={giveaway} />
-            ))}
-          </div>
-        )}
-      </div>
+      <Tabs defaultValue="active" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
+          <TabsTrigger value="active">Active ({activeGiveaways.length})</TabsTrigger>
+          <TabsTrigger value="finished">Finished ({finishedGiveaways.length})</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="active" className="space-y-6">
+          {activeGiveaways.length === 0 ? (
+            <div className="text-center py-12">
+              <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No Active Giveaways</h3>
+              <p className="text-muted-foreground">Follow us to get notifications about new giveaways</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {activeGiveaways.map((giveaway) => (
+                <GiveawayCard key={giveaway.id} giveaway={giveaway} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="finished" className="space-y-6">
+          {finishedGiveaways.length === 0 ? (
+            <div className="text-center py-12">
+              <Calendar className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No Finished Giveaways</h3>
+              <p className="text-muted-foreground">Recently finished giveaways will appear here</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {finishedGiveaways.map((giveaway) => (
+                <GiveawayCard key={giveaway.id} giveaway={giveaway} isFinished />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       {/* Mobile Navigation */}
       <MobileNav 
