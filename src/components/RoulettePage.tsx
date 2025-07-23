@@ -292,30 +292,30 @@ const RoulettePage = ({
               </div>
             </div>
 
-            {/* Spin Controls */}
-            <div className="bg-gradient-to-t from-background via-background/95 to-transparent backdrop-blur-xl p-4 rounded-2xl space-y-3 border border-white/20">
-              <div className="flex gap-2 justify-center">
-                {spinPrices.map(price => <Button key={price} variant={selectedSpinPrice === price ? "default" : "outline"} size="sm" onClick={() => setSelectedSpinPrice(price)} className={`px-3 py-1.5 rounded-full transition-all text-xs ${selectedSpinPrice === price ? 'bg-primary text-white border-primary shadow-lg shadow-primary/30' : 'bg-secondary/60 text-white/70 border-white/20 hover:bg-secondary/80'}`}>
-                    <img src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" alt="TON" className="w-2.5 h-2.5 mr-1" />
-                    {price}
-                  </Button>)}
-              </div>
-              
-              <Button onClick={() => handleSpin(false)} className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 h-12 text-base font-bold rounded-2xl shadow-lg shadow-primary/40 transition-all duration-300 transform hover:scale-105" disabled={isSpinning}>
-                {isSpinning ? <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Spinning...</span>
-                  </div> : <div className="flex items-center gap-2">
-                    <img src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" alt="TON" className="w-4 h-4" />
-                    <span>Spin for {selectedSpinPrice} TON</span>
-                  </div>}
-              </Button>
-            </div>
-
-            <div className="h-28"></div>
+            <div className="h-32"></div>
           </div>
         </div>
       </ScrollArea>
+
+      {/* Fixed Spin Controls Above Bottom Navigation */}
+      <div className="fixed bottom-16 left-0 right-0 bg-gradient-to-t from-background via-background/95 to-transparent backdrop-blur-xl p-4 space-y-3 border-t border-white/20">
+        <div className="flex gap-2 justify-center">
+          {spinPrices.map(price => <Button key={price} variant={selectedSpinPrice === price ? "default" : "outline"} size="sm" onClick={() => setSelectedSpinPrice(price)} className={`px-3 py-1.5 rounded-full transition-all text-xs ${selectedSpinPrice === price ? 'bg-primary text-white border-primary shadow-lg shadow-primary/30' : 'bg-secondary/60 text-white/70 border-white/20 hover:bg-secondary/80'}`}>
+              <img src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" alt="TON" className="w-2.5 h-2.5 mr-1" />
+              {price}
+            </Button>)}
+        </div>
+        
+        <Button onClick={() => handleSpin(false)} className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 h-12 text-base font-bold rounded-2xl shadow-lg shadow-primary/40 transition-all duration-300 transform hover:scale-105" disabled={isSpinning}>
+          {isSpinning ? <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Spinning...</span>
+            </div> : <div className="flex items-center gap-2">
+              <img src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" alt="TON" className="w-4 h-4" />
+              <span>Spin for {selectedSpinPrice} TON</span>
+            </div>}
+        </Button>
+      </div>
 
     </div>;
 };
