@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -29,6 +30,7 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
     isVisible: !!onBack 
   });
 
+  // Fixed SPACE logo URL
   const spaceLogoUrl = "https://assets.pepecase.app/assets/space-logo.png";
 
   const handleSwapCurrencies = () => {
@@ -119,15 +121,31 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
 
   return (
     <div className="min-h-screen unified-gaming-bg text-foreground">
-      <div className="pt-4">
+      <div className="pt-8">
         <div className="px-3 space-y-3 max-w-md mx-auto">
-          {/* Price Indicator Box - Back to normal size */}
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-white mb-2">Exchange</h1>
+            <p className="text-white/70 text-lg">
+              Trade between SPACE and TON tokens
+            </p>
+          </div>
+
+          {/* Price Indicator Box */}
           <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl p-6 overflow-hidden">
             <div className="space-y-4">
               {/* Top row with logo and name */}
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
-                  <img src={spaceLogoUrl} alt="$SPACE" className="w-full h-full object-cover" />
+                  <img 
+                    src={spaceLogoUrl} 
+                    alt="$SPACE" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error('Error loading SPACE logo:', e);
+                      // Fallback to a default image or hide the image
+                    }}
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-xl font-bold text-white mb-1">$SPACE</div>
@@ -153,7 +171,7 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
             </div>
           </Card>
 
-          {/* Chart - Much larger for better visibility */}
+          {/* Chart */}
           <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl h-64 p-6">
             <CryptoChart currentPrice={spacePrice} />
           </Card>
