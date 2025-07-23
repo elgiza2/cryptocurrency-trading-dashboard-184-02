@@ -142,7 +142,7 @@
 }
 
 .telegram-safe-area {
-  padding-top: var(--telegram-safe-area-top);
+  padding-top: calc(var(--telegram-safe-area-top) + 16px);
   padding-bottom: var(--telegram-safe-area-bottom);
 }
 
