@@ -114,15 +114,24 @@ const NavButton = ({ item, isActive, onClick }: NavButtonProps) => {
   return (
     <Button
       variant="ghost"
-      className="flex flex-col items-center gap-0.5 h-auto p-1 rounded-lg transition-all duration-300 group hover:scale-105 active:scale-95"
+      className={cn(
+        "flex flex-col items-center gap-0.5 h-auto p-2 rounded-lg transition-all duration-300 group hover:scale-105",
+        "hover:bg-transparent active:bg-transparent focus:bg-transparent",
+        isActive ? "" : ""
+      )}
       onClick={onClick}
     >
-      
-      {/* Icon without background */}
-      <Icon className="h-4 w-4 text-gray-400 group-hover:text-white transition-all duration-300" />
+      {/* Icon */}
+      <Icon className={cn(
+        "h-5 w-5 transition-all duration-300",
+        isActive ? "text-white" : "text-gray-400 group-hover:text-white"
+      )} />
       
       {/* Label */}
-      <span className="text-xs font-medium text-gray-400 group-hover:text-white transition-colors duration-300">
+      <span className={cn(
+        "text-xs font-medium transition-colors duration-300",
+        isActive ? "text-white" : "text-gray-400 group-hover:text-white"
+      )}>
         {label}
       </span>
     </Button>
@@ -157,7 +166,7 @@ const CenterButton = ({ item, isActive, onClick }: CenterButtonProps) => {
         variant="ghost"
         className={cn(
           "relative h-20 w-20 rounded-full p-0 overflow-hidden transition-all duration-300 group",
-          "hover:scale-110 active:scale-95 shadow-2xl"
+          "hover:scale-110 shadow-2xl hover:bg-transparent active:bg-transparent focus:bg-transparent"
         )}
         onClick={onClick}
       >

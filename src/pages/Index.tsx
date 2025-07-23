@@ -82,7 +82,7 @@ const Index = () => {
   };
 
   // Check if current page should hide navigation
-  const shouldHideNavigation = ['about-servers', 'roulette', 'nft', 'exchange', 'activity', 'servers', 'giveaways'].includes(activeTab);
+  const shouldHideNavigation = ['about-servers', 'nft', 'exchange', 'activity', 'servers'].includes(activeTab);
 
   const renderContent = () => {
     if (showAdminLogin && !isAdminLoggedIn) {
