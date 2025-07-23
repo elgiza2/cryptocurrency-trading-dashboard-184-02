@@ -297,8 +297,8 @@ const RoulettePage = ({
         </div>
       </ScrollArea>
 
-      {/* Fixed Bottom Section */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/95 to-transparent backdrop-blur-xl p-3 space-y-3">
+      {/* Fixed Bottom Section - Hidden */}
+      <div className="hidden fixed bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/95 to-transparent backdrop-blur-xl p-3 space-y-3">
         
         
 
