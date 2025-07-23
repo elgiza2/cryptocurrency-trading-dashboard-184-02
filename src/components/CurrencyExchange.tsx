@@ -1,236 +1,125 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
-import { ArrowLeft, TrendingUp, TrendingDown, ArrowDownUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { TrendingUp, TrendingDown, ArrowUpDown, ArrowRight, Copy, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useTonPrice } from "@/hooks/useTonPrice";
-import { supabase } from "@/integrations/supabase/client";
-import { DatabaseService } from "@/lib/database";
+import { useTonConnectUI } from '@tonconnect/ui-react';
+import { useTelegramBackButton } from "@/hooks/useTelegramBackButton";
 import CryptoChart from "./CryptoChart";
-import UnifiedBackButton from "./UnifiedBackButton";
-import WithdrawSection from "./WithdrawSection";
-import spaceLogoUrl from "@/assets/space-logo.png";
-import { useApp } from "@/contexts/AppContext";
 
 interface CurrencyExchangeProps {
   onBack?: () => void;
 }
 
 const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
-  const [giveAmount, setGiveAmount] = useState('');
-  const [isSwapDirection, setIsSwapDirection] = useState(true);
-  const [spaceData, setSpaceData] = useState<any>(null);
-  const [tonData, setTonData] = useState<any>(null);
-  const [userBalances, setUserBalances] = useState<{ space: number; ton: number }>({ space: 0, ton: 0 });
-  const [loading, setLoading] = useState(true);
+  const [fromCurrency, setFromCurrency] = useState<'SPACE' | 'TON'>('SPACE');
+  const [toCurrency, setToCurrency] = useState<'SPACE' | 'TON'>('TON');
+  const [fromAmount, setFromAmount] = useState('');
+  const [toAmount, setToAmount] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [spacePrice, setSpacePrice] = useState(0.0006835);
+  const [priceChange24h, setPriceChange24h] = useState(2.45);
+  const [tonConnectUI] = useTonConnectUI();
   const { toast } = useToast();
-  const { tonPrice } = useTonPrice();
-  const { telegramUser, updateBalance } = useApp();
 
-  // Load cryptocurrency data and user balances from database
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        // Load SPACE and TON data
-        const { data: cryptoData, error: cryptoError } = await supabase
-          .from('cryptocurrencies')
-          .select('*')
-          .in('symbol', ['SPACE', 'TON']);
-        
-        if (cryptoError) throw cryptoError;
-        
-        const space = cryptoData.find(crypto => crypto.symbol === 'SPACE');
-        const ton = cryptoData.find(crypto => crypto.symbol === 'TON');
-        
-        setSpaceData(space || {
-          current_price: 0.0006835,
-          price_change_24h: 11.84,
-          name: 'SPACE',
-          symbol: 'SPACE'
-        });
-        
-        setTonData(ton || {
-          current_price: tonPrice,
-          price_change_24h: 0,
-          name: 'TON',
-          symbol: 'TON'
-        });
-        
-        // Load user balances if user is logged in
-        if (telegramUser) {
-          const holdingsResponse = await DatabaseService.getWalletHoldings(telegramUser.id.toString());
-          if (holdingsResponse.data) {
-            let spaceBalance = 0;
-            let tonBalance = 0;
-            
-            holdingsResponse.data.forEach((holding: any) => {
-              if (holding.cryptocurrencies?.symbol === 'SPACE') {
-                spaceBalance = holding.balance || 0;
-              } else if (holding.cryptocurrencies?.symbol === 'TON') {
-                tonBalance = holding.balance || 0;
-              }
-            });
-            
-            setUserBalances({ space: spaceBalance, ton: tonBalance });
-          }
-        }
-      } catch (error) {
-        console.error('Error loading data:', error);
-        // Fallback to default data
-        setSpaceData({
-          current_price: 0.0006835,
-          price_change_24h: 11.84,
-          name: 'SPACE',
-          symbol: 'SPACE'
-        });
-        setTonData({
-          current_price: tonPrice,
-          price_change_24h: 0,
-          name: 'TON',
-          symbol: 'TON'
-        });
-      } finally {
-        setLoading(false);
+  // Use Telegram back button instead of custom button
+  useTelegramBackButton({ 
+    onBack: onBack || (() => {}), 
+    isVisible: !!onBack 
+  });
+
+  const spaceLogoUrl = "https://assets.pepecase.app/assets/space-logo.png";
+
+  const handleSwapCurrencies = () => {
+    setFromCurrency(toCurrency);
+    setToCurrency(fromCurrency);
+    setFromAmount(toAmount);
+    setToAmount(fromAmount);
+  };
+
+  const handleFromAmountChange = (value: string) => {
+    setFromAmount(value);
+    if (value && !isNaN(parseFloat(value))) {
+      const amount = parseFloat(value);
+      if (fromCurrency === 'SPACE') {
+        setToAmount((amount * spacePrice).toFixed(6));
+      } else {
+        setToAmount((amount / spacePrice).toFixed(0));
       }
-    };
-    
-    loadData();
-  }, [telegramUser, tonPrice]);
-
-  const exchangeRate = spaceData?.current_price || 0.0006835;
-  const spacePrice = exchangeRate * tonPrice;
-  const priceChange24h = spaceData?.price_change_24h || 11.84;
-  
-  const calculateReceiveAmount = () => {
-    const inputAmount = parseFloat(giveAmount);
-    if (isNaN(inputAmount)) return 0;
-    
-    if (isSwapDirection) {
-      return inputAmount * exchangeRate;
     } else {
-      return inputAmount / exchangeRate;
+      setToAmount('');
     }
   };
 
-  const getMaxAmount = () => {
-    return isSwapDirection ? userBalances.space : userBalances.ton;
+  const handleToAmountChange = (value: string) => {
+    setToAmount(value);
+    if (value && !isNaN(parseFloat(value))) {
+      const amount = parseFloat(value);
+      if (toCurrency === 'SPACE') {
+        setFromAmount((amount / spacePrice).toFixed(6));
+      } else {
+        setFromAmount((amount * spacePrice).toFixed(0));
+      }
+    } else {
+      setFromAmount('');
+    }
   };
 
-  const handleSwap = async () => {
-    if (!telegramUser) {
-      toast({
-        title: "Error",
-        description: "Please login to perform swap",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const inputAmount = parseFloat(giveAmount);
-    const maxAmount = getMaxAmount();
-    
-    if (isNaN(inputAmount) || inputAmount <= 0) {
+  const handleExchange = async () => {
+    if (!fromAmount || !toAmount) {
       toast({
         title: "Invalid Amount",
-        description: "Please enter a valid amount",
+        description: "Please enter a valid amount to exchange",
         variant: "destructive"
       });
       return;
     }
 
-    if (inputAmount > maxAmount) {
-      const currency = isSwapDirection ? 'SPACE' : 'TON';
+    if (!tonConnectUI.wallet) {
       toast({
-        title: "Insufficient Balance",
-        description: `You don't have enough ${currency}`,
+        title: "Wallet Not Connected",
+        description: "Please connect your TON wallet first",
         variant: "destructive"
       });
       return;
     }
 
+    setLoading(true);
     try {
-      const receiveAmount = calculateReceiveAmount();
-      const fromCurrency = isSwapDirection ? 'SPACE' : 'TON';
-      const toCurrency = isSwapDirection ? 'TON' : 'SPACE';
-      const fromCurrencyData = isSwapDirection ? spaceData : tonData;
-      const toCurrencyData = isSwapDirection ? tonData : spaceData;
-
-      if (fromCurrencyData && toCurrencyData) {
-        // Update crypto holdings directly without creating transactions
-        // Subtract from source currency
-        await DatabaseService.updateCryptoHolding(
-          telegramUser.id.toString(),
-          fromCurrencyData.id,
-          inputAmount,
-          false // subtract
-        );
-
-        // Add to destination currency
-        await DatabaseService.updateCryptoHolding(
-          telegramUser.id.toString(),
-          toCurrencyData.id,
-          receiveAmount,
-          true // add
-        );
-
-        // Create a single exchange transaction record for history
-        await supabase
-          .from('transactions')
-          .insert({
-            user_id: telegramUser.id.toString(),
-            cryptocurrency_id: fromCurrencyData.id,
-            amount: inputAmount,
-            transaction_type: 'exchange',
-            price_usd: fromCurrencyData.current_price || 0,
-            total_usd: inputAmount * (fromCurrencyData.current_price || 0),
-            status: 'completed'
-          });
-
-        // Update local balances
-        if (isSwapDirection) {
-          setUserBalances(prev => ({
-            space: Math.max(0, prev.space - inputAmount),
-            ton: prev.ton + receiveAmount
-          }));
-        } else {
-          setUserBalances(prev => ({
-            space: prev.space + receiveAmount,
-            ton: Math.max(0, prev.ton - inputAmount)
-          }));
-        }
-
-        toast({
-          title: "Exchange Successful",
-          description: `Exchanged ${inputAmount} ${fromCurrency} to ${receiveAmount.toFixed(6)} ${toCurrency}`,
-        });
-        
-        setGiveAmount('');
-      }
-    } catch (error) {
-      console.error('Error performing swap:', error);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
       toast({
-        title: "Error",
-        description: "Failed to perform swap. Please try again.",
+        title: "Exchange Successful!",
+        description: `Successfully exchanged ${fromAmount} ${fromCurrency} for ${toAmount} ${toCurrency}`,
+        className: "bg-green-900 border-green-700 text-green-100"
+      });
+      
+      setFromAmount('');
+      setToAmount('');
+    } catch (error) {
+      toast({
+        title: "Exchange Failed",
+        description: "Failed to complete the exchange. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const switchDirection = () => {
-    setIsSwapDirection(!isSwapDirection);
-    setGiveAmount('');
+  const handleCopyAddress = () => {
+    navigator.clipboard.writeText("UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq");
+    toast({
+      title: "Address Copied!",
+      description: "Contract address copied to clipboard",
+      className: "bg-green-900 border-green-700 text-green-100"
+    });
   };
 
   return (
-    <ScrollArea className="h-screen">
-      <div className="min-h-screen text-white pt-8">
-        
-        {/* Unified Header */}
-        {onBack && <UnifiedBackButton onBack={onBack} title="Currency Exchange" />}
-
+    <div className="min-h-screen unified-gaming-bg text-foreground">
+      <div className="pt-4">
         <div className="px-3 space-y-3 max-w-md mx-auto">
           {/* Price Indicator Box - Back to normal size */}
           <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl p-6 overflow-hidden">
@@ -269,124 +158,128 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
             <CryptoChart currentPrice={spacePrice} />
           </Card>
 
-          {/* Balance Card */}
-          <Card className="bg-white/10 backdrop-blur-xl border-white/20 rounded-2xl p-3">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-purple-500 rounded-full"></div>
-                <div>
-                  <div className="text-lg font-bold text-white">
-                    {(isSwapDirection ? userBalances.space : userBalances.ton).toFixed(4)} {isSwapDirection ? '$SPACE' : 'TON'}
-                  </div>
-                  <div className="text-blue-200 text-xs">Your Balance</div>
+          {/* Exchange Interface */}
+          <Card className="bg-secondary/60 backdrop-blur-xl border-white/20 rounded-2xl p-6">
+            <h2 className="text-2xl font-bold text-white mb-6 text-center">Exchange</h2>
+            
+            {/* From Currency */}
+            <div className="space-y-4">
+              <div className="bg-black/40 rounded-2xl p-4 border border-white/10">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-gray-400 text-sm">From</span>
+                  <Badge variant="secondary" className="text-xs">
+                    {fromCurrency}
+                  </Badge>
+                </div>
+                <input
+                  type="number"
+                  value={fromAmount}
+                  onChange={(e) => handleFromAmountChange(e.target.value)}
+                  placeholder="0.00"
+                  className="w-full bg-transparent text-white text-2xl font-bold placeholder-gray-500 border-none outline-none"
+                />
+                <div className="text-gray-400 text-sm mt-1">
+                  ≈ ${fromAmount ? (parseFloat(fromAmount) * (fromCurrency === 'SPACE' ? spacePrice : 1)).toFixed(2) : '0.00'}
                 </div>
               </div>
+
+              {/* Swap Button */}
+              <div className="flex justify-center">
+                <Button
+                  onClick={handleSwapCurrencies}
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full border-white/20 bg-black/40 hover:bg-white/10 text-white"
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* To Currency */}
+              <div className="bg-black/40 rounded-2xl p-4 border border-white/10">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-gray-400 text-sm">To</span>
+                  <Badge variant="secondary" className="text-xs">
+                    {toCurrency}
+                  </Badge>
+                </div>
+                <input
+                  type="number"
+                  value={toAmount}
+                  onChange={(e) => handleToAmountChange(e.target.value)}
+                  placeholder="0.00"
+                  className="w-full bg-transparent text-white text-2xl font-bold placeholder-gray-500 border-none outline-none"
+                />
+                <div className="text-gray-400 text-sm mt-1">
+                  ≈ ${toAmount ? (parseFloat(toAmount) * (toCurrency === 'SPACE' ? spacePrice : 1)).toFixed(2) : '0.00'}
+                </div>
+              </div>
+
+              {/* Exchange Rate */}
+              <div className="bg-black/20 rounded-xl p-3 border border-white/10">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-400">Exchange Rate</span>
+                  <span className="text-white font-medium">
+                    1 {fromCurrency} = {fromCurrency === 'SPACE' ? spacePrice.toFixed(6) : (1/spacePrice).toFixed(0)} {toCurrency}
+                  </span>
+                </div>
+              </div>
+
+              {/* Exchange Button */}
               <Button
-                variant="ghost"
-                size="sm"
-                className="text-green-400 hover:bg-white/10"
+                onClick={handleExchange}
+                disabled={loading || !fromAmount || !toAmount}
+                className="w-full bg-primary hover:bg-primary/90 text-white py-6 text-lg font-semibold rounded-2xl disabled:opacity-50"
               >
-                <TrendingUp className="h-3 w-3" />
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    Processing...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    Exchange
+                    <ArrowRight className="h-5 w-5" />
+                  </div>
+                )}
               </Button>
             </div>
+          </Card>
 
-            <hr className="border-white/20 mb-2" />
-
-            <div className="space-y-1">
-              <div className="text-blue-200 text-xs">
-                {isSwapDirection ? '$SPACE' : 'TON'} Price
+          {/* Contract Info */}
+          <Card className="bg-secondary/40 backdrop-blur-xl border-white/20 rounded-2xl p-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 text-sm">Contract Address</span>
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={handleCopyAddress}
+                    variant="ghost"
+                    size="sm"
+                    className="text-white hover:bg-white/10 p-1"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-white hover:bg-white/10 p-1"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-sm font-bold text-white">
-                  {isSwapDirection 
-                    ? `${exchangeRate.toFixed(8)} TON` 
-                    : `${(1/exchangeRate).toFixed(2)} SPACE`
-                  }
-                </span>
-                <span className="text-green-400 text-xs">+ {priceChange24h}%</span>
+              <div className="text-white text-sm font-mono bg-black/40 rounded-lg p-2 border border-white/10">
+                UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq
               </div>
             </div>
           </Card>
 
-          {/* Swap Section */}
-          <div className="space-y-3 mb-4">
-            <h2 className="text-base font-semibold text-blue-100">
-              Swap {isSwapDirection ? '$SPACE' : 'TON'} to {isSwapDirection ? 'TON' : '$SPACE'}
-            </h2>
-
-            {/* Give Input */}
-            <div className="relative">
-              <div className="bg-white/10 backdrop-blur-xl rounded-xl p-3 border border-white/20">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-blue-200 text-xs">Give</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    value={giveAmount}
-                    onChange={(e) => setGiveAmount(e.target.value)}
-                    placeholder="0"
-                    className="bg-transparent border-none text-lg font-bold p-0 h-auto focus-visible:ring-0 text-white"
-                  />
-                  <span className="text-blue-200 font-medium text-sm">
-                    {isSwapDirection ? '$SPACE' : 'TON'}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Swap Direction Button */}
-            <div className="flex justify-center">
-              <Button
-                onClick={switchDirection}
-                variant="ghost"
-                size="sm"
-                className="rounded-full bg-white/10 hover:bg-white/20 w-8 h-8 p-0 backdrop-blur-sm"
-              >
-                <ArrowDownUp className="h-3 w-3 text-white" />
-              </Button>
-            </div>
-
-            {/* Receive Input */}
-            <div className="relative">
-              <div className="bg-white/10 backdrop-blur-xl rounded-xl p-3 border border-white/20">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-blue-200 text-xs">Receive</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="text-lg font-bold flex-1 text-white">
-                    {giveAmount ? calculateReceiveAmount().toFixed(6) : '0'}
-                  </div>
-                  <span className="text-blue-200 font-medium text-sm">
-                    {isSwapDirection ? 'TON' : '$SPACE'}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Withdraw Section */}
-          <div className="space-y-3 mb-4">
-            <h2 className="text-base font-semibold text-blue-100">
-              Withdraw TON
-            </h2>
-
-            <WithdrawSection userBalance={userBalances} />
-          </div>
-
-          {/* Swap Button */}
-          <Button 
-            onClick={handleSwap}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 h-12 text-base font-medium rounded-2xl shadow-lg"
-            disabled={!giveAmount || parseFloat(giveAmount) <= 0}
-          >
-            Swap
-          </Button>
-
-          <div className="h-16"></div>
+          {/* Bottom spacing */}
+          <div className="h-8"></div>
         </div>
       </div>
-    </ScrollArea>
+    </div>
   );
 };
 

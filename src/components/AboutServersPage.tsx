@@ -1,34 +1,41 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-import UnifiedBackButton from "./UnifiedBackButton";
+import { useTelegramBackButton } from "@/hooks/useTelegramBackButton";
 
 interface AboutServersPageProps {
   onBack?: () => void;
 }
 
 const AboutServersPage = ({ onBack }: AboutServersPageProps) => {
+  // Use Telegram back button instead of custom button
+  useTelegramBackButton({ 
+    onBack: onBack || (() => {}), 
+    isVisible: !!onBack 
+  });
+
   return (
     <ScrollArea className="h-screen">
       <div className="min-h-screen text-foreground">
-        
-        {/* Unified Header */}
-        {onBack && <UnifiedBackButton onBack={onBack} title="Space Verse" />}
+        <div className="p-4 space-y-4 pt-8">
+          {/* Title */}
+          <div className="text-center py-4">
+            <h1 className="text-3xl font-bold text-white mb-2">Space Verse</h1>
+          </div>
 
-        <div className="p-4 space-y-4">
           {/* Compact Logo */}
           <div className="text-center py-4">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-2xl mx-auto mb-3 flex items-center justify-center">
               <span className="text-white text-2xl font-bold">SV</span>
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Space Verse
-            </h1>
+            </h2>
           </div>
 
           {/* Compact Content */}
           <div className="space-y-4 max-w-md mx-auto">
             <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20">
-              <h2 className="text-lg font-bold text-blue-100 mb-2">About Mining</h2>
+              <h3 className="text-lg font-bold text-blue-100 mb-2">About Mining</h3>
               <p className="text-blue-200 text-sm leading-relaxed">
                 Space Verse allows you to rent virtual servers that mine cryptocurrency 24/7. 
                 Each server provides passive income in TON tokens.

@@ -1,14 +1,14 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft } from "lucide-react";
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { useToast } from "@/hooks/use-toast";
 import { DatabaseService } from "@/lib/database";
+import { useTelegramBackButton } from "@/hooks/useTelegramBackButton";
 import NFTDetailView from "./NFTDetailView";
-import UnifiedBackButton from "./UnifiedBackButton";
 
 interface NFTPageProps {
   onBack?: () => void;
@@ -88,6 +88,12 @@ const NFTPage = ({ onBack }: NFTPageProps) => {
   const [selectedNFT, setSelectedNFT] = useState<NFTItem | null>(null);
   const { toast } = useToast();
 
+  // Use Telegram back button instead of custom button
+  useTelegramBackButton({ 
+    onBack: onBack || (() => {}), 
+    isVisible: !!onBack 
+  });
+
   useEffect(() => {
     const initTelegramData = () => {
       if ((window as any).Telegram?.WebApp?.initDataUnsafe?.user) {
@@ -159,12 +165,10 @@ const NFTPage = ({ onBack }: NFTPageProps) => {
   return (
     <ScrollArea className="h-screen">
       <div className="min-h-screen unified-gaming-bg text-foreground">
-        {/* Unified Header */}
-        {onBack && <UnifiedBackButton onBack={onBack} title="NFT Miners" />}
-
-        <div className="p-6">
+        <div className="p-6 pt-8">
           {/* Title */}
           <div className="mb-8">
+            <h1 className="text-3xl font-bold text-white mb-2">NFT Miners</h1>
             <p className="text-white/70 text-lg">
               Presale of characters that will soon let you mine even more TON
             </p>
