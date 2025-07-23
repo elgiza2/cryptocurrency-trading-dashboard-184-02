@@ -154,6 +154,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_finished: boolean | null
+          is_free: boolean | null
           max_participants: number | null
           prize_image_url: string
           prize_value_ton: number
@@ -172,6 +173,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_finished?: boolean | null
+          is_free?: boolean | null
           max_participants?: number | null
           prize_image_url: string
           prize_value_ton: number
@@ -190,6 +192,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_finished?: boolean | null
+          is_free?: boolean | null
           max_participants?: number | null
           prize_image_url?: string
           prize_value_ton?: number
