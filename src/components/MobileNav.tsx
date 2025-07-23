@@ -51,7 +51,7 @@ const MobileNav = ({
   const rouletteItem = navItems.find(item => item.special);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50">
+    <div className="fixed bottom-0 left-0 right-0 z-50" style={{ paddingBottom: 'var(--telegram-safe-area-bottom)' }}>
       {/* Background with blur and gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-lg" />
       

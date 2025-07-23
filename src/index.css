@@ -54,9 +54,11 @@
     --glow-accent: 0 0 25px hsl(45 95% 60% / 0.6);
     --glow-success: 0 0 25px hsl(142 76% 55% / 0.5);
     
-    /* Telegram Mini App Safe Area */
-    --telegram-safe-area-top: env(safe-area-inset-top, 0px);
+    /* Telegram Mini App Viewport Variables */
+    --telegram-safe-area-top: 0px;
+    --telegram-safe-area-bottom: 0px;
     --telegram-viewport-height: 100vh;
+    --telegram-viewport-stable-height: 100vh;
   }
   
   * {
@@ -78,17 +80,26 @@
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     touch-action: pan-y;
-    
-    /* Support for iOS safe area */
-    padding-top: env(safe-area-inset-top);
+    height: 100%;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    
+    /* Use Telegram viewport variables */
     height: var(--telegram-viewport-height);
-    background: hsl(var(--background));
-    color: hsl(var(--foreground));
+    min-height: var(--telegram-viewport-stable-height);
+    
+    /* Animated dark blue gradient background */
+    background: linear-gradient(-45deg, 
+      hsl(220 84% 5%), 
+      hsl(225 70% 8%), 
+      hsl(230 60% 6%), 
+      hsl(235 50% 10%)
+    );
+    background-size: 400% 400%;
+    animation: darkBlueWave 15s ease infinite;
     
     /* Prevent horizontal scroll and zoom */
     overflow-x: hidden;
@@ -101,22 +112,18 @@
     
     /* Safe area support */
     padding-top: var(--telegram-safe-area-top);
+    padding-bottom: var(--telegram-safe-area-bottom);
+  }
+
+  /* Root element height */
+  #root {
+    height: 100%;
+    min-height: var(--telegram-viewport-height);
   }
 }
 
-/* Telegram Mini App Full Screen Support */
-.telegram-safe-area {
-  padding-top: var(--telegram-safe-area-top);
-  transition: padding-top 0.3s ease;
-}
-
-.telegram-full-height {
-  height: var(--telegram-viewport-height);
-  min-height: var(--telegram-viewport-height);
-}
-
-/* Animated Background */
-@keyframes gradientShift {
+/* Dark blue wave animation */
+@keyframes darkBlueWave {
   0% {
     background-position: 0% 50%;
   }
@@ -126,6 +133,50 @@
   100% {
     background-position: 0% 50%;
   }
+}
+
+/* Telegram Mini App Classes */
+.telegram-viewport {
+  height: var(--telegram-viewport-height);
+  min-height: var(--telegram-viewport-stable-height);
+}
+
+.telegram-safe-area {
+  padding-top: var(--telegram-safe-area-top);
+  padding-bottom: var(--telegram-safe-area-bottom);
+}
+
+.telegram-content {
+  height: calc(var(--telegram-viewport-height) - var(--telegram-safe-area-top) - var(--telegram-safe-area-bottom));
+  overflow-y: auto;
+}
+
+/* Enhanced Unified Gaming Background */
+.unified-gaming-bg {
+  background: linear-gradient(-45deg, 
+    hsl(220 84% 5%), 
+    hsl(225 70% 8%), 
+    hsl(230 60% 6%), 
+    hsl(235 50% 10%)
+  );
+  background-size: 400% 400%;
+  animation: darkBlueWave 15s ease infinite;
+  min-height: var(--telegram-viewport-height);
+}
+
+/* Black Background Class for specific elements */
+.unified-black-bg {
+  background: hsl(220 84% 3%);
+}
+
+/* Enhanced header background */
+.unified-header-bg {
+  background: linear-gradient(135deg, 
+    hsl(220 84% 5% / 0.95), 
+    hsl(225 70% 8% / 0.95)
+  );
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid hsl(220 30% 15%);
 }
 
 /* Gaming Glow Effects */
@@ -268,21 +319,4 @@
   @apply h-full transition-all duration-1000 ease-out;
   background: var(--gradient-primary);
   box-shadow: var(--glow-primary);
-}
-
-/* Enhanced Unified Gaming Background */
-.unified-gaming-bg {
-  background: linear-gradient(-45deg, 
-    hsl(var(--background)), 
-    hsl(220 50% 8%), 
-    hsl(250 40% 10%), 
-    hsl(270 30% 8%)
-  );
-  background-size: 400% 400%;
-  animation: gradientShift 12s ease infinite;
-}
-
-/* Black Background Class for specific elements */
-.unified-black-bg {
-  background: hsl(220 84% 3%);
 }

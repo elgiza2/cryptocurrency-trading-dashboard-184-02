@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import MobileNav from "@/components/MobileNav";
 import MiningDashboard from "@/components/MiningDashboard";
@@ -30,7 +31,7 @@ const Index = () => {
     referralCount: 0
   });
 
-  // استخدام hook الخاص بـ Telegram viewport
+  // Use Telegram viewport hook
   const viewport = useTelegramViewport();
 
   // Handle URL hash navigation
@@ -188,18 +189,23 @@ const Index = () => {
   };
 
   return (
-    <div className={`telegram-full-height unified-gaming-bg relative ${viewport.isExpanded ? 'telegram-safe-area' : ''}`}>
-      {/* Main Content */}
-      <div className={`${!shouldHideNavigation ? 'pb-20' : ''}`}>
-        {renderContent()}
+    <div className="telegram-viewport unified-gaming-bg">
+      {/* Safe area wrapper */}
+      <div className={`telegram-safe-area h-full ${viewport.isFullscreen ? 'telegram-content' : ''}`}>
+        {/* Main Content */}
+        <div className={`h-full ${!shouldHideNavigation ? 'pb-20' : ''}`}>
+          {renderContent()}
+        </div>
+        
+        {/* Mobile Navigation */}
+        {!shouldHideNavigation && !isAdminLoggedIn && (
+          <MobileNav 
+            activeTab={activeTab} 
+            onTabChange={handleTabChange}
+            onAdminAccess={() => setShowAdminLogin(true)}
+          />
+        )}
       </div>
-      
-      {/* Mobile Navigation */}
-      {!shouldHideNavigation && !isAdminLoggedIn && <MobileNav 
-        activeTab={activeTab} 
-        onTabChange={handleTabChange}
-        onAdminAccess={() => setShowAdminLogin(true)}
-      />}
 
       {/* Congratulations Dialog */}
       <CongratulationsDialog 
