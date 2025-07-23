@@ -108,51 +108,69 @@ export const useTelegramViewport = () => {
     }
 
     // Enable fullscreen mode
-    tg.expand();
+    try {
+      tg.expand();
+    } catch (error) {
+      console.error('Error expanding Telegram WebApp:', error);
+    }
     
     const updateViewport = () => {
-      const { topInset, bottomInset } = calculateSafeAreaInsets();
-      
-      const newViewport = {
-        isExpanded: tg.isExpanded || false,
-        height: tg.viewportHeight || window.innerHeight,
-        stableHeight: tg.viewportStableHeight || window.innerHeight,
-        safeAreaInsetTop: topInset,
-        safeAreaInsetBottom: bottomInset,
-        isFullscreen: tg.isExpanded || false
-      };
-      
-      setViewport(newViewport);
-      updateCSSVariables(newViewport);
-      
-      console.log('Telegram viewport updated:', newViewport);
+      try {
+        const { topInset, bottomInset } = calculateSafeAreaInsets();
+        
+        const newViewport = {
+          isExpanded: tg.isExpanded || false,
+          height: tg.viewportHeight || window.innerHeight,
+          stableHeight: tg.viewportStableHeight || window.innerHeight,
+          safeAreaInsetTop: topInset,
+          safeAreaInsetBottom: bottomInset,
+          isFullscreen: tg.isExpanded || false
+        };
+        
+        setViewport(newViewport);
+        updateCSSVariables(newViewport);
+        
+        console.log('Telegram viewport updated:', newViewport);
+      } catch (error) {
+        console.error('Error updating viewport:', error);
+      }
     };
 
     // Listen for viewport changes
-    tg.onEvent('viewportChanged', updateViewport);
-    
-    // Listen for theme changes
-    tg.onEvent('themeChanged', updateViewport);
+    try {
+      tg.onEvent('viewportChanged', updateViewport);
+      tg.onEvent('themeChanged', updateViewport);
+    } catch (error) {
+      console.error('Error setting up Telegram event listeners:', error);
+    }
     
     // Initial update
     updateViewport();
     
     // Also listen for window resize as fallback
     const handleWindowResize = () => {
-      if (!tg.viewportHeight) {
-        updateViewport();
-      }
+      console.log('Window resized:', { width: window.innerWidth, height: window.innerHeight });
+      setTimeout(updateViewport, 100);
+    };
+    
+    const handleOrientationChange = () => {
+      console.log('Orientation changed');
+      setTimeout(updateViewport, 300);
     };
     
     window.addEventListener('resize', handleWindowResize);
-    window.addEventListener('orientationchange', updateViewport);
+    window.addEventListener('orientationchange', handleOrientationChange);
     
     // Cleanup
     return () => {
-      tg.offEvent('viewportChanged', updateViewport);
-      tg.offEvent('themeChanged', updateViewport);
+      try {
+        tg.offEvent('viewportChanged', updateViewport);
+        tg.offEvent('themeChanged', updateViewport);
+      } catch (error) {
+        console.error('Error removing Telegram event listeners:', error);
+      }
       window.removeEventListener('resize', handleWindowResize);
-      window.removeEventListener('orientationchange', updateViewport);
+      window.removeEventListener('orientationchange', handleOrientationChange);
     };
   }, [calculateSafeAreaInsets, updateCSSVariables]);
 

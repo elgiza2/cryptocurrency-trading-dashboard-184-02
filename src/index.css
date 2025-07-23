@@ -89,7 +89,10 @@
     
     /* Use Telegram viewport variables */
     height: var(--telegram-viewport-height);
+    max-height: var(--telegram-viewport-height);
     min-height: var(--telegram-viewport-stable-height);
+    position: relative;
+    overflow-x: hidden;
     
     /* Animated dark blue gradient background */
     background: linear-gradient(-45deg, 
