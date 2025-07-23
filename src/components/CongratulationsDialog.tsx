@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -6,22 +7,21 @@ import { TonTransactionService } from "@/services/tonTransactionService";
 import { useTonConnectUI } from "@tonconnect/ui-react";
 import { useToast } from "@/hooks/use-toast";
 import { Star, Gift, Clock, Shield } from "lucide-react";
+
 interface CongratulationsDialogProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
 export default function CongratulationsDialog({
   isOpen,
   onClose
 }: CongratulationsDialogProps) {
-  const {
-    isConnected
-  } = useTonWallet();
+  const { isConnected } = useTonWallet();
   const [tonConnectUI] = useTonConnectUI();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+
   const handlePayment = async () => {
     if (!isConnected || !tonConnectUI) {
       toast({
@@ -31,6 +31,7 @@ export default function CongratulationsDialog({
       });
       return;
     }
+
     setIsProcessing(true);
     try {
       const transactionService = new TonTransactionService(tonConnectUI);
@@ -41,11 +42,13 @@ export default function CongratulationsDialog({
         2, // 2 TON
         "SPACE Verse verification - 400,000th user reward claim"
       );
+
       toast({
         title: "Verification Successful!",
         description: "Your 4002 TON reward will be sent within 24 hours",
         variant: "default"
       });
+
       onClose();
     } catch (error) {
       console.error("Transaction failed:", error);
@@ -58,10 +61,13 @@ export default function CongratulationsDialog({
       setIsProcessing(false);
     }
   };
+
   const handleConnectWallet = () => {
     tonConnectUI.openModal();
   };
-  return <Dialog open={isOpen} onOpenChange={onClose}>
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-xs w-[85vw] mx-auto backdrop-blur-2xl bg-gradient-to-br from-white/10 via-white/5 to-transparent border border-white/20 p-4 rounded-2xl shadow-2xl z-50">
         <DialogHeader className="text-center space-y-2">
           <DialogTitle className="text-lg font-bold bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 bg-clip-text text-transparent drop-shadow-sm">
@@ -111,16 +117,32 @@ export default function CongratulationsDialog({
 
           {/* Action button */}
           <div className="pt-2">
-            {isConnected ? <Button onClick={handlePayment} disabled={isProcessing} className="w-full backdrop-blur-xl bg-gradient-to-r from-emerald-500/20 to-green-500/20 hover:from-emerald-500/30 hover:to-green-500/30 border border-emerald-400/30 text-white text-sm py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-emerald-500/20">
-                {isProcessing ? <span className="flex items-center gap-2 justify-center">
+            {isConnected ? (
+              <Button 
+                onClick={handlePayment} 
+                disabled={isProcessing} 
+                className="w-full backdrop-blur-xl bg-gradient-to-r from-emerald-500/20 to-green-500/20 hover:from-emerald-500/30 hover:to-green-500/30 border border-emerald-400/30 text-white text-sm py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-emerald-500/20"
+              >
+                {isProcessing ? (
+                  <span className="flex items-center gap-2 justify-center">
                     <div className="w-4 h-4 border-2 border-white/70 border-t-transparent rounded-full animate-spin"></div>
                     Processing...
-                  </span> : "Pay 2 TON & Claim"}
-              </Button> : <Button onClick={handleConnectWallet} className="w-full backdrop-blur-xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 border border-blue-400/30 text-white text-sm py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-blue-500/20">
+                  </span>
+                ) : (
+                  "Pay 2 TON & Claim"
+                )}
+              </Button>
+            ) : (
+              <Button 
+                onClick={handleConnectWallet} 
+                className="w-full backdrop-blur-xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 border border-blue-400/30 text-white text-sm py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-blue-500/20"
+              >
                 Connect Wallet
-              </Button>}
+              </Button>
+            )}
           </div>
         </div>
       </DialogContent>
-    </Dialog>;
+    </Dialog>
+  );
 }

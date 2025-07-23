@@ -46,14 +46,14 @@ export const TonWalletCard = () => {
       try {
         await navigator.clipboard.writeText(walletAddress);
         toast({
-          title: "تم النسخ!",
-          description: "تم نسخ عنوان المحفظة إلى الحافظة",
+          title: "Copied!",
+          description: "Wallet address copied to clipboard",
         });
       } catch (error) {
         console.error('Failed to copy address:', error);
         toast({
-          title: "فشل النسخ",
-          description: "فشل في نسخ العنوان",
+          title: "Copy Failed",
+          description: "Failed to copy address",
           variant: "destructive"
         });
       }
@@ -92,8 +92,8 @@ export const TonWalletCard = () => {
       console.error('💥 Connection failed in card:', error);
       setConnectionState('error');
       toast({
-        title: "فشل الاتصال",
-        description: "تعذر ربط محفظة TON. تأكد من تثبيت محفظة TON",
+        title: "Connection Failed",
+        description: "Failed to connect TON wallet. Make sure you have a TON wallet installed",
         variant: "destructive"
       });
     }
@@ -110,11 +110,11 @@ export const TonWalletCard = () => {
               <div className="p-2 rounded-full bg-success/20">
                 <Wallet className="h-5 w-5 text-success" />
               </div>
-              محفظة TON
+              TON Wallet
             </div>
             <Badge variant="secondary" className="bg-success/20 text-success border-success/30 animate-pulse">
               <CheckCircle className="w-3 h-3 mr-1" />
-              متصل
+              Connected
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -126,7 +126,7 @@ export const TonWalletCard = () => {
                 {balance ? `${balance} TON` : (
                   <div className="flex items-center justify-center gap-2">
                     <RefreshCw className="h-5 w-5 animate-spin" />
-                    جاري التحميل...
+                    Loading...
                   </div>
                 )}
               </div>
@@ -136,7 +136,7 @@ export const TonWalletCard = () => {
                 </div>
               )}
               <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                <span>سعر TON:</span>
+                <span>TON Price:</span>
                 <span className="font-medium text-primary">${tonPrice.toFixed(2)}</span>
                 <Button 
                   size="icon" 
@@ -155,7 +155,7 @@ export const TonWalletCard = () => {
           <div className="space-y-3">
             <label className="text-sm font-medium text-foreground flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-success" />
-              عنوان المحفظة
+              Wallet Address
             </label>
             <div className="flex items-center gap-2 p-3 bg-card/30 rounded-xl border border-success/20 hover:border-success/40 transition-colors">
               <code className="flex-1 text-foreground text-sm font-mono">
@@ -173,12 +173,12 @@ export const TonWalletCard = () => {
           {/* Quick Actions with Enhanced UI */}
           <div className="grid grid-cols-2 gap-3">
             <div className="p-4 bg-primary/10 rounded-xl text-center hover:bg-primary/20 transition-all cursor-pointer border border-primary/20 hover:border-primary/40">
-              <div className="text-primary font-medium mb-1">إرسال</div>
-              <div className="text-xs text-muted-foreground">TON إلى محفظة أخرى</div>
+              <div className="text-primary font-medium mb-1">Send</div>
+              <div className="text-xs text-muted-foreground">TON to another wallet</div>
             </div>
             <div className="p-4 bg-secondary/10 rounded-xl text-center hover:bg-secondary/20 transition-all cursor-pointer border border-secondary/20 hover:border-secondary/40">
-              <div className="text-secondary font-medium mb-1">استقبال</div>
-              <div className="text-xs text-muted-foreground">عرض عنوان المحفظة</div>
+              <div className="text-secondary font-medium mb-1">Receive</div>
+              <div className="text-xs text-muted-foreground">Show wallet address</div>
             </div>
           </div>
 
@@ -190,7 +190,7 @@ export const TonWalletCard = () => {
             disabled={isLoading}
           >
             <LogOut className="h-4 w-4 mr-2" />
-            {isLoading ? "جاري قطع الاتصال..." : "قطع الاتصال"}
+            {isLoading ? "Disconnecting..." : "Disconnect"}
           </Button>
         </CardContent>
       </Card>
@@ -206,7 +206,7 @@ export const TonWalletCard = () => {
           <div className="p-2 rounded-full bg-primary/20">
             <Wallet className="h-5 w-5 text-primary" />
           </div>
-          محفظة TON
+          TON Wallet
         </CardTitle>
       </CardHeader>
       <CardContent className="relative">
@@ -216,11 +216,11 @@ export const TonWalletCard = () => {
             <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg animate-fade-in">
               <div className="flex items-center gap-2 text-destructive mb-2">
                 <AlertCircle className="h-4 w-4" />
-                <span className="text-sm font-medium">خطأ في الاتصال</span>
+                <span className="text-sm font-medium">Connection Error</span>
               </div>
               <p className="text-xs text-destructive/80">{connectionError}</p>
               <div className="text-xs text-muted-foreground mt-2">
-                تأكد من تثبيت محفظة TON مثل Tonkeeper أو TonHub
+                Make sure you have a TON wallet like Tonkeeper or TonHub installed
               </div>
             </div>
           )}
@@ -231,9 +231,9 @@ export const TonWalletCard = () => {
               <Wallet className="h-8 w-8 text-primary" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-foreground">اربط محفظتك</h3>
+              <h3 className="text-lg font-semibold text-foreground">Connect Your Wallet</h3>
               <p className="text-muted-foreground text-sm">
-                ابدأ تجربة التداول والاستثمار الآمن مع TON
+                Start your secure trading and investment experience with TON
               </p>
             </div>
           </div>
@@ -247,10 +247,10 @@ export const TonWalletCard = () => {
             {connectionState === 'connecting' ? (
               <div className="flex items-center gap-2">
                 <RefreshCw className="h-4 w-4 animate-spin" />
-                جاري الاتصال...
+                Connecting...
               </div>
             ) : (
-              "ربط محفظة TON"
+              "Connect TON Wallet"
             )}
           </Button>
           
@@ -262,9 +262,9 @@ export const TonWalletCard = () => {
                 connectionState === 'connecting' ? 'bg-warning animate-pulse' :
                 connectionState === 'error' ? 'bg-destructive' : 'bg-muted'
               }`}></span>
-              حالة الاتصال: {connectionState === 'idle' ? 'غير متصل' : connectionState}
+              Connection Status: {connectionState}
             </p>
-            <p>تأكد من تثبيت محفظة TON مثل Tonkeeper</p>
+            <p>Make sure you have a TON wallet like Tonkeeper installed</p>
           </div>
         </div>
       </CardContent>

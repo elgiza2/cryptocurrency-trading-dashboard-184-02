@@ -25,20 +25,20 @@ export const useTonWallet = () => {
   // Enhanced connection checking with better error handling
   const checkConnection = useCallback(async () => {
     if (!tonConnectUI) {
-      console.log('❌ TonConnectUI غير مهيأ');
+      console.log('❌ TonConnectUI not initialized');
       return;
     }
 
     try {
-      console.log('🔍 فحص اتصال محفظة TON...');
-      console.log('📱 مثيل TonConnectUI:', !!tonConnectUI);
-      console.log('🔗 حالة الاتصال:', tonConnectUI?.connected);
-      console.log('💳 المحفظة الحالية:', tonConnectUI?.wallet);
+      console.log('🔍 Checking TON wallet connection...');
+      console.log('📱 TonConnectUI instance:', !!tonConnectUI);
+      console.log('🔗 Connection status:', tonConnectUI?.connected);
+      console.log('💳 Current wallet:', tonConnectUI?.wallet);
       
       const connected = tonConnectUI.connected;
       const hasWallet = !!tonConnectUI.wallet;
       
-      console.log('🎯 نتائج فحص الاتصال:', { connected, hasWallet });
+      console.log('🎯 Connection check results:', { connected, hasWallet });
       
       // Update connection state
       setIsConnected(connected && hasWallet);
@@ -46,64 +46,64 @@ export const useTonWallet = () => {
       
       if (connected && hasWallet && tonConnectUI.wallet?.account) {
         const address = tonConnectUI.wallet.account.address;
-        console.log('✅ تم ربط المحفظة بنجاح');
-        console.log('📍 عنوان المحفظة:', address);
+        console.log('✅ Wallet connected successfully');
+        console.log('📍 Wallet address:', address);
         
         setWalletAddress(address);
         
         // Fetch balance with improved error handling
         try {
-          console.log('💰 جلب رصيد المحفظة...');
+          console.log('💰 Fetching wallet balance...');
           const response = await fetch(`https://toncenter.com/api/v2/getAddressBalance?address=${address}`);
           
           if (!response.ok) {
-            throw new Error(`خطأ HTTP! الحالة: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
           }
           
           const data = await response.json();
-          console.log('📊 استجابة API الرصيد:', data);
+          console.log('📊 Balance API response:', data);
           
           if (data.ok && data.result) {
             const balanceInTon = (parseInt(data.result) / 1_000_000_000).toFixed(4);
             setBalance(balanceInTon);
-            console.log('✅ تم جلب الرصيد بنجاح:', balanceInTon, 'TON');
+            console.log('✅ Balance fetched successfully:', balanceInTon, 'TON');
           } else {
-            console.warn('⚠️ API الرصيد أرجع خطأ:', data);
+            console.warn('⚠️ Balance API returned error:', data);
             setBalance('0.0000');
           }
         } catch (balanceError) {
-          console.error('❌ فشل في جلب الرصيد:', balanceError);
+          console.error('❌ Failed to fetch balance:', balanceError);
           setBalance('0.0000');
         }
       } else {
-        console.log('❌ المحفظة غير متصلة أو لا توجد معلومات حساب');
+        console.log('❌ Wallet not connected or no account info');
         setWalletAddress(null);
         setBalance(null);
       }
     } catch (error) {
-      console.error('💥 خطأ في فحص الاتصال:', error);
+      console.error('💥 Connection check error:', error);
       setIsConnected(false);
-      setConnectionError(error instanceof Error ? error.message : 'خطأ اتصال غير معروف');
+      setConnectionError(error instanceof Error ? error.message : 'Unknown connection error');
     }
   }, [tonConnectUI]);
 
   // Enhanced effect for monitoring TON Connect UI changes
   useEffect(() => {
     if (!tonConnectUI) {
-      console.log('⏳ انتظار تهيئة TonConnectUI...');
+      console.log('⏳ Waiting for TonConnectUI initialization...');
       return;
     }
 
-    console.log('🚀 تم تهيئة TonConnectUI، إعداد المستمعين...');
+    console.log('🚀 TonConnectUI initialized, setting up listeners...');
     
     // Initial connection check
     checkConnection();
     
     // Enhanced status change listener
     const unsubscribe = tonConnectUI.onStatusChange((wallet) => {
-      console.log('🔄 === تم تغيير حالة المحفظة ===');
-      console.log('🔄 كائن المحفظة الجديد:', wallet);
-      console.log('🔄 حالة الاتصال:', !!wallet);
+      console.log('🔄 === Wallet status changed ===');
+      console.log('🔄 New wallet object:', wallet);
+      console.log('🔄 Connection status:', !!wallet);
       
       // Immediate state updates
       const connected = !!wallet;
@@ -113,17 +113,17 @@ export const useTonWallet = () => {
         const address = wallet.account.address;
         setWalletAddress(address);
         setConnectionError(null);
-        console.log('✅ تم ربط المحفظة عبر تغيير الحالة:', address);
+        console.log('✅ Wallet connected via status change:', address);
         
         // Show success toast
         toast({
-          title: "تم الاتصال بنجاح",
-          description: "تم ربط محفظة TON بنجاح",
+          title: "Connection Successful",
+          description: "TON wallet connected successfully",
         });
       } else {
         setWalletAddress(null);
         setBalance(null);
-        console.log('❌ تم قطع اتصال المحفظة عبر تغيير الحالة');
+        console.log('❌ Wallet disconnected via status change');
       }
       
       // Re-check connection after a short delay
@@ -134,7 +134,7 @@ export const useTonWallet = () => {
     
     return () => {
       if (unsubscribe) {
-        console.log('🧹 تنظيف مستمع حالة المحفظة');
+        console.log('🧹 Cleaning up wallet status listener');
         unsubscribe();
       }
     };
@@ -144,22 +144,22 @@ export const useTonWallet = () => {
   const connectWallet = useCallback(async () => {
     try {
       if (!tonConnectUI) {
-        throw new Error('TonConnect UI غير مهيأ');
+        throw new Error('TonConnect UI not initialized');
       }
 
-      console.log('🚀 === محاولة ربط المحفظة ===');
-      console.log('🔍 حالة الاتصال الحالية:', tonConnectUI.connected);
-      console.log('💳 المحفظة الحالية:', tonConnectUI.wallet);
+      console.log('🚀 === Attempting wallet connection ===');
+      console.log('🔍 Current connection status:', tonConnectUI.connected);
+      console.log('💳 Current wallet:', tonConnectUI.wallet);
       
       // Check if already connected properly
       if (tonConnectUI.connected && tonConnectUI.wallet?.account) {
-        console.log('✅ المحفظة متصلة بالفعل، فرض تحديث واجهة المستخدم');
+        console.log('✅ Wallet already connected, forcing UI update');
         setIsConnected(true);
         setWalletAddress(tonConnectUI.wallet.account.address);
         
         toast({
-          title: "المحفظة متصلة بالفعل",
-          description: "محفظة TON متصلة ومعدة للاستخدام",
+          title: "Wallet Already Connected",
+          description: "TON wallet is connected and ready to use",
         });
         return;
       }
@@ -167,21 +167,21 @@ export const useTonWallet = () => {
       setIsLoading(true);
       setConnectionError(null);
       
-      console.log('📱 فتح نافذة الاتصال...');
+      console.log('📱 Opening connection modal...');
       
       // Open the modal and wait for user interaction
       await tonConnectUI.openModal();
       
-      console.log('✅ تم فتح نافذة الاتصال بنجاح');
+      console.log('✅ Connection modal opened successfully');
       
     } catch (error) {
-      console.error('💥 فشل الاتصال:', error);
-      const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
+      console.error('💥 Connection failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       setConnectionError(errorMessage);
       
       toast({
-        title: "فشل الاتصال",
-        description: `فشل في ربط محفظة TON: ${errorMessage}`,
+        title: "Connection Failed",
+        description: `Failed to connect TON wallet: ${errorMessage}`,
         variant: "destructive"
       });
     } finally {
@@ -193,10 +193,10 @@ export const useTonWallet = () => {
   const disconnectWallet = useCallback(async () => {
     try {
       if (!tonConnectUI) {
-        throw new Error('TonConnect UI غير مهيأ');
+        throw new Error('TonConnect UI not initialized');
       }
 
-      console.log('🔌 قطع اتصال المحفظة...');
+      console.log('🔌 Disconnecting wallet...');
       setIsLoading(true);
       
       await tonConnectUI.disconnect();
@@ -207,17 +207,17 @@ export const useTonWallet = () => {
       setIsConnected(false);
       setConnectionError(null);
       
-      console.log('✅ تم قطع اتصال المحفظة بنجاح');
+      console.log('✅ Wallet disconnected successfully');
       
       toast({
-        title: "تم قطع الاتصال",
-        description: "تم قطع اتصال المحفظة بنجاح",
+        title: "Disconnected",
+        description: "Wallet disconnected successfully",
       });
     } catch (error) {
-      console.error('💥 فشل قطع اتصال المحفظة:', error);
+      console.error('💥 Failed to disconnect wallet:', error);
       toast({
-        title: "فشل قطع الاتصال",
-        description: "فشل في قطع اتصال المحفظة",
+        title: "Disconnection Failed",
+        description: "Failed to disconnect wallet",
         variant: "destructive"
       });
     } finally {
@@ -231,17 +231,17 @@ export const useTonWallet = () => {
     amountTon: number, 
     comment?: string
   ) => {
-    console.log('🎬 === بدء إرسال المعاملة من المحفظة ===');
-    console.log('📤 تفاصيل المعاملة:', { toAddress, amountTon, comment });
+    console.log('🎬 === Starting transaction from wallet ===');
+    console.log('📤 Transaction details:', { toAddress, amountTon, comment });
 
     if (!isConnected || !tonConnectUI) {
-      const error = 'المحفظة غير متصلة';
+      const error = 'Wallet not connected';
       console.error('❌', error);
       throw new Error(error);
     }
 
     if (!amountTon || amountTon <= 0) {
-      const error = `مبلغ غير صحيح: ${amountTon}`;
+      const error = `Invalid amount: ${amountTon}`;
       console.error('❌', error);
       throw new Error(error);
     }
@@ -249,30 +249,30 @@ export const useTonWallet = () => {
     try {
       setIsLoading(true);
       
-      console.log('💸 إرسال المعاملة عبر الخدمة...');
+      console.log('💸 Sending transaction via service...');
       const result = await transactionService.sendTransaction(toAddress, amountTon, comment);
       
-      console.log('✅ تم إرسال المعاملة بنجاح:', result);
+      console.log('✅ Transaction sent successfully:', result);
       toast({
-        title: "تم إرسال المعاملة",
-        description: `تم إرسال ${amountTon} TON بنجاح`,
+        title: "Transaction Sent",
+        description: `${amountTon} TON sent successfully`,
       });
 
       return result;
       
     } catch (error) {
-      console.error('💥 فشلت المعاملة:', error);
-      const errorMessage = error instanceof Error ? error.message : 'خطأ معاملة غير معروف';
+      console.error('💥 Transaction failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown transaction error';
       
       toast({
-        title: "فشل المعاملة",
-        description: `فشل في إرسال TON: ${errorMessage}`,
+        title: "Transaction Failed",
+        description: `Failed to send TON: ${errorMessage}`,
         variant: "destructive"
       });
       throw error;
     } finally {
       setIsLoading(false);
-      console.log('🏁 === انتهاء إرسال المعاملة من المحفظة ===');
+      console.log('🏁 === Transaction from wallet ended ===');
     }
   }, [isConnected, transactionService, toast, tonConnectUI]);
 
