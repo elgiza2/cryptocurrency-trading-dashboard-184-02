@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,7 +11,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useApp } from "@/contexts/AppContext";
-import { useTelegramBackButton } from "@/hooks/useTelegramBackButton";
 
 interface ActivityRewardsPageProps {
   onNavigateToReferral?: () => void;
@@ -35,12 +35,6 @@ const ActivityRewardsPage = ({
   const [miningEarnings, setMiningEarnings] = useState(0);
   const { telegramUser } = useApp();
   const { toast } = useToast();
-
-  // Use Telegram back button instead of custom button
-  useTelegramBackButton({ 
-    onBack: onBack || (() => {}), 
-    isVisible: !!onBack 
-  });
 
   const prizes = [
     {
@@ -185,7 +179,17 @@ const ActivityRewardsPage = ({
       <div className="min-h-screen unified-gaming-bg text-foreground p-3 space-y-4">
         
         {/* Header */}
-        <div className="flex items-center gap-3 pt-8">
+        <div className="flex items-center gap-3 pt-4">
+          {onBack && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onBack}
+              className="text-foreground hover:bg-secondary"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          )}
           <div>
             <h1 className="text-2xl font-bold">Activity Rewards</h1>
             <p className="text-gray-400 text-sm mt-1">

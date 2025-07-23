@@ -24,7 +24,6 @@ interface Giveaway {
   is_active: boolean;
   is_finished: boolean;
   total_pool_ton: number;
-  is_free?: boolean;
 }
 
 const GiveawaysPage = () => {
@@ -33,10 +32,6 @@ const GiveawaysPage = () => {
   const [tonConnectUI] = useTonConnectUI();
   const [transactionService, setTransactionService] = useState<TonTransactionService | null>(null);
   const { toast } = useToast();
-
-  // Separate paid and free giveaways
-  const paidGiveaways = activeGiveaways.filter(g => !g.is_free);
-  const freeGiveaways = activeGiveaways.filter(g => g.is_free);
 
   useEffect(() => {
     loadGiveaways();
@@ -82,53 +77,20 @@ const GiveawaysPage = () => {
   };
 
   const joinGiveaway = async (giveaway: Giveaway) => {
+    // Check if wallet is connected
+    if (!tonConnectUI.wallet) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your TON wallet to join giveaways",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Create transaction service on demand
+    const currentTransactionService = new TonTransactionService(tonConnectUI);
+
     try {
-      // For free giveaways, just add participant directly
-      if (giveaway.is_free) {
-        const { data, error } = await supabase
-          .from('giveaway_participants')
-          .insert({
-            giveaway_id: giveaway.id,
-            user_id: 'demo_user', // Should be replaced with actual user ID from Telegram
-            entry_fee_paid: 0,
-            ton_tx_hash: 'free_entry'
-          });
-
-        if (error) {
-          if (error.code === '23505') {
-            toast({
-              title: "Already Joined",
-              description: "You have already joined this free giveaway!",
-              variant: "destructive"
-            });
-            return;
-          }
-          throw error;
-        }
-
-        toast({
-          title: "Successfully Joined! 🎉",
-          description: `You have joined ${giveaway.title} for free!`,
-          className: "bg-green-900 border-green-700 text-green-100"
-        });
-
-        loadGiveaways();
-        return;
-      }
-
-      // For paid giveaways, check if wallet is connected
-      if (!tonConnectUI.wallet) {
-        toast({
-          title: "Wallet Required",
-          description: "Please connect your TON wallet to join paid giveaways",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Create transaction service on demand
-      const currentTransactionService = new TonTransactionService(tonConnectUI);
-
       // Show loading state
       toast({
         title: "Processing Transaction",
@@ -220,13 +182,10 @@ const GiveawaysPage = () => {
   };
 
   const GiveawayCard = ({ giveaway, isFinished = false }: { giveaway: Giveaway; isFinished?: boolean }) => (
-    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-primary/20 bg-black/20">
+    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-primary/20">
       <CardHeader className="pb-1 pt-3">
           <div className="flex items-start justify-between">
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-sm font-bold text-primary leading-tight">{giveaway.title}</CardTitle>
-              {giveaway.is_free && <Badge variant="outline" className="text-xs text-green-600 border-green-600">FREE</Badge>}
-            </div>
+            <CardTitle className="text-sm font-bold text-primary leading-tight">{giveaway.title}</CardTitle>
             <Badge variant={isFinished ? "secondary" : "default"} className="shrink-0 text-xs px-1 py-0">
               {isFinished ? "Ended" : "Active"}
             </Badge>
@@ -281,19 +240,11 @@ const GiveawaysPage = () => {
         {/* Join Button */}
         {!isFinished && giveaway.current_participants < giveaway.max_participants && (
           <Button 
-            onClick={() => {
-              if (giveaway.is_free) {
-                joinGiveaway(giveaway);
-              } else {
-                !tonConnectUI?.wallet ? tonConnectUI.openModal() : joinGiveaway(giveaway);
-              }
-            }}
-            className="w-full bg-black hover:bg-black/80 h-7 text-xs text-white"
+            onClick={() => !tonConnectUI?.wallet ? tonConnectUI.openModal() : joinGiveaway(giveaway)}
+            className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 h-7 text-xs"
             size="sm"
           >
-            {giveaway.is_free ? (
-              <span>Join Free</span>
-            ) : !tonConnectUI?.wallet ? (
+            {!tonConnectUI?.wallet ? (
               <span>Connect Wallet</span>
             ) : (
               <span>Join {giveaway.entry_fee_ton} TON</span>
@@ -326,54 +277,23 @@ const GiveawaysPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-primary mb-2">Giveaway Events</h1>
-        <p className="text-muted-foreground text-sm">Join free events or compete in paid giveaways!</p>
-      </div>
+      
 
-      <Tabs defaultValue="free" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="free" className="text-xs">
-            Free Events ({freeGiveaways.length})
-          </TabsTrigger>
-          <TabsTrigger value="paid" className="text-xs">
-            Paid Events ({paidGiveaways.length})
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="free" className="space-y-6 mt-6">
-          {freeGiveaways.length === 0 ? (
-            <div className="text-center py-12">
-              <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Free Events</h3>
-              <p className="text-muted-foreground">Check back later for free giveaway events</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {freeGiveaways.map((giveaway) => (
-                <GiveawayCard key={giveaway.id} giveaway={giveaway} />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="paid" className="space-y-6 mt-6">
-          {paidGiveaways.length === 0 ? (
-            <div className="text-center py-12">
-              <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Paid Events</h3>
-              <p className="text-muted-foreground">Check back later for paid giveaway events</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paidGiveaways.map((giveaway) => (
-                <GiveawayCard key={giveaway.id} giveaway={giveaway} />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+      <div className="space-y-6">
+        {activeGiveaways.length === 0 ? (
+          <div className="text-center py-12">
+            <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No Active Giveaways</h3>
+            <p className="text-muted-foreground">Follow us to get notifications about new giveaways</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activeGiveaways.map((giveaway) => (
+              <GiveawayCard key={giveaway.id} giveaway={giveaway} />
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Mobile Navigation */}
       <MobileNav 

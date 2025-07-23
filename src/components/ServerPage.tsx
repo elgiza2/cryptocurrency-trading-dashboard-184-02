@@ -1,107 +1,119 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Server, Zap, CheckCircle, Info } from "lucide-react";
+import { 
+  ChevronRight,
+  X,
+  ArrowLeft
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTonConnectUI } from '@tonconnect/ui-react';
-import { EnhancedTonTransactionService } from '@/services/enhancedTonTransactionService';
-import { DatabaseService } from "@/lib/database";
-import { useTelegramBackButton } from "@/hooks/useTelegramBackButton";
+import AboutServersPage from "./AboutServersPage";
+import UnifiedBackButton from "./UnifiedBackButton";
+import { EnhancedDepositDialog } from "./EnhancedDepositDialog";
 
 interface ServerPageProps {
   onBack?: () => void;
-  onNavigateToAbout?: () => void;
-  userBalance?: {
-    space: number;
-    ton: number;
-  };
+  userBalance?: { space: number; ton: number };
   userServers?: any[];
   onServerPurchase?: (server: any) => void;
 }
 
-interface ServerTier {
-  id: string;
-  name: string;
-  price: number;
-  dailyReward: number;
-  duration: number;
-  description: string;
-  color: string;
-  icon: typeof Server;
-}
-
-const ServerPage = ({ onBack, onNavigateToAbout, userBalance }: ServerPageProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedServer, setSelectedServer] = useState<string | null>(null);
-  const [telegramUser, setTelegramUser] = useState<any>(null);
+const ServerPage = ({ 
+  onBack, 
+  userBalance = { space: 0.8001, ton: 0.1175 },
+  userServers = [],
+  onServerPurchase 
+}: ServerPageProps) => {
+  const [selectedServer, setSelectedServer] = useState<any>(null);
+  const [showAboutServers, setShowAboutServers] = useState(false);
+  const [showDepositDialog, setShowDepositDialog] = useState(false);
   const [tonConnectUI] = useTonConnectUI();
   const { toast } = useToast();
 
-  // Use Telegram back button instead of custom button
-  useTelegramBackButton({ 
-    onBack: onBack || (() => {}), 
-    isVisible: !!onBack 
-  });
-
-  useEffect(() => {
-    const initTelegramData = () => {
-      if ((window as any).Telegram?.WebApp?.initDataUnsafe?.user) {
-        setTelegramUser((window as any).Telegram.WebApp.initDataUnsafe.user);
-      }
-    };
-
-    initTelegramData();
-    const timeout = setTimeout(initTelegramData, 1000);
-    return () => clearTimeout(timeout);
-  }, []);
-
-  const serverTiers: ServerTier[] = [
+  const servers = [
     {
-      id: "basic",
-      name: "Basic Server",
-      price: 0.5,
-      dailyReward: 65,
-      duration: 30,
-      description: "Perfect for beginners",
+      id: 1,
+      name: "Flux",
       color: "bg-blue-500",
-      icon: Server
-    },
-    {
-      id: "advanced",
-      name: "Advanced Server",
       price: 1,
-      dailyReward: 130,
+      income: 2,
       duration: 30,
-      description: "Great for regular miners",
-      color: "bg-purple-500",
-      icon: Server
+      totalIncome: 2
     },
     {
-      id: "pro",
-      name: "Pro Server",
-      price: 2.5,
-      dailyReward: 325,
-      duration: 30,
-      description: "High performance mining",
-      color: "bg-orange-500",
-      icon: Server
-    },
-    {
-      id: "enterprise",
-      name: "Enterprise Server",
+      id: 2,
+      name: "Nova",
+      color: "bg-green-500", 
       price: 5,
-      dailyReward: 650,
+      income: 10,
       duration: 30,
-      description: "Maximum mining power",
-      color: "bg-red-500",
-      icon: Server
+      totalIncome: 10
+    },
+    {
+      id: 3,
+      name: "ByteHub",
+      color: "bg-gradient-to-r from-orange-500 to-red-500",
+      price: 10,
+      income: 20,
+      duration: 30,
+      totalIncome: 20
+    },
+    {
+      id: 4,
+      name: "CoreX",
+      color: "bg-cyan-500",
+      price: 50,
+      income: 100,
+      duration: 30,
+      totalIncome: 100
+    },
+    {
+      id: 5,
+      name: "Zeon",
+      color: "bg-gradient-to-r from-yellow-400 to-yellow-600",
+      price: 100,
+      income: 210,
+      duration: 30,
+      totalIncome: 210
+    },
+    {
+      id: 6,
+      name: "VortexPro",
+      color: "bg-purple-500",
+      price: 250,
+      income: 537.5,
+      duration: 30,
+      totalIncome: 537.5
+    },
+    {
+      id: 7,
+      name: "NexusMax",
+      color: "bg-pink-500",
+      price: 500,
+      income: 1100,
+      duration: 30,
+      totalIncome: 1100
+    },
+    {
+      id: 8,
+      name: "QuantumCore",
+      color: "bg-indigo-500",
+      price: 1000,
+      income: 2225,
+      duration: 30,
+      totalIncome: 2225
     }
   ];
 
-  const handleRentServer = async (server: ServerTier) => {
+  const handleRentServer = (server: any) => {
+    setSelectedServer(server);
+  };
+
+  const confirmPurchase = async () => {
+    if (!selectedServer) return;
+
     if (!tonConnectUI.wallet) {
       toast({
         title: "Wallet Required",
@@ -111,56 +123,48 @@ const ServerPage = ({ onBack, onNavigateToAbout, userBalance }: ServerPageProps)
       return;
     }
 
-    if (!telegramUser?.id) {
-      toast({
-        title: "Error",
-        description: "Telegram user not found",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    setSelectedServer(server.id);
-
     try {
-      const transactionService = new EnhancedTonTransactionService(tonConnectUI);
-      
+      // Import TonTransactionService
+      const { TonTransactionService } = await import('@/services/tonTransactionService');
+      const transactionService = new TonTransactionService(tonConnectUI);
+
       toast({
         title: "Processing Transaction",
-        description: "Please confirm the TON transaction in your wallet..."
+        description: "Please confirm the TON transaction in your wallet...",
       });
 
-      const result = await transactionService.sendTransaction(
-        "UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq",
-        server.price,
-        `Server Rental: ${server.name}`,
-        telegramUser.id.toString()
+      // Send TON transaction for server purchase
+      const tonTransactionResult = await transactionService.sendTransaction(
+        "UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq", // Destination address
+        selectedServer.price, // Amount in TON
+        `Server Purchase: ${selectedServer.name}` // Comment
       );
 
-      console.log('Transaction result:', result);
+      console.log('TON Transaction completed:', tonTransactionResult);
 
-      // Save to database
-      const { error } = await DatabaseService.purchaseServer(
-        telegramUser.id.toString(),
-        server.id,
-        server.price,
-        server.dailyReward,
-        server.duration * 24
-      );
+      const newServer = {
+        ...selectedServer,
+        purchasedAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + selectedServer.duration * 24 * 60 * 60 * 1000).toISOString(),
+        isActive: true,
+        timeLeft: "28d 12h 46m",
+        dailyIncome: selectedServer.income / selectedServer.duration
+      };
 
-      if (error) {
-        console.error('Database error:', error);
+      if (onServerPurchase) {
+        onServerPurchase(newServer);
       }
 
+      const dailySpaceIncome = selectedServer.price * 130; // 130 SPACE per TON invested per day
       toast({
-        title: "Server Rented Successfully!",
-        description: `${server.name} has been rented for ${server.duration} days. You'll earn ${server.dailyReward} SPACE daily.`,
+        title: "Server Purchased!",
+        description: `${selectedServer.name} purchased! You will earn ${dailySpaceIncome} $SPACE daily for ${selectedServer.duration} days.`,
         className: "bg-green-900 border-green-700 text-green-100"
       });
 
+      setSelectedServer(null);
     } catch (error: any) {
-      console.error('Error renting server:', error);
+      console.error('Error purchasing server:', error);
       
       if (error.message?.includes('User declined')) {
         toast({
@@ -171,146 +175,187 @@ const ServerPage = ({ onBack, onNavigateToAbout, userBalance }: ServerPageProps)
       } else if (error.message?.includes('Insufficient')) {
         toast({
           title: "Insufficient Balance",
-          description: `You need at least ${server.price} TON to rent this server.`,
+          description: `You need at least ${selectedServer.price} TON to purchase this server.`,
           variant: "destructive"
         });
       } else {
         toast({
-          title: "Transaction Failed",
-          description: error.message || "Failed to rent server. Please try again.",
+          title: "Purchase Failed",
+          description: error.message || "Transaction was cancelled or failed.",
           variant: "destructive"
         });
       }
-    } finally {
-      setIsLoading(false);
-      setSelectedServer(null);
     }
   };
 
+  if (showAboutServers) {
+    return <AboutServersPage onBack={() => setShowAboutServers(false)} />;
+  }
+
+  const hasSufficientBalance = selectedServer ? userBalance.ton >= selectedServer.price : true;
+
   return (
     <ScrollArea className="h-screen">
-      <div className="min-h-screen unified-gaming-bg text-foreground">
-        <div className="p-4 pt-8">
-          {/* Header */}
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-white mb-2">Server Rental</h1>
-            <p className="text-white/70 text-lg">
-              Rent virtual servers to mine $SPACE tokens 24/7
-            </p>
-          </div>
+      <div className="min-h-screen unified-gaming-bg text-white space-y-4">
+        
+        {/* Unified Header */}
+        {onBack && <UnifiedBackButton onBack={onBack} title="Rent Server" />}
 
-          {/* Info Card */}
-          <Card className="bg-secondary/60 backdrop-blur-xl border-white/20 rounded-2xl p-4 mb-6">
-            <div className="flex items-start gap-3">
-              <Info className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-white/90 text-sm leading-relaxed">
-                  Each server mines automatically for 30 days. Higher tier servers provide better daily rewards.
-                </p>
-                <button 
-                  onClick={onNavigateToAbout}
-                  className="text-blue-400 text-sm mt-2 hover:text-blue-300 transition-colors"
-                >
-                  Learn more about mining →
-                </button>
+        <div className="px-3 space-y-4">
+          {/* About Servers Button */}
+          <Button 
+            onClick={() => setShowAboutServers(true)}
+            className="w-full h-12 bg-secondary/80 backdrop-blur-sm border border-white/20 text-white hover:bg-secondary/60 justify-between rounded-2xl"
+            variant="outline"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-base">!</span>
               </div>
+              <span className="text-base">About Servers</span>
             </div>
-          </Card>
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </Button>
 
-          {/* Server Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {serverTiers.map((server) => (
-              <Card key={server.id} className="bg-secondary/60 backdrop-blur-xl border-white/20 rounded-2xl overflow-hidden hover:bg-secondary/80 transition-all duration-300">
-                <CardHeader className="pb-3">
+          {/* Active Servers Display */}
+          {userServers.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold text-blue-100">Your Active Servers ({userServers.length})</h3>
+              {userServers.map((server, index) => (
+                <Card key={index} className="bg-secondary/60 backdrop-blur-xl border-white/20 p-4 rounded-2xl">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`w-10 h-10 ${server.color} rounded-full`}></div>
+                    <div>
+                      <div className="font-semibold text-base text-white">{server.name}</div>
+                    </div>
+                  </div>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-12 h-12 ${server.color} rounded-xl flex items-center justify-center`}>
-                        <server.icon className="h-6 w-6 text-white" />
+                    <div>
+                      <div className="text-lg font-bold text-white">{server.timeLeft || "28d 12h 46m"}</div>
+                      <div className="text-xs text-blue-200">Time Left</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold flex items-center gap-1 text-white">
+                        ~ {server.dailyIncome || 0.02}
+                        <img 
+                          src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" 
+                          alt="TON" 
+                          className="w-4 h-4"
+                        />
                       </div>
-                      <div>
-                        <CardTitle className="text-white text-lg">{server.name}</CardTitle>
-                        <p className="text-white/70 text-sm">{server.description}</p>
+                      <div className="text-xs text-blue-200">Income Per Day</div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Available Servers */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-blue-100">Available Servers</h3>
+            {servers.map((server, index) => (
+              <Card key={index} className="bg-secondary/60 backdrop-blur-xl border-white/20 p-4 rounded-2xl hover:border-primary/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 ${server.color} rounded-full`}></div>
+                    <div>
+                      <h3 className="font-semibold text-base mb-1 text-white">{server.name}</h3>
+                      <div className="flex items-center gap-4 text-sm text-blue-200">
+                        <span>~ {server.income} TON</span>
+                        <span>{server.duration} days</span>
+                      </div>
+                      <div className="text-xs text-blue-300 mt-1">
+                        Total Income | Mining Time
                       </div>
                     </div>
                   </div>
-                </CardHeader>
-                
-                <CardContent className="pb-3">
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-white/70 text-sm">Price</span>
-                      <div className="flex items-center gap-1">
-                        <img src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" alt="TON" className="w-4 h-4" />
-                        <span className="text-white font-medium">{server.price} TON</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <span className="text-white/70 text-sm">Daily Reward</span>
-                      <div className="flex items-center gap-1">
-                        <img src="https://assets.pepecase.app/assets/space-logo.png" alt="SPACE" className="w-4 h-4" />
-                        <span className="text-white font-medium">{server.dailyReward} SPACE</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <span className="text-white/70 text-sm">Duration</span>
-                      <Badge variant="secondary" className="bg-white/10 text-white">
-                        {server.duration} days
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                      <span className="text-white/70 text-sm">Total Reward</span>
-                      <div className="flex items-center gap-1">
-                        <img src="https://assets.pepecase.app/assets/space-logo.png" alt="SPACE" className="w-4 h-4" />
-                        <span className="text-green-400 font-medium">{server.dailyReward * server.duration} SPACE</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-                
-                <CardFooter className="pt-3">
                   <Button 
                     onClick={() => handleRentServer(server)}
-                    disabled={isLoading}
-                    className={`w-full ${server.color} hover:opacity-90 text-white py-3 text-base font-medium rounded-xl transition-all duration-300 ${
-                      selectedServer === server.id ? 'animate-pulse' : ''
-                    }`}
+                    className="bg-primary hover:bg-primary/90 px-4 py-2 text-sm font-medium rounded-xl"
                   >
-                    {isLoading && selectedServer === server.id ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Processing...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <Zap className="h-4 w-4" />
-                        <span>Rent Server</span>
-                      </div>
-                    )}
+                    Rent {server.price} TON
                   </Button>
-                </CardFooter>
+                </div>
               </Card>
             ))}
           </div>
 
-          {/* Connect Wallet Button */}
-          {!tonConnectUI.wallet && (
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background to-transparent">
-              <Button 
-                onClick={() => tonConnectUI.openModal()} 
-                className="w-full bg-primary hover:bg-primary/90 text-white py-4 text-lg font-medium rounded-2xl border border-primary/50"
-              >
-                Connect Wallet to Rent Servers
-              </Button>
+          {/* Purchase Dialog */}
+          {selectedServer && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+              <Card className="bg-secondary/95 backdrop-blur-xl border-white/20 p-5 w-full max-w-sm rounded-3xl">
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="flex justify-end mb-3">
+                      <Button 
+                        onClick={() => setSelectedServer(null)}
+                        variant="ghost"
+                        size="sm"
+                        className="text-white/70 hover:text-white"
+                      >
+                        <X className="h-5 w-5" />
+                      </Button>
+                    </div>
+                    <div className={`w-16 h-16 ${selectedServer.color} rounded-full mx-auto mb-3`}></div>
+                    <h3 className="text-2xl font-bold mb-2 text-white">{selectedServer.name}</h3>
+                    <div className="text-xl font-bold flex items-center justify-center gap-1 text-white">
+                      {selectedServer.price}
+                      <img 
+                        src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" 
+                        alt="TON" 
+                        className="w-5 h-5"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3 text-center py-3">
+                    <div>
+                      <div className="text-lg font-bold text-white flex items-center justify-center gap-1">
+                        {selectedServer.totalIncome}
+                        <img 
+                          src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" 
+                          alt="TON" 
+                          className="w-4 h-4"
+                        />
+                      </div>
+                      <div className="text-xs text-blue-200">Total Income</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold text-white">{selectedServer.duration} days</div>
+                      <div className="text-xs text-blue-200">Mining Time</div>
+                    </div>
+                  </div>
+
+                  <Button 
+                    onClick={confirmPurchase}
+                    className="w-full bg-primary hover:bg-primary/90 h-12 text-base font-medium rounded-2xl"
+                  >
+                    {!tonConnectUI?.wallet ? "Connect Wallet" : "Confirm Purchase"}
+                  </Button>
+                </div>
+              </Card>
             </div>
           )}
 
-          {/* Bottom spacing */}
           <div className="h-20"></div>
         </div>
       </div>
+
+      {/* Deposit Dialog */}
+      <EnhancedDepositDialog 
+        isOpen={showDepositDialog}
+        onClose={() => setShowDepositDialog(false)}
+        onDeposit={async (amount) => {
+          toast({
+            title: "Deposit Successful",
+            description: `${amount} TON deposited successfully`,
+            className: "bg-green-900 border-green-700 text-green-100"
+          });
+          setShowDepositDialog(false);
+        }}
+        isProcessing={false}
+      />
     </ScrollArea>
   );
 };

