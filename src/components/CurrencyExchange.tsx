@@ -232,34 +232,34 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
         {onBack && <UnifiedBackButton onBack={onBack} title="Currency Exchange" />}
 
         <div className="px-3 space-y-3 max-w-md mx-auto">
-          {/* Price Indicator Box - Redesigned to prevent overflow */}
-          <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl p-6 overflow-hidden">
-            <div className="space-y-4">
-              {/* Top row with logo and name */}
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+          {/* Price Indicator Box - Much larger and better contained */}
+          <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl p-8 overflow-hidden">
+            <div className="space-y-6">
+              {/* Top row with logo and name - bigger */}
+              <div className="flex items-center gap-6">
+                <div className="w-20 h-20 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
                   <img src={spaceLogoUrl} alt="$SPACE" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-xl font-bold text-white">$SPACE</div>
-                  <div className="text-base text-gray-300">
+                  <div className="text-2xl font-bold text-white mb-2">$SPACE</div>
+                  <div className="text-lg text-gray-300">
                     ${loading ? '0.000000' : spacePrice.toFixed(6)}
                   </div>
                 </div>
               </div>
               
-              {/* Bottom row with price change */}
-              <div className="flex items-center justify-between pt-2 border-t border-white/10">
-                <div className="flex items-center gap-2">
+              {/* Bottom row with price change - more spaced */}
+              <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                <div className="flex items-center gap-3">
                   {priceChange24h > 0 ? 
-                    <TrendingUp className="h-5 w-5 text-yellow-500" /> : 
-                    <TrendingDown className="h-5 w-5 text-yellow-500" />
+                    <TrendingUp className="h-6 w-6 text-yellow-500" /> : 
+                    <TrendingDown className="h-6 w-6 text-yellow-500" />
                   }
-                  <span className="text-yellow-500 font-medium text-base">
+                  <span className="text-yellow-500 font-medium text-lg">
                     {priceChange24h > 0 ? '+' : ''}{priceChange24h.toFixed(2)}%
                   </span>
                 </div>
-                <div className="text-sm text-gray-400">24h Change</div>
+                <div className="text-base text-gray-400">24h Change</div>
               </div>
             </div>
           </Card>
