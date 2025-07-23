@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
         entry_fee_ton: prize.entry_fee_ton,
         start_time: startTime.toISOString(),
         end_time: endTime.toISOString(),
-        max_participants: 100,
+        max_participants: 10000,
         current_participants: 0,
         is_active: true,
         is_finished: false,
