@@ -11,6 +11,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useApp } from "@/contexts/AppContext";
+import UnifiedBackButton from "./UnifiedBackButton";
 
 interface ActivityRewardsPageProps {
   onNavigateToReferral?: () => void;
@@ -178,24 +179,13 @@ const ActivityRewardsPage = ({
     <ScrollArea className="h-screen">
       <div className="min-h-screen unified-gaming-bg text-foreground p-3 space-y-4">
         
-        {/* Header */}
-        <div className="flex items-center gap-3 pt-4">
-          {onBack && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onBack}
-              className="text-foreground hover:bg-secondary"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          )}
-          <div>
-            <h1 className="text-2xl font-bold">Activity Rewards</h1>
-            <p className="text-gray-400 text-sm mt-1">
-              Stay active and earn collectible Telegram gifts every 5 days!
-            </p>
-          </div>
+        {/* Unified Header */}
+        {onBack && <UnifiedBackButton onBack={onBack} title="Activity Rewards" />}
+        
+        <div className="px-4">
+          <p className="text-gray-400 text-sm">
+            Stay active and earn collectible Telegram gifts every 5 days!
+          </p>
         </div>
 
         {/* Countdown Timer */}
