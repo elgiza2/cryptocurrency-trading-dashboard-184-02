@@ -124,8 +124,6 @@ const Index = () => {
         return (
           <CurrencyExchange 
             onBack={() => navigateToTab("home")}
-            userBalance={appState.userBalance}
-            onExchange={handleCurrencyExchange}
           />
         );
       case "nft":
