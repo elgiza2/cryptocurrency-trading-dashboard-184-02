@@ -11,11 +11,13 @@ import {
   TrendingUp,
   Zap,
   Info,
-  ChevronRight
+  ChevronRight,
+  Wallet
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useApp } from "@/contexts/AppContext";
 import { supabase } from "@/integrations/supabase/client";
+import WithdrawModal from "./WithdrawModal";
 
 interface MiningDashboardProps {
   onNavigateToNFT?: () => void;
@@ -42,7 +44,8 @@ const MiningDashboard = ({
   const [realUserServers, setRealUserServers] = useState<any[]>([]);
   const [incomeSources, setIncomeSources] = useState<any[]>([]);
   const [totalDailyIncome, setTotalDailyIncome] = useState(0);
-  const { telegramUser } = useApp();
+  const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
+  const { telegramUser, balance } = useApp();
   const { toast } = useToast();
 
   // Fetch real user data
@@ -57,16 +60,12 @@ const MiningDashboard = ({
           .select('balance, cryptocurrencies(symbol)')
           .eq('user_id', telegramUser.id.toString());
 
-        if (walletData) {
-          const balances = { space: 0, ton: 0, si: 0 };
-          walletData.forEach((holding: any) => {
-            const symbol = holding.cryptocurrencies?.symbol?.toLowerCase();
-            if (symbol === 'space') balances.space = Number(holding.balance);
-            if (symbol === 'ton') balances.ton = Number(holding.balance);
-            if (symbol === 'si') balances.si = Number(holding.balance);
-          });
-          setRealUserBalance(balances);
-        }
+        // Use balance from context
+        setRealUserBalance({
+          space: balance.space,
+          ton: balance.ton,
+          si: 0
+        });
 
         // Fetch user servers
         const { data: serversData } = await supabase
@@ -130,7 +129,7 @@ const MiningDashboard = ({
     };
 
     fetchUserData();
-  }, [telegramUser?.id]);
+  }, [telegramUser?.id, balance]);
 
   const handleGetGifts = () => {
     if (onNavigateToActivityRewards) {
@@ -227,10 +226,16 @@ const MiningDashboard = ({
                 </div>
               </div>
               <ChevronRight className="h-4 w-4 text-blue-300 mx-2" />
-              <div className="flex-1 text-right">
-                <div className="text-lg font-bold text-white">{realUserBalance.ton.toFixed(4)}</div>
+              <div 
+                className="flex-1 text-right cursor-pointer hover:bg-white/10 rounded-lg p-2 transition-colors"
+                onClick={() => setWithdrawModalOpen(true)}
+              >
+                <div className="text-lg font-bold text-white flex items-center justify-end gap-1">
+                  {realUserBalance.ton.toFixed(4)}
+                  <Wallet className="h-4 w-4 text-blue-400" />
+                </div>
                 <div className="text-xs text-gray-300">
-                  TON balance
+                  TON balance • Click to withdraw
                 </div>
               </div>
             </div>
@@ -369,6 +374,13 @@ const MiningDashboard = ({
           <div className="h-4"></div>
         </div>
       </ScrollArea>
+
+      {/* Withdraw Modal */}
+      <WithdrawModal
+        isOpen={withdrawModalOpen}
+        onClose={() => setWithdrawModalOpen(false)}
+        tonBalance={realUserBalance.ton}
+      />
     </div>
   );
 };

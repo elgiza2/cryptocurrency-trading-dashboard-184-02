@@ -28,7 +28,7 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { tonPrice } = useTonPrice();
-  const { telegramUser, updateBalance } = useApp();
+  const { telegramUser, balance: appBalance, refreshBalance } = useApp();
 
   // Load cryptocurrency data and user balances from database
   useEffect(() => {
@@ -61,21 +61,7 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
         
         // Load user balances if user is logged in
         if (telegramUser) {
-          const holdingsResponse = await DatabaseService.getWalletHoldings(telegramUser.id.toString());
-          if (holdingsResponse.data) {
-            let spaceBalance = 0;
-            let tonBalance = 0;
-            
-            holdingsResponse.data.forEach((holding: any) => {
-              if (holding.cryptocurrencies?.symbol === 'SPACE') {
-                spaceBalance = holding.balance || 0;
-              } else if (holding.cryptocurrencies?.symbol === 'TON') {
-                tonBalance = holding.balance || 0;
-              }
-            });
-            
-            setUserBalances({ space: spaceBalance, ton: tonBalance });
-          }
+          setUserBalances(appBalance);
         }
       } catch (error) {
         console.error('Error loading data:', error);
@@ -98,7 +84,7 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
     };
     
     loadData();
-  }, [telegramUser, tonPrice]);
+  }, [telegramUser, tonPrice, appBalance]);
 
   const exchangeRate = spaceData?.current_price || 0.0006835;
   const spacePrice = exchangeRate * tonPrice;
@@ -158,57 +144,36 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
       const fromCurrencyData = isSwapDirection ? spaceData : tonData;
       const toCurrencyData = isSwapDirection ? tonData : spaceData;
 
-      if (fromCurrencyData && toCurrencyData) {
-        // Update crypto holdings directly without creating transactions
-        // Subtract from source currency
-        await DatabaseService.updateCryptoHolding(
-          telegramUser.id.toString(),
-          fromCurrencyData.id,
-          inputAmount,
-          false // subtract
-        );
+      // Use database function to process exchange
+      const { data, error } = await supabase.rpc('process_currency_exchange', {
+        user_telegram_id: telegramUser.id.toString(),
+        from_currency: fromCurrency,
+        to_currency: toCurrency,
+        from_amount: inputAmount,
+        to_amount: receiveAmount
+      });
 
-        // Add to destination currency
-        await DatabaseService.updateCryptoHolding(
-          telegramUser.id.toString(),
-          toCurrencyData.id,
-          receiveAmount,
-          true // add
-        );
+      if (error) throw error;
 
-        // Create a single exchange transaction record for history
-        await supabase
-          .from('transactions')
-          .insert({
-            user_id: telegramUser.id.toString(),
-            cryptocurrency_id: fromCurrencyData.id,
-            amount: inputAmount,
-            transaction_type: 'exchange',
-            price_usd: fromCurrencyData.current_price || 0,
-            total_usd: inputAmount * (fromCurrencyData.current_price || 0),
-            status: 'completed'
-          });
-
-        // Update local balances
-        if (isSwapDirection) {
-          setUserBalances(prev => ({
-            space: Math.max(0, prev.space - inputAmount),
-            ton: prev.ton + receiveAmount
-          }));
-        } else {
-          setUserBalances(prev => ({
-            space: prev.space + receiveAmount,
-            ton: Math.max(0, prev.ton - inputAmount)
-          }));
-        }
-
-        toast({
-          title: "Exchange Successful",
-          description: `Exchanged ${inputAmount} ${fromCurrency} to ${receiveAmount.toFixed(6)} ${toCurrency}`,
-        });
-        
-        setGiveAmount('');
+      if (!data) {
+        throw new Error('Insufficient balance');
       }
+
+      // Refresh balance from database
+      await refreshBalance();
+      
+      // Update local state
+      const newBalance = isSwapDirection ? 
+        { space: userBalances.space - inputAmount, ton: userBalances.ton + receiveAmount } :
+        { space: userBalances.space + receiveAmount, ton: userBalances.ton - inputAmount };
+      setUserBalances(newBalance);
+
+      toast({
+        title: "Exchange Successful",
+        description: `Exchanged ${inputAmount} ${fromCurrency} to ${receiveAmount.toFixed(6)} ${toCurrency}`,
+      });
+      
+      setGiveAmount('');
     } catch (error) {
       console.error('Error performing swap:', error);
       toast({
@@ -365,14 +330,6 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
             </div>
           </div>
 
-          {/* Withdraw Section */}
-          <div className="space-y-3 mb-4">
-            <h2 className="text-base font-semibold text-blue-100">
-              Withdraw TON
-            </h2>
-
-            <WithdrawSection userBalance={userBalances} />
-          </div>
 
           {/* Swap Button */}
           <Button 

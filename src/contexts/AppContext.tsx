@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
 import { DatabaseService } from "@/lib/database";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TelegramUser {
   id: number;
@@ -14,8 +15,9 @@ interface TelegramUser {
 interface AppContextType {
   telegramUser: TelegramUser | null;
   isLoading: boolean;
-  balance: number;
-  updateBalance: (newBalance: number) => void;
+  balance: { space: number; ton: number };
+  updateBalance: (newBalance: { space: number; ton: number }) => void;
+  refreshBalance: () => Promise<void>;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -35,7 +37,7 @@ interface AppProviderProps {
 export const AppProvider = ({ children }: AppProviderProps) => {
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState({ space: 0, ton: 0 });
 
   useEffect(() => {
     initializeTelegramUser();
@@ -51,11 +53,11 @@ export const AppProvider = ({ children }: AppProviderProps) => {
         // Create or update user in database
         await DatabaseService.createOrUpdateUser(tgUser);
         
+        // Initialize user balance if needed
+        await supabase.rpc('initialize_user_balance', { user_telegram_id: tgUser.id.toString() });
+        
         // Load user balance from database
-        const userData = await DatabaseService.getUser(tgUser.id.toString());
-        if (userData.data) {
-          setBalance(userData.data.total_balance || 0);
-        }
+        await loadUserBalance(tgUser.id.toString());
         
         console.log('Telegram user initialized:', tgUser);
       } else {
@@ -68,11 +70,11 @@ export const AppProvider = ({ children }: AppProviderProps) => {
         setTelegramUser(fallbackUser);
         await DatabaseService.createOrUpdateUser(fallbackUser);
         
+        // Initialize user balance if needed
+        await supabase.rpc('initialize_user_balance', { user_telegram_id: fallbackUser.id.toString() });
+        
         // Load user balance from database
-        const userData = await DatabaseService.getUser(fallbackUser.id.toString());
-        if (userData.data) {
-          setBalance(userData.data.total_balance || 0);
-        }
+        await loadUserBalance(fallbackUser.id.toString());
         
         console.log('Using fallback user for development');
       }
@@ -83,10 +85,29 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     }
   };
 
-  const updateBalance = (newBalance: number) => {
+  const loadUserBalance = async (userId: string) => {
+    try {
+      const { data, error } = await supabase.rpc('get_user_balance', { user_telegram_id: userId });
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        setBalance({
+          space: parseFloat(data[0].space_balance.toString()) || 0,
+          ton: parseFloat(data[0].ton_balance.toString()) || 0
+        });
+      }
+    } catch (error) {
+      console.error('Error loading user balance:', error);
+    }
+  };
+
+  const updateBalance = (newBalance: { space: number; ton: number }) => {
     setBalance(newBalance);
+  };
+
+  const refreshBalance = async () => {
     if (telegramUser) {
-      DatabaseService.updateUserBalance(telegramUser.id.toString(), newBalance);
+      await loadUserBalance(telegramUser.id.toString());
     }
   };
 
@@ -95,7 +116,8 @@ export const AppProvider = ({ children }: AppProviderProps) => {
       telegramUser,
       isLoading,
       balance,
-      updateBalance
+      updateBalance,
+      refreshBalance
     }}>
       {children}
     </AppContext.Provider>

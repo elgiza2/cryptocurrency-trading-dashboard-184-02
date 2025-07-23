@@ -154,6 +154,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_finished: boolean | null
+          is_free: boolean | null
           max_participants: number | null
           prize_image_url: string
           prize_value_ton: number
@@ -172,6 +173,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_finished?: boolean | null
+          is_free?: boolean | null
           max_participants?: number | null
           prize_image_url: string
           prize_value_ton: number
@@ -190,6 +192,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_finished?: boolean | null
+          is_free?: boolean | null
           max_participants?: number | null
           prize_image_url?: string
           prize_value_ton?: number
@@ -659,6 +662,36 @@ export type Database = {
       finish_expired_giveaways: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      get_user_balance: {
+        Args: { user_telegram_id: string }
+        Returns: {
+          space_balance: number
+          ton_balance: number
+        }[]
+      }
+      initialize_user_balance: {
+        Args: { user_telegram_id: string }
+        Returns: undefined
+      }
+      process_currency_exchange: {
+        Args: {
+          user_telegram_id: string
+          from_currency: string
+          to_currency: string
+          from_amount: number
+          to_amount: number
+        }
+        Returns: boolean
+      }
+      update_user_wallet_balance: {
+        Args: {
+          user_telegram_id: string
+          currency_symbol: string
+          amount_change: number
+          operation_type: string
+        }
+        Returns: boolean
       }
     }
     Enums: {

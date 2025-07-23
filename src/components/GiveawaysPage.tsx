@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, Trophy, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, Users, Trophy, ArrowRight, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import MobileNav from '@/components/MobileNav';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { TonTransactionService } from '@/services/tonTransactionService';
+import { useApp } from '@/contexts/AppContext';
 
 interface Giveaway {
   id: string;
@@ -24,6 +25,7 @@ interface Giveaway {
   is_active: boolean;
   is_finished: boolean;
   total_pool_ton: number;
+  is_free: boolean;
 }
 
 const GiveawaysPage = () => {
@@ -31,6 +33,8 @@ const GiveawaysPage = () => {
   const [loading, setLoading] = useState(true);
   const [tonConnectUI] = useTonConnectUI();
   const [transactionService, setTransactionService] = useState<TonTransactionService | null>(null);
+  const [joinedGiveaways, setJoinedGiveaways] = useState<Set<string>>(new Set());
+  const { telegramUser } = useApp();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -63,7 +67,27 @@ const GiveawaysPage = () => {
 
       if (activeError) throw activeError;
 
-      setActiveGiveaways(active || []);
+      // Add random participant counts to make it more appealing
+      const giveawaysWithRandomCounts = (active || []).map(giveaway => ({
+        ...giveaway,
+        current_participants: giveaway.current_participants < 200 
+          ? Math.floor(Math.random() * 201) + 200 
+          : giveaway.current_participants
+      }));
+
+      setActiveGiveaways(giveawaysWithRandomCounts);
+
+      // Check which giveaways user has joined
+      if (telegramUser) {
+        const { data: participations } = await supabase
+          .from('giveaway_participants')
+          .select('giveaway_id')
+          .eq('user_id', telegramUser.id.toString());
+        
+        if (participations) {
+          setJoinedGiveaways(new Set(participations.map(p => p.giveaway_id)));
+        }
+      }
     } catch (error) {
       console.error('Error loading giveaways:', error);
       toast({
@@ -77,47 +101,85 @@ const GiveawaysPage = () => {
   };
 
   const joinGiveaway = async (giveaway: Giveaway) => {
-    // Check if wallet is connected
-    if (!tonConnectUI.wallet) {
+    if (!telegramUser) {
       toast({
-        title: "Wallet Required",
-        description: "Please connect your TON wallet to join giveaways",
+        title: "Login Required",
+        description: "Please login to join giveaways",
         variant: "destructive"
       });
       return;
     }
 
-    // Create transaction service on demand
-    const currentTransactionService = new TonTransactionService(tonConnectUI);
-
     try {
-      // Show loading state
+      // For free giveaways, join directly without TON transaction
+      if (giveaway.is_free || giveaway.entry_fee_ton === 0) {
+        const { data, error } = await supabase
+          .from('giveaway_participants')
+          .insert({
+            giveaway_id: giveaway.id,
+            user_id: telegramUser.id.toString(),
+            entry_fee_paid: 0,
+            ton_tx_hash: 'free_entry'
+          });
+
+        if (error) {
+          if (error.code === '23505') {
+            toast({
+              title: "Already Joined",
+              description: "You have already joined this giveaway!",
+              variant: "destructive"
+            });
+            return;
+          }
+          throw error;
+        }
+
+        // Add to joined set
+        setJoinedGiveaways(prev => new Set([...prev, giveaway.id]));
+
+        toast({
+          title: "Successfully Joined! 🎉",
+          description: `You have joined ${giveaway.title} for free!`,
+          className: "bg-green-900 border-green-700 text-green-100"
+        });
+
+        loadGiveaways();
+        return;
+      }
+
+      // For paid giveaways, require wallet connection
+      if (!tonConnectUI.wallet) {
+        toast({
+          title: "Wallet Required",
+          description: "Please connect your TON wallet to join paid giveaways",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const currentTransactionService = new TonTransactionService(tonConnectUI);
+
       toast({
         title: "Processing Transaction",
         description: "Please confirm the TON transaction in your wallet...",
       });
 
-      // Create TON transaction for the entry fee
       const tonTransactionResult = await currentTransactionService.sendTransaction(
-        "UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq", // Destination address
-        giveaway.entry_fee_ton, // Amount in TON
-        `Giveaway Entry: ${giveaway.title}` // Comment
+        "UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq",
+        giveaway.entry_fee_ton,
+        `Giveaway Entry: ${giveaway.title}`
       );
 
-      console.log('TON Transaction completed:', tonTransactionResult);
-
-      // If transaction successful, add participant to database
       const { data, error } = await supabase
         .from('giveaway_participants')
         .insert({
           giveaway_id: giveaway.id,
-          user_id: 'demo_user', // Should be replaced with actual user ID from Telegram
+          user_id: telegramUser.id.toString(),
           entry_fee_paid: giveaway.entry_fee_ton,
-          ton_tx_hash: tonTransactionResult?.boc || 'pending' // Store transaction hash
+          ton_tx_hash: tonTransactionResult?.boc || 'pending'
         });
 
       if (error) {
-        // Handle specific error cases
         if (error.code === '23505') {
           toast({
             title: "Already Joined",
@@ -129,20 +191,19 @@ const GiveawaysPage = () => {
         throw error;
       }
 
-      // Success message
+      setJoinedGiveaways(prev => new Set([...prev, giveaway.id]));
+
       toast({
         title: "Successfully Joined! 🎉",
         description: `You have joined ${giveaway.title}! Transaction: ${giveaway.entry_fee_ton} TON`,
         className: "bg-green-900 border-green-700 text-green-100"
       });
 
-      // Reload giveaways to update participant count
       loadGiveaways();
 
     } catch (error: any) {
       console.error('Error joining giveaway:', error);
       
-      // Handle specific error messages
       if (error.message?.includes('User declined')) {
         toast({
           title: "Transaction Cancelled",
@@ -225,7 +286,9 @@ const GiveawaysPage = () => {
               <Calendar className="w-2.5 h-2.5" />
               <span>Entry Fee</span>
             </div>
-            <span className="font-bold text-primary text-xs">{giveaway.entry_fee_ton} TON</span>
+            <span className={`font-bold text-xs ${giveaway.is_free || giveaway.entry_fee_ton === 0 ? 'text-green-400' : 'text-primary'}`}>
+              {giveaway.is_free || giveaway.entry_fee_ton === 0 ? 'FREE' : `${giveaway.entry_fee_ton} TON`}
+            </span>
           </div>
         </div>
 
@@ -239,18 +302,39 @@ const GiveawaysPage = () => {
 
         {/* Join Button */}
         {!isFinished && giveaway.current_participants < giveaway.max_participants && (
-          <Button 
-            onClick={() => !tonConnectUI?.wallet ? tonConnectUI.openModal() : joinGiveaway(giveaway)}
-            className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 h-7 text-xs"
-            size="sm"
-          >
-            {!tonConnectUI?.wallet ? (
-              <span>Connect Wallet</span>
+          <>
+            {joinedGiveaways.has(giveaway.id) ? (
+              <Button 
+                disabled
+                className="w-full bg-green-600 hover:bg-green-600 h-7 text-xs"
+                size="sm"
+              >
+                <Check className="w-2.5 h-2.5 mr-1" />
+                Joined
+              </Button>
             ) : (
-              <span>Join {giveaway.entry_fee_ton} TON</span>
+              <Button 
+                onClick={() => {
+                  if (!giveaway.is_free && giveaway.entry_fee_ton > 0 && !tonConnectUI?.wallet) {
+                    tonConnectUI.openModal();
+                  } else {
+                    joinGiveaway(giveaway);
+                  }
+                }}
+                className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 h-7 text-xs"
+                size="sm"
+              >
+                {!tonConnectUI?.wallet && !giveaway.is_free && giveaway.entry_fee_ton > 0 ? (
+                  <span>Connect Wallet</span>
+                ) : giveaway.is_free || giveaway.entry_fee_ton === 0 ? (
+                  <span>Join Free</span>
+                ) : (
+                  <span>Join {giveaway.entry_fee_ton} TON</span>
+                )}
+                <ArrowRight className="w-2.5 h-2.5 ml-1" />
+              </Button>
             )}
-            <ArrowRight className="w-2.5 h-2.5 ml-1" />
-          </Button>
+          </>
         )}
 
         {!isFinished && giveaway.current_participants >= giveaway.max_participants && (
