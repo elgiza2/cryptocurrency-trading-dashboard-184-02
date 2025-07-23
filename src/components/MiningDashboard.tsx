@@ -235,7 +235,7 @@ const MiningDashboard = ({
                   <Wallet className="h-4 w-4 text-blue-400" />
                 </div>
                 <div className="text-xs text-gray-300">
-                  TON balance • Click to withdraw
+                  TON balance
                 </div>
               </div>
             </div>
