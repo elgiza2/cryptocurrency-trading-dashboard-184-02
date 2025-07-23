@@ -1,16 +1,15 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Users, Trophy, ArrowRight, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import MobileNav from '@/components/MobileNav';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { TonTransactionService } from '@/services/tonTransactionService';
 import { useApp } from '@/contexts/AppContext';
-import { useOptimizedGiveaways } from '@/hooks/useOptimizedGiveaways';
-import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
-import SkeletonLoader from '@/components/SkeletonLoader';
 
 interface Giveaway {
   id: string;
@@ -30,27 +29,78 @@ interface Giveaway {
 }
 
 const GiveawaysPage = () => {
+  const [activeGiveaways, setActiveGiveaways] = useState<Giveaway[]>([]);
+  const [loading, setLoading] = useState(true);
   const [tonConnectUI] = useTonConnectUI();
+  const [transactionService, setTransactionService] = useState<TonTransactionService | null>(null);
+  const [joinedGiveaways, setJoinedGiveaways] = useState<Set<string>>(new Set());
   const { telegramUser } = useApp();
   const { toast } = useToast();
-  
-  // Performance monitoring
-  const { markRenderStart, markRenderEnd } = usePerformanceMonitor('GiveawaysPage');
-  
-  // Optimized data fetching
-  const {
-    activeGiveaways,
-    isLoading,
-    error,
-    joinedGiveawaysSet,
-    joinGiveaway: optimizedJoinGiveaway
-  } = useOptimizedGiveaways(telegramUser?.id.toString());
 
-  // Mark render start
-  markRenderStart();
+  useEffect(() => {
+    loadGiveaways();
+    
+    // Initialize transaction service when wallet is connected
+    if (tonConnectUI && tonConnectUI.wallet) {
+      setTransactionService(new TonTransactionService(tonConnectUI));
+    }
+    
+    // Update data every minute to check for finished events
+    const interval = setInterval(loadGiveaways, 60000);
+    return () => clearInterval(interval);
+  }, [tonConnectUI]);
 
-  // Optimized join giveaway function with memoization
-  const joinGiveaway = useCallback(async (giveaway: Giveaway) => {
+  const loadGiveaways = async () => {
+    try {
+      setLoading(true);
+      
+      // Update expired giveaways first
+      await supabase.rpc('finish_expired_giveaways');
+      
+      // Fetch active giveaways
+      const { data: active, error: activeError } = await supabase
+        .from('giveaways')
+        .select('*')
+        .eq('is_active', true)
+        .eq('is_finished', false)
+        .order('end_time', { ascending: true });
+
+      if (activeError) throw activeError;
+
+      // Add random participant counts to make it more appealing
+      const giveawaysWithRandomCounts = (active || []).map(giveaway => ({
+        ...giveaway,
+        current_participants: giveaway.current_participants < 200 
+          ? Math.floor(Math.random() * 201) + 200 
+          : giveaway.current_participants
+      }));
+
+      setActiveGiveaways(giveawaysWithRandomCounts);
+
+      // Check which giveaways user has joined
+      if (telegramUser) {
+        const { data: participations } = await supabase
+          .from('giveaway_participants')
+          .select('giveaway_id')
+          .eq('user_id', telegramUser.id.toString());
+        
+        if (participations) {
+          setJoinedGiveaways(new Set(participations.map(p => p.giveaway_id)));
+        }
+      }
+    } catch (error) {
+      console.error('Error loading giveaways:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load giveaways",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const joinGiveaway = async (giveaway: Giveaway) => {
     if (!telegramUser) {
       toast({
         title: "Login Required",
@@ -61,17 +111,43 @@ const GiveawaysPage = () => {
     }
 
     try {
+      // For free giveaways, join directly without TON transaction
       if (giveaway.is_free || giveaway.entry_fee_ton === 0) {
-        await optimizedJoinGiveaway(giveaway, telegramUser.id.toString());
+        const { data, error } = await supabase
+          .from('giveaway_participants')
+          .insert({
+            giveaway_id: giveaway.id,
+            user_id: telegramUser.id.toString(),
+            entry_fee_paid: 0,
+            ton_tx_hash: 'free_entry'
+          });
+
+        if (error) {
+          if (error.code === '23505') {
+            toast({
+              title: "Already Joined",
+              description: "You have already joined this giveaway!",
+              variant: "destructive"
+            });
+            return;
+          }
+          throw error;
+        }
+
+        // Add to joined set
+        setJoinedGiveaways(prev => new Set([...prev, giveaway.id]));
+
         toast({
           title: "Successfully Joined! 🎉",
           description: `You have joined ${giveaway.title} for free!`,
           className: "bg-green-900 border-green-700 text-green-100"
         });
+
+        loadGiveaways();
         return;
       }
 
-      // Handle paid giveaways
+      // For paid giveaways, require wallet connection
       if (!tonConnectUI.wallet) {
         toast({
           title: "Wallet Required",
@@ -81,25 +157,49 @@ const GiveawaysPage = () => {
         return;
       }
 
-      const transactionService = new TonTransactionService(tonConnectUI);
+      const currentTransactionService = new TonTransactionService(tonConnectUI);
+
       toast({
         title: "Processing Transaction",
         description: "Please confirm the TON transaction in your wallet...",
       });
 
-      await transactionService.sendTransaction(
+      const tonTransactionResult = await currentTransactionService.sendTransaction(
         "UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq",
         giveaway.entry_fee_ton,
         `Giveaway Entry: ${giveaway.title}`
       );
 
-      await optimizedJoinGiveaway(giveaway, telegramUser.id.toString());
-      
+      const { data, error } = await supabase
+        .from('giveaway_participants')
+        .insert({
+          giveaway_id: giveaway.id,
+          user_id: telegramUser.id.toString(),
+          entry_fee_paid: giveaway.entry_fee_ton,
+          ton_tx_hash: tonTransactionResult?.boc || 'pending'
+        });
+
+      if (error) {
+        if (error.code === '23505') {
+          toast({
+            title: "Already Joined",
+            description: "You have already joined this giveaway!",
+            variant: "destructive"
+          });
+          return;
+        }
+        throw error;
+      }
+
+      setJoinedGiveaways(prev => new Set([...prev, giveaway.id]));
+
       toast({
         title: "Successfully Joined! 🎉",
         description: `You have joined ${giveaway.title}! Transaction: ${giveaway.entry_fee_ton} TON`,
         className: "bg-green-900 border-green-700 text-green-100"
       });
+
+      loadGiveaways();
 
     } catch (error: any) {
       console.error('Error joining giveaway:', error);
@@ -124,11 +224,9 @@ const GiveawaysPage = () => {
         });
       }
     }
-  }, [telegramUser, tonConnectUI, optimizedJoinGiveaway, toast]);
+  };
 
-
-  // Memoized time formatting function
-  const formatTimeRemaining = useCallback((endTime: string) => {
+  const formatTimeRemaining = (endTime: string) => {
     const now = new Date();
     const end = new Date(endTime);
     const diff = end.getTime() - now.getTime();
@@ -142,7 +240,7 @@ const GiveawaysPage = () => {
     if (days > 0) return `${days}d ${hours}h`;
     if (hours > 0) return `${hours}h ${minutes}m`;
     return `${minutes}m`;
-  }, []);
+  };
 
   const GiveawayCard = ({ giveaway, isFinished = false }: { giveaway: Giveaway; isFinished?: boolean }) => (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-primary/20">
@@ -205,7 +303,7 @@ const GiveawaysPage = () => {
         {/* Join Button */}
         {!isFinished && giveaway.current_participants < giveaway.max_participants && (
           <>
-            {joinedGiveawaysSet.has(giveaway.id) ? (
+            {joinedGiveaways.has(giveaway.id) ? (
               <Button 
                 disabled
                 className="w-full bg-green-600 hover:bg-green-600 h-7 text-xs"
@@ -248,24 +346,14 @@ const GiveawaysPage = () => {
     </Card>
   );
 
-  // Mark render end
-  markRenderEnd();
-
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <SkeletonLoader count={6} type="giveaway" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center py-12">
-          <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Error Loading Giveaways</h3>
-          <p className="text-muted-foreground">Please try again later</p>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading giveaways...</p>
+          </div>
         </div>
       </div>
     );
