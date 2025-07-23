@@ -220,7 +220,7 @@ const GiveawaysPage = () => {
   };
 
   const GiveawayCard = ({ giveaway, isFinished = false }: { giveaway: Giveaway; isFinished?: boolean }) => (
-    <Card className={`overflow-hidden hover:shadow-lg transition-all duration-300 ${giveaway.is_free ? 'border-green-400/40 bg-green-50/20' : 'border-primary/20'}`}>
+    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-primary/20 bg-black/20">
       <CardHeader className="pb-1 pt-3">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
@@ -288,7 +288,7 @@ const GiveawaysPage = () => {
                 !tonConnectUI?.wallet ? tonConnectUI.openModal() : joinGiveaway(giveaway);
               }
             }}
-            className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 h-7 text-xs"
+            className="w-full bg-black hover:bg-black/80 h-7 text-xs text-white"
             size="sm"
           >
             {giveaway.is_free ? (
@@ -328,7 +328,7 @@ const GiveawaysPage = () => {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-primary mb-2">🎁 Giveaway Events</h1>
+        <h1 className="text-2xl font-bold text-primary mb-2">Giveaway Events</h1>
         <p className="text-muted-foreground text-sm">Join free events or compete in paid giveaways!</p>
       </div>
 

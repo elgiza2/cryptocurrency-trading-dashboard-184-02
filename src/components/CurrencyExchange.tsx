@@ -264,34 +264,6 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
             </div>
           </Card>
 
-          {/* Contract Info */}
-          <Card className="bg-secondary/40 backdrop-blur-xl border-white/20 rounded-2xl p-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400 text-sm">Contract Address</span>
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={handleCopyAddress}
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/10 p-1"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/10 p-1"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              <div className="text-white text-sm font-mono bg-black/40 rounded-lg p-2 border border-white/10">
-                UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq
-              </div>
-            </div>
-          </Card>
 
           {/* Bottom spacing */}
           <div className="h-8"></div>
