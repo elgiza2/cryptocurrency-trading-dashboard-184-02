@@ -18,7 +18,7 @@ interface AppContextType {
   updateBalance: (newBalance: number) => void;
 }
 
-const AppContext = createContext<AppContextType | undefined>(undefined);
+export const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const useApp = () => {
   const context = useContext(AppContext);
@@ -51,6 +51,12 @@ export const AppProvider = ({ children }: AppProviderProps) => {
         // Create or update user in database
         await DatabaseService.createOrUpdateUser(tgUser);
         
+        // Load user balance from database
+        const userData = await DatabaseService.getUser(tgUser.id.toString());
+        if (userData.data) {
+          setBalance(userData.data.total_balance || 0);
+        }
+        
         console.log('Telegram user initialized:', tgUser);
       } else {
         // Fallback for development/testing
@@ -61,6 +67,13 @@ export const AppProvider = ({ children }: AppProviderProps) => {
         };
         setTelegramUser(fallbackUser);
         await DatabaseService.createOrUpdateUser(fallbackUser);
+        
+        // Load user balance from database
+        const userData = await DatabaseService.getUser(fallbackUser.id.toString());
+        if (userData.data) {
+          setBalance(userData.data.total_balance || 0);
+        }
+        
         console.log('Using fallback user for development');
       }
     } catch (error) {

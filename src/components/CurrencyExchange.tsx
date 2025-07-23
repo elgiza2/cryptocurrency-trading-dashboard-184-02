@@ -121,7 +121,7 @@ const CurrencyExchange = ({
 
   return (
     <ScrollArea className="h-screen">
-      <div className="min-h-screen text-white">
+      <div className="min-h-screen text-white pt-8">
         
         {/* Unified Header */}
         {onBack && <UnifiedBackButton onBack={onBack} title="Currency Exchange" />}

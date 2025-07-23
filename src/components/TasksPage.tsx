@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DatabaseService } from "@/lib/database";
 import { supabase } from "@/integrations/supabase/client";
 import AdminPage from "./AdminPage";
+import { useApp } from "@/contexts/AppContext";
 
 interface TasksPageProps {
   onNavigateToReferral?: () => void;
@@ -18,25 +19,25 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
   const [tasks, setTasks] = useState<any[]>([]);
   const [userTasks, setUserTasks] = useState<any[]>([]);
-  const [telegramUser, setTelegramUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [clickCount, setClickCount] = useState(0);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const { toast } = useToast();
+  const { telegramUser, updateBalance } = useApp();
 
   useEffect(() => {
-    // Get Telegram user data and set referral link
-    if ((window as any).Telegram?.WebApp?.initDataUnsafe?.user) {
-      const user = (window as any).Telegram.WebApp.initDataUnsafe.user;
-      setTelegramUser(user);
-      setReferralLink(`https://t.me/SpaceVerseBot?start=${user.id}`);
+    // Set referral link based on telegram user
+    if (telegramUser) {
+      setReferralLink(`https://t.me/SpaceVerseBot?start=${telegramUser.id}`);
     } else {
       // Fallback for testing
       setReferralLink("https://t.me/SpaceVerseBot?start=123456");
     }
 
     fetchTasks();
-    fetchUserTasks();
+    if (telegramUser) {
+      fetchUserTasks();
+    }
 
     // Set up real-time subscription for missions
     const channel = supabase
@@ -77,7 +78,7 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [toast]);
+  }, [toast, telegramUser]);
 
   const fetchTasks = async () => {
     try {
@@ -112,12 +113,34 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
         await DatabaseService.completeMission(telegramUser.id.toString(), taskId);
         setCompletedTasks(prev => [...prev, taskId]);
         
+        // Get SPACE cryptocurrency for reward
+        const cryptoData = await DatabaseService.getCryptocurrencies();
+        const spaceCoin = cryptoData.data?.find(crypto => crypto.symbol === 'SPACE');
+        
+        if (spaceCoin) {
+          // Add SPACE tokens to user's balance
+          await DatabaseService.updateCryptoHolding(
+            telegramUser.id.toString(),
+            spaceCoin.id,
+            reward,
+            true
+          );
+        }
+        
+        // Update user's total balance
+        const currentUser = await DatabaseService.getUser(telegramUser.id.toString());
+        if (currentUser.data) {
+          const newTotalBalance = (currentUser.data.total_balance || 0) + reward;
+          await DatabaseService.updateUserBalance(telegramUser.id.toString(), newTotalBalance);
+          // Update balance in all components using AppContext
+          updateBalance(newTotalBalance);
+        }
+        
         // Check if this is the Daily Login Check mission
         const task = tasks.find(t => t.id === taskId);
         if (task && task.title === "Daily Login Check") {
           // Create a transaction of 0.25 TON for the daily login
-          const tonCrypto = await DatabaseService.getCryptocurrencies();
-          const tonCoin = tonCrypto.data?.find(crypto => crypto.symbol === 'TON');
+          const tonCoin = cryptoData.data?.find(crypto => crypto.symbol === 'TON');
           
           if (tonCoin) {
             await DatabaseService.createTransaction(
@@ -145,7 +168,9 @@ const TasksPage = ({ onNavigateToReferral }: TasksPageProps) => {
           });
         }
         
-        fetchUserTasks(); // Refresh user tasks
+        // Refresh data
+        fetchUserTasks();
+        fetchTasks();
       }
     } catch (error) {
       console.error("Error completing task:", error);
