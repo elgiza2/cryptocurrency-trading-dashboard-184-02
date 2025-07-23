@@ -197,17 +197,17 @@ const MiningDashboard = ({
             className="bg-gradient-to-r from-purple-500/80 to-purple-600/80 border-purple-500/30 cursor-pointer hover:border-purple-400/50 transition-colors rounded-xl backdrop-blur-xl bg-opacity-80"
             onClick={handleGetGifts}
           >
-            <div className="p-3 flex items-center gap-3">
-              <div className="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center">
+            <div className="p-5 flex items-center gap-4">
+              <div className="w-12 h-12 bg-teal-500 rounded-lg flex items-center justify-center">
                 <img 
                   src="https://cdn.changes.tg/gifts/models/Gem%20Signet/png/Render.png?v=1" 
                   alt="Gift" 
-                  className="w-6 h-6 object-contain"
+                  className="w-8 h-8 object-contain"
                 />
               </div>
               <div className="flex-1">
-                <h2 className="text-base font-bold text-white mb-1">Get gifts for free!</h2>
-                <p className="text-xs text-purple-100">
+                <h2 className="text-lg font-bold text-white mb-1">Get gifts for free!</h2>
+                <p className="text-sm text-purple-100">
                   Participate in weekly sweepstakes
                 </p>
               </div>
