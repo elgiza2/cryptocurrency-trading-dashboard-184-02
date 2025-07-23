@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface TelegramViewport {
   isExpanded: boolean;
@@ -89,6 +89,20 @@ export const useTelegramViewport = () => {
     return { topInset, bottomInset };
   }, []);
 
+  // Debounced viewport updates for performance
+  const debounceTimeoutRef = useRef<NodeJS.Timeout>();
+
+  const debouncedUpdate = useCallback((newViewport: TelegramViewport) => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+    
+    debounceTimeoutRef.current = setTimeout(() => {
+      setViewport(newViewport);
+      updateCSSVariables(newViewport);
+    }, 50); // 50ms debounce for performance
+  }, [updateCSSVariables]);
+
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
     
@@ -114,7 +128,7 @@ export const useTelegramViewport = () => {
       console.error('Error expanding Telegram WebApp:', error);
     }
     
-    const updateViewport = () => {
+    const updateViewport = useCallback(() => {
       try {
         const { topInset, bottomInset } = calculateSafeAreaInsets();
         
@@ -127,14 +141,12 @@ export const useTelegramViewport = () => {
           isFullscreen: tg.isExpanded || false
         };
         
-        setViewport(newViewport);
-        updateCSSVariables(newViewport);
-        
+        debouncedUpdate(newViewport);
         console.log('Telegram viewport updated:', newViewport);
       } catch (error) {
         console.error('Error updating viewport:', error);
       }
-    };
+    }, [calculateSafeAreaInsets, debouncedUpdate]);
 
     // Listen for viewport changes
     try {
@@ -147,22 +159,25 @@ export const useTelegramViewport = () => {
     // Initial update
     updateViewport();
     
-    // Also listen for window resize as fallback
-    const handleWindowResize = () => {
+    // Optimized window resize handlers
+    const handleWindowResize = useCallback(() => {
       console.log('Window resized:', { width: window.innerWidth, height: window.innerHeight });
-      setTimeout(updateViewport, 100);
-    };
+      updateViewport();
+    }, [updateViewport]);
     
-    const handleOrientationChange = () => {
+    const handleOrientationChange = useCallback(() => {
       console.log('Orientation changed');
       setTimeout(updateViewport, 300);
-    };
+    }, [updateViewport]);
     
-    window.addEventListener('resize', handleWindowResize);
-    window.addEventListener('orientationchange', handleOrientationChange);
+    window.addEventListener('resize', handleWindowResize, { passive: true });
+    window.addEventListener('orientationchange', handleOrientationChange, { passive: true });
     
     // Cleanup
     return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
       try {
         tg.offEvent('viewportChanged', updateViewport);
         tg.offEvent('themeChanged', updateViewport);
@@ -172,7 +187,7 @@ export const useTelegramViewport = () => {
       window.removeEventListener('resize', handleWindowResize);
       window.removeEventListener('orientationchange', handleOrientationChange);
     };
-  }, [calculateSafeAreaInsets, updateCSSVariables]);
+  }, [calculateSafeAreaInsets, updateCSSVariables, debouncedUpdate]);
 
   return viewport;
 };
