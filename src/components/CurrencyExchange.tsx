@@ -158,36 +158,47 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
       const fromCurrencyData = isSwapDirection ? spaceData : tonData;
       const toCurrencyData = isSwapDirection ? tonData : spaceData;
 
-      // Create transactions in database
       if (fromCurrencyData && toCurrencyData) {
-        // Sell transaction (remove from balance)
-        await DatabaseService.createTransaction(
+        // Update crypto holdings directly without creating transactions
+        // Subtract from source currency
+        await DatabaseService.updateCryptoHolding(
           telegramUser.id.toString(),
           fromCurrencyData.id,
-          -inputAmount,
-          'sell',
-          fromCurrencyData.current_price || 0
+          inputAmount,
+          false // subtract
         );
 
-        // Buy transaction (add to balance)
-        await DatabaseService.createTransaction(
+        // Add to destination currency
+        await DatabaseService.updateCryptoHolding(
           telegramUser.id.toString(),
           toCurrencyData.id,
           receiveAmount,
-          'buy',
-          toCurrencyData.current_price || 0
+          true // add
         );
+
+        // Create a single exchange transaction record for history
+        await supabase
+          .from('transactions')
+          .insert({
+            user_id: telegramUser.id.toString(),
+            cryptocurrency_id: fromCurrencyData.id,
+            amount: inputAmount,
+            transaction_type: 'exchange',
+            price_usd: fromCurrencyData.current_price || 0,
+            total_usd: inputAmount * (fromCurrencyData.current_price || 0),
+            status: 'completed'
+          });
 
         // Update local balances
         if (isSwapDirection) {
           setUserBalances(prev => ({
-            space: prev.space - inputAmount,
+            space: Math.max(0, prev.space - inputAmount),
             ton: prev.ton + receiveAmount
           }));
         } else {
           setUserBalances(prev => ({
             space: prev.space + receiveAmount,
-            ton: prev.ton - inputAmount
+            ton: Math.max(0, prev.ton - inputAmount)
           }));
         }
 
