@@ -55,10 +55,10 @@ const MobileNav = ({
       {/* Background with blur and gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-lg" />
       
-      <div className="relative px-2 py-1">
-        <div className="flex items-end justify-center max-w-sm mx-auto">
+      <div className="relative px-3 py-2">
+        <div className="flex items-end justify-center max-w-xs mx-auto">
           {/* Left side buttons */}
-          <div className="flex space-x-2 flex-1 justify-around">
+          <div className="flex space-x-1 flex-1 justify-around">
             {regularItems.slice(0, 2).map((item) => (
               <NavButton
                 key={item.id}
@@ -71,7 +71,7 @@ const MobileNav = ({
 
           {/* Center Roulette button */}
           {rouletteItem && (
-            <div className="mx-4 -mt-6">
+            <div className="mx-3 -mt-4">
               <CenterButton
                 item={rouletteItem}
                 isActive={activeTab === rouletteItem.id}
@@ -81,7 +81,7 @@ const MobileNav = ({
           )}
 
           {/* Right side buttons */}
-          <div className="flex space-x-2 flex-1 justify-around">
+          <div className="flex space-x-1 flex-1 justify-around">
             {regularItems.slice(2).map((item) => (
               <NavButton
                 key={item.id}
@@ -115,21 +115,21 @@ const NavButton = ({ item, isActive, onClick }: NavButtonProps) => {
     <Button
       variant="ghost"
       className={cn(
-        "flex flex-col items-center gap-0.5 h-auto p-2 rounded-lg transition-all duration-300 group hover:scale-105",
-        "hover:bg-transparent active:bg-transparent focus:bg-transparent",
+        "flex flex-col items-center gap-0.5 h-auto p-1.5 rounded-lg transition-all duration-300 group hover:scale-105",
+        "hover:bg-transparent active:bg-transparent focus:bg-transparent min-w-[48px]",
         isActive ? "" : ""
       )}
       onClick={onClick}
     >
       {/* Icon */}
       <Icon className={cn(
-        "h-5 w-5 transition-all duration-300",
+        "h-4 w-4 transition-all duration-300",
         isActive ? "text-white" : "text-gray-400 group-hover:text-white"
       )} />
       
       {/* Label */}
       <span className={cn(
-        "text-xs font-medium transition-colors duration-300",
+        "text-[10px] font-medium transition-colors duration-300 leading-tight",
         isActive ? "text-white" : "text-gray-400 group-hover:text-white"
       )}>
         {label}
@@ -165,7 +165,7 @@ const CenterButton = ({ item, isActive, onClick }: CenterButtonProps) => {
       <Button
         variant="ghost"
         className={cn(
-          "relative h-20 w-20 rounded-full p-0 overflow-hidden transition-all duration-300 group",
+          "relative h-16 w-16 rounded-full p-0 overflow-hidden transition-all duration-300 group",
           "hover:scale-110 shadow-2xl hover:bg-transparent active:bg-transparent focus:bg-transparent"
         )}
         onClick={onClick}
@@ -181,7 +181,7 @@ const CenterButton = ({ item, isActive, onClick }: CenterButtonProps) => {
         <div className="absolute inset-1 bg-gradient-to-br from-white/20 to-transparent rounded-full" />
         
         {/* Icon */}
-        <Icon className="relative z-10 h-8 w-8 text-white drop-shadow-lg" />
+        <Icon className="relative z-10 h-6 w-6 text-white drop-shadow-lg" />
         
         {/* Ripple effect */}
         <div className={cn(
