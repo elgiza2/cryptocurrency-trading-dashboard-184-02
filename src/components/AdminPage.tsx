@@ -78,26 +78,27 @@ const AdminPage = ({ onBack }: { onBack: () => void }) => {
 
   const loadUsers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .order('created_at', { ascending: false });
+      // Fixed total users target
+      const targetTotalUsers = 600000;
       
-      if (error) throw error;
-      
-      // Generate user statistics by country
-      const totalUsers = data?.length || 0;
-      const russianUsers = Math.floor(Math.random() * (150000 - 140000 + 1)) + 140000;
-      const usUsers = Math.floor(totalUsers * 0.15);
-      const ukUsers = Math.floor(totalUsers * 0.08);
-      const deUsers = Math.floor(totalUsers * 0.06);
-      const otherUsers = Math.max(0, totalUsers - russianUsers - usUsers - ukUsers - deUsers);
+      // Generate user statistics by country with fixed numbers
+      const russianUsers = Math.floor(Math.random() * (150000 - 140000 + 1)) + 140000; // 140k-150k as requested
+      const usUsers = Math.floor(targetTotalUsers * 0.18); // 18% = ~108,000
+      const ukUsers = Math.floor(targetTotalUsers * 0.12); // 12% = ~72,000
+      const deUsers = Math.floor(targetTotalUsers * 0.08); // 8% = ~48,000
+      const frUsers = Math.floor(targetTotalUsers * 0.06); // 6% = ~36,000
+      const indiaUsers = Math.floor(targetTotalUsers * 0.05); // 5% = ~30,000
+      const brazilUsers = Math.floor(targetTotalUsers * 0.04); // 4% = ~24,000
+      const otherUsers = targetTotalUsers - russianUsers - usUsers - ukUsers - deUsers - frUsers - indiaUsers - brazilUsers;
       
       const userStats = [
         { country: "Russia", users: russianUsers, flag: "🇷🇺" },
         { country: "United States", users: usUsers, flag: "🇺🇸" },
         { country: "Ukraine", users: ukUsers, flag: "🇺🇦" },
         { country: "Germany", users: deUsers, flag: "🇩🇪" },
+        { country: "France", users: frUsers, flag: "🇫🇷" },
+        { country: "India", users: indiaUsers, flag: "🇮🇳" },
+        { country: "Brazil", users: brazilUsers, flag: "🇧🇷" },
         { country: "Others", users: otherUsers, flag: "🌍" }
       ];
       
