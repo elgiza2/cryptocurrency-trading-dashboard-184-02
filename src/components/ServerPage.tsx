@@ -18,6 +18,8 @@ interface ServerPageProps {
     space: number;
     ton: number;
   };
+  userServers?: any[];
+  onServerPurchase?: (server: any) => void;
 }
 
 interface ServerTier {
@@ -139,12 +141,12 @@ const ServerPage = ({ onBack, onNavigateToAbout, userBalance }: ServerPageProps)
       console.log('Transaction result:', result);
 
       // Save to database
-      const { error } = await DatabaseService.createServerPurchase(
+      const { error } = await DatabaseService.purchaseServer(
         telegramUser.id.toString(),
         server.id,
         server.price,
         server.dailyReward,
-        server.duration
+        server.duration * 24
       );
 
       if (error) {
