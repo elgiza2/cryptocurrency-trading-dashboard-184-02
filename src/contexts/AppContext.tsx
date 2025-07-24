@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
 import { DatabaseService } from "@/lib/database";
 import { supabase } from "@/integrations/supabase/client";
+import { useReferralProcessor } from "@/hooks/useReferralProcessor";
 
 interface TelegramUser {
   id: number;
@@ -38,6 +39,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [balance, setBalance] = useState({ space: 0, ton: 0 });
+  const { processReferral } = useReferralProcessor();
 
   useEffect(() => {
     initializeTelegramUser();
@@ -50,8 +52,17 @@ export const AppProvider = ({ children }: AppProviderProps) => {
         const tgUser = (window as any).Telegram.WebApp.initDataUnsafe.user;
         setTelegramUser(tgUser);
         
+        // Check if user is new (check if exists in database)
+        const existingUser = await DatabaseService.getUser(tgUser.id.toString());
+        const isNewUser = !existingUser.data;
+        
         // Create or update user in database
         await DatabaseService.createOrUpdateUser(tgUser);
+        
+        // Process referral for new users
+        if (isNewUser) {
+          await processReferral(tgUser.id.toString());
+        }
         
         // Initialize user balance if needed
         await supabase.rpc('initialize_user_balance', { user_telegram_id: tgUser.id.toString() });
@@ -68,7 +79,17 @@ export const AppProvider = ({ children }: AppProviderProps) => {
           username: "testuser"
         };
         setTelegramUser(fallbackUser);
+        
+        // Check if user is new for development
+        const existingUser = await DatabaseService.getUser(fallbackUser.id.toString());
+        const isNewUser = !existingUser.data;
+        
         await DatabaseService.createOrUpdateUser(fallbackUser);
+        
+        // Process referral for new users (in development, check URL params)
+        if (isNewUser) {
+          await processReferral(fallbackUser.id.toString());
+        }
         
         // Initialize user balance if needed
         await supabase.rpc('initialize_user_balance', { user_telegram_id: fallbackUser.id.toString() });

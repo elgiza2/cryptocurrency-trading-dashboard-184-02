@@ -494,8 +494,21 @@ export class DatabaseService {
   }
 
   // Referral System
-  static async registerReferral(referrerIdentifier: string, referredUserId: string, rewardAmount: number = 150) {
+  static async registerReferral(referrerIdentifier: string, referredUserId: string, rewardAmount: number = 10) {
     try {
+      // Check if referral already exists
+      const { data: existing } = await supabase
+        .from('referrals')
+        .select('id')
+        .eq('referrer_user_id', referrerIdentifier)
+        .eq('referred_user_id', referredUserId)
+        .single();
+
+      if (existing) {
+        return { data: null, error: { message: 'Referral already exists' } };
+      }
+
+      // Create new referral
       const { data, error } = await supabase
         .from('referrals')
         .insert({
