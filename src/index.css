@@ -4,55 +4,55 @@
 
 @layer base {
   :root {
-    /* Enhanced Dark Gaming Color System - All HSL */
-    --background: 220 84% 5%; /* Deep dark blue background */
+    /* iOS Style Blue/Black Theme - All HSL */
+    --background: 220 25% 8%; /* Deep blue-black background */
     --foreground: 210 40% 98%; /* Pure white text */
     
-    --primary: 250 95% 65%; /* Vibrant purple primary */
-    --primary-foreground: 210 40% 98%; /* Pure white on primary */
-    --primary-glow: 250 95% 75%; /* Lighter primary for glows */
+    --primary: 211 100% 50%; /* iOS Blue */
+    --primary-foreground: 0 0% 100%; /* Pure white on primary */
+    --primary-glow: 211 100% 60%; /* Lighter primary for glows */
     
-    --secondary: 220 30% 8%; /* Very dark cards */
-    --secondary-foreground: 210 40% 95%; /* Light text on secondary */
+    --secondary: 220 15% 20%; /* Secondary gray */
+    --secondary-foreground: 210 40% 98%; /* Light text on secondary */
     
-    --accent: 45 95% 60%; /* Golden yellow accent */
-    --accent-foreground: 220 84% 5%; /* Dark text on accent */
+    --accent: 211 100% 50%; /* iOS Blue accent */
+    --accent-foreground: 0 0% 100%; /* White text on accent */
     
-    --success: 142 76% 55%; /* Bright green */
-    --warning: 35 85% 55%; /* Orange warning */
-    --destructive: 0 84% 60%; /* Red destructive */
+    --success: 142 71% 45%; /* Green */
+    --warning: 38 92% 50%; /* Orange */
+    --destructive: 0 84% 60%; /* Red */
     
-    --muted: 220 30% 12%;
-    --muted-foreground: 220 15% 65%;
+    --muted: 220 15% 18%;
+    --muted-foreground: 215 15% 70%;
     
-    --border: 220 30% 15%;
-    --input: 220 30% 8%;
-    --ring: 250 95% 65%;
+    --border: 220 15% 25%;
+    --input: 220 15% 20%;
+    --ring: 211 100% 50%;
     
-    --card: 220 30% 8%; /* Very dark cards */
+    --card: 220 20% 12%; /* Dark cards with slight blue tint */
     --card-foreground: 210 40% 98%; /* Pure white text on cards */
     
-    /* Gaming colors */
-    --blue-gaming: 215 95% 60%;
-    --purple-gaming: 270 95% 65%;
-    --pink-gaming: 320 85% 65%;
-    --cyan-gaming: 185 85% 60%;
-    --green-gaming: 142 76% 55%;
-    --orange-gaming: 25 95% 60%;
+    --popover: 220 20% 15%;
+    --popover-foreground: 210 40% 98%;
     
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(250 95% 65%), hsl(270 95% 65%));
-    --gradient-secondary: linear-gradient(135deg, hsl(185 85% 60%), hsl(215 95% 60%));
-    --gradient-accent: linear-gradient(135deg, hsl(320 85% 65%), hsl(45 95% 60%));
+    /* iOS Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(211, 100%, 50%), hsl(220, 100%, 60%));
+    --gradient-dark: linear-gradient(180deg, hsl(220, 25%, 8%), hsl(220, 30%, 4%));
+    --gradient-card: linear-gradient(135deg, hsl(220, 20%, 12%), hsl(220, 25%, 10%));
     
-    /* Link color */
-    --link: 250 85% 78%; /* Purple links */
+    /* iOS Glow Effects */
+    --glow-primary: 0 0 30px hsla(211, 100%, 50%, 0.3), 0 0 60px hsla(211, 100%, 50%, 0.2);
+    --glow-subtle: 0 0 20px hsla(211, 100%, 50%, 0.15);
     
-    /* Enhanced glow effects */
-    --glow-primary: 0 0 30px hsl(250 95% 65% / 0.5);
-    --glow-secondary: 0 0 25px hsl(185 85% 60% / 0.4);
-    --glow-accent: 0 0 25px hsl(45 95% 60% / 0.6);
-    --glow-success: 0 0 25px hsl(142 76% 55% / 0.5);
+    /* Chart Colors */
+    --chart-1: 211 100% 50%;
+    --chart-2: 220 100% 60%;
+    --chart-3: 142 71% 45%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 0 84% 60%;
+    
+    /* iOS Radius - more rounded */
+    --radius: 0.75rem;
     
     /* Telegram Mini App Viewport Variables */
     --telegram-safe-area-top: 0px;
@@ -85,7 +85,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
     
     /* Use Telegram viewport variables */
     height: var(--telegram-viewport-height);
@@ -94,15 +94,16 @@
     position: relative;
     overflow-x: hidden;
     
-    /* Animated dark blue gradient background */
-    background: linear-gradient(-45deg, 
-      hsl(220 84% 5%), 
-      hsl(225 70% 8%), 
-      hsl(230 60% 6%), 
-      hsl(235 50% 10%)
+    /* iOS style animated blue/black gradient background */
+    background: linear-gradient(135deg, 
+      #001a33 0%,
+      #000814 25%, 
+      #001f4d 50%, 
+      #000814 75%, 
+      #001a33 100%
     );
     background-size: 400% 400%;
-    animation: darkBlueWave 15s ease infinite;
+    animation: iOSBlueWave 20s ease-in-out infinite;
     
     /* Prevent horizontal scroll and zoom */
     overflow-x: hidden;
@@ -125,16 +126,13 @@
   }
 }
 
-/* Dark blue wave animation */
-@keyframes darkBlueWave {
-  0% {
+/* iOS Blue Wave Animation */
+@keyframes iOSBlueWave {
+  0%, 100% {
     background-position: 0% 50%;
   }
   50% {
     background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
   }
 }
 
@@ -154,16 +152,17 @@
   overflow-y: auto;
 }
 
-/* Enhanced Unified Gaming Background */
+/* Enhanced Unified iOS Gaming Background */
 .unified-gaming-bg {
-  background: linear-gradient(-45deg, 
-    hsl(220 84% 5%), 
-    hsl(225 70% 8%), 
-    hsl(230 60% 6%), 
-    hsl(235 50% 10%)
+  background: linear-gradient(135deg, 
+    #001a33 0%,
+    #000814 25%, 
+    #001f4d 50%, 
+    #000814 75%, 
+    #001a33 100%
   );
   background-size: 400% 400%;
-  animation: darkBlueWave 15s ease infinite;
+  animation: iOSBlueWave 20s ease-in-out infinite;
   min-height: var(--telegram-viewport-height);
 }
 
@@ -175,11 +174,11 @@
 /* Enhanced header background */
 .unified-header-bg {
   background: linear-gradient(135deg, 
-    hsl(220 84% 5% / 0.95), 
-    hsl(225 70% 8% / 0.95)
+    hsla(220, 20%, 15%, 0.95), 
+    hsla(220, 25%, 12%, 0.95)
   );
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid hsl(220 30% 15%);
+  border-bottom: 1px solid hsl(220, 15%, 25%);
 }
 
 /* Gaming Glow Effects */
@@ -195,43 +194,87 @@
   box-shadow: var(--glow-accent);
 }
 
-/* Enhanced Gaming Button Styles */
+/* iOS style button */
+.btn-ios {
+  background: hsl(211, 100%, 50%);
+  color: white;
+  padding: 0.875rem 1.75rem;
+  border-radius: 0.875rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px hsla(211, 100%, 50%, 0.25);
+}
+
+.btn-ios:hover {
+  background: hsl(211, 100%, 55%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px hsla(211, 100%, 50%, 0.4);
+}
+
+.btn-ios:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px hsla(211, 100%, 50%, 0.2);
+}
+
+.btn-ios-secondary {
+  background: hsl(220, 15%, 20%);
+  color: hsl(210, 40%, 98%);
+  border: 1px solid hsl(220, 15%, 30%);
+  padding: 0.875rem 1.75rem;
+  border-radius: 0.875rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-ios-secondary:hover {
+  background: hsl(220, 15%, 25%);
+  border-color: hsl(220, 15%, 35%);
+  transform: translateY(-1px);
+}
+
+/* Legacy gaming button - keep for compatibility */
 .btn-gaming {
-  @apply bg-primary text-primary-foreground font-semibold rounded-2xl transition-all duration-300;
-  background: var(--gradient-primary);
-  box-shadow: var(--glow-primary);
+  @apply bg-primary text-primary-foreground font-semibold rounded-2xl transition-all duration-200;
+  background: hsl(211, 100%, 50%);
+  box-shadow: 0 4px 12px hsla(211, 100%, 50%, 0.25);
 }
 
 .btn-gaming:hover {
-  background: hsl(var(--primary-glow));
+  background: hsl(211, 100%, 55%);
   transform: translateY(-2px);
-  box-shadow: 0 0 40px hsl(var(--primary) / 0.7);
-}
-
-.btn-gaming.active {
-  animation: gaming-pulse 2s ease-in-out infinite;
+  box-shadow: 0 6px 20px hsla(211, 100%, 50%, 0.4);
 }
 
 .btn-secondary {
-  @apply bg-accent text-accent-foreground font-semibold rounded-2xl transition-all duration-300;
-  background: var(--gradient-secondary);
-  box-shadow: var(--glow-secondary);
+  @apply bg-secondary text-secondary-foreground font-semibold rounded-2xl transition-all duration-200;
+  background: hsl(220, 15%, 20%);
+  border: 1px solid hsl(220, 15%, 30%);
 }
 
 .btn-secondary:hover {
-  background: hsl(var(--cyan-gaming));
-  transform: translateY(-2px);
-  box-shadow: 0 0 40px hsl(var(--cyan-gaming) / 0.7);
+  background: hsl(220, 15%, 25%);
+  transform: translateY(-1px);
 }
 
-/* Enhanced Card Styles */
+/* iOS Glass Card Styles */
+.ios-card {
+  @apply backdrop-blur-xl border shadow-2xl;
+  background: linear-gradient(135deg, hsla(220, 20%, 15%, 0.9), hsla(220, 25%, 12%, 0.85));
+  border: 1px solid hsla(211, 100%, 50%, 0.15);
+  border-radius: 1.125rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px hsla(211, 100%, 50%, 0.1);
+}
+
+/* Legacy glass card - keep for compatibility */
 .glass-card {
   @apply backdrop-blur-xl border shadow-2xl;
-  background: hsl(var(--card) / 0.95);
-  border: 1px solid hsl(var(--border));
-  border-radius: 20px;
+  background: linear-gradient(135deg, hsla(220, 20%, 15%, 0.9), hsla(220, 25%, 12%, 0.85));
+  border: 1px solid hsla(211, 100%, 50%, 0.15);
+  border-radius: 1.125rem;
   padding: 24px;
-  box-shadow: 0 8px 32px hsl(var(--background) / 0.8);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 /* Enhanced Roulette Button */

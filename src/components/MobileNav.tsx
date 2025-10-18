@@ -1,4 +1,4 @@
-import { Home, Users, Trophy, Target, Gift, Zap } from "lucide-react";
+import { Home, Users, Sparkles, ListTodo, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -18,32 +18,32 @@ const MobileNav = ({
       id: 'home',
       icon: Home,
       label: 'Home',
-      gradient: 'from-blue-500 to-cyan-500'
+      color: 'hsl(211, 100%, 50%)'
     },
     {
       id: 'referral',
       icon: Users,
       label: 'Friends',
-      gradient: 'from-green-500 to-emerald-500'
+      color: 'hsl(142, 71%, 45%)'
     },
     {
       id: 'roulette',
-      icon: Zap,
+      icon: Sparkles,
       label: 'Roulette',
       special: true,
-      gradient: 'from-pink-500 to-purple-600'
+      color: 'hsl(211, 100%, 50%)'
     },
     {
       id: 'missions',
-      icon: Trophy,
+      icon: ListTodo,
       label: 'Tasks',
-      gradient: 'from-orange-500 to-red-500'
+      color: 'hsl(38, 92%, 50%)'
     },
     {
       id: 'giveaways',
       icon: Gift,
       label: 'Giveaways',
-      gradient: 'from-violet-500 to-purple-500'
+      color: 'hsl(271, 81%, 56%)'
     }
   ];
 
@@ -52,13 +52,13 @@ const MobileNav = ({
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50" style={{ paddingBottom: 'var(--telegram-safe-area-bottom)' }}>
-      {/* Background with blur and gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-lg" />
+      {/* iOS style background with blur */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[hsl(220,25%,8%)] via-[hsl(220,25%,8%)]/98 to-transparent backdrop-blur-2xl border-t border-white/10" />
       
-      <div className="relative px-3 py-2">
-        <div className="flex items-end justify-center max-w-xs mx-auto">
+      <div className="relative px-4 py-3">
+        <div className="flex items-end justify-center max-w-md mx-auto">
           {/* Left side buttons */}
-          <div className="flex space-x-1 flex-1 justify-around">
+          <div className="flex space-x-2 flex-1 justify-around">
             {regularItems.slice(0, 2).map((item) => (
               <NavButton
                 key={item.id}
@@ -71,7 +71,7 @@ const MobileNav = ({
 
           {/* Center Roulette button */}
           {rouletteItem && (
-            <div className="mx-3 -mt-4">
+            <div className="mx-4 -mt-6">
               <CenterButton
                 item={rouletteItem}
                 isActive={activeTab === rouletteItem.id}
@@ -81,7 +81,7 @@ const MobileNav = ({
           )}
 
           {/* Right side buttons */}
-          <div className="flex space-x-1 flex-1 justify-around">
+          <div className="flex space-x-2 flex-1 justify-around">
             {regularItems.slice(2).map((item) => (
               <NavButton
                 key={item.id}
@@ -102,35 +102,43 @@ interface NavButtonProps {
     id: string;
     icon: any;
     label: string;
-    gradient: string;
+    color: string;
   };
   isActive: boolean;
   onClick: () => void;
 }
 
 const NavButton = ({ item, isActive, onClick }: NavButtonProps) => {
-  const { icon: Icon, label, gradient } = item;
+  const { icon: Icon, label, color } = item;
 
   return (
     <Button
       variant="ghost"
       className={cn(
-        "flex flex-col items-center gap-0.5 h-auto p-1.5 rounded-lg transition-all duration-300 group hover:scale-105",
-        "hover:bg-transparent active:bg-transparent focus:bg-transparent min-w-[48px]",
-        isActive ? "" : ""
+        "flex flex-col items-center gap-1 h-auto py-2 px-3 rounded-xl transition-all duration-200 group",
+        "hover:bg-white/5 active:scale-95 min-w-[56px]",
+        isActive ? "bg-white/10" : ""
       )}
       onClick={onClick}
     >
-      {/* Icon */}
-      <Icon className={cn(
-        "h-4 w-4 transition-all duration-300",
-        isActive ? "text-white" : "text-gray-400 group-hover:text-white"
-      )} />
+      {/* iOS style icon container */}
+      <div className={cn(
+        "flex items-center justify-center w-7 h-7 rounded-lg transition-all duration-200",
+        isActive ? "bg-primary/20" : "group-hover:bg-white/5"
+      )}>
+        <Icon 
+          className={cn(
+            "h-5 w-5 transition-all duration-200",
+            isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+          )} 
+          style={isActive ? { color } : {}}
+        />
+      </div>
       
       {/* Label */}
       <span className={cn(
-        "text-[10px] font-medium transition-colors duration-300 leading-tight",
-        isActive ? "text-white" : "text-gray-400 group-hover:text-white"
+        "text-[11px] font-medium transition-colors duration-200 leading-none",
+        isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
       )}>
         {label}
       </span>
@@ -143,51 +151,47 @@ interface CenterButtonProps {
     id: string;
     icon: any;
     label: string;
-    gradient: string;
+    color: string;
   };
   isActive: boolean;
   onClick: () => void;
 }
 
 const CenterButton = ({ item, isActive, onClick }: CenterButtonProps) => {
-  const { icon: Icon, gradient } = item;
+  const { icon: Icon, color } = item;
 
   return (
     <div className="relative">
-      {/* Outer glow ring */}
+      {/* iOS glow effect */}
       <div className={cn(
-        "absolute inset-0 rounded-full transition-all duration-500",
+        "absolute inset-0 rounded-full transition-all duration-500 blur-xl",
         isActive 
-          ? "bg-gradient-to-br from-pink-500/50 to-purple-600/50 scale-110 animate-pulse" 
-          : "bg-gradient-to-br from-pink-500/20 to-purple-600/20"
+          ? "bg-primary/40 scale-110" 
+          : "bg-primary/20"
       )} />
       
       <Button
         variant="ghost"
         className={cn(
-          "relative h-16 w-16 rounded-full p-0 overflow-hidden transition-all duration-300 group",
-          "hover:scale-110 shadow-2xl hover:bg-transparent active:bg-transparent focus:bg-transparent"
+          "relative h-16 w-16 rounded-2xl p-0 overflow-hidden transition-all duration-200 group",
+          "shadow-2xl hover:scale-105 active:scale-95",
+          "border-2 border-white/20"
         )}
+        style={{
+          background: `linear-gradient(135deg, ${color}, hsl(220, 100%, 60%))`
+        }}
         onClick={onClick}
       >
-        {/* Background gradient */}
-        <div className={cn(
-          "absolute inset-0 bg-gradient-to-br transition-all duration-300",
-          gradient,
-          isActive ? "opacity-100" : "opacity-80 group-hover:opacity-100"
-        )} />
-        
-        {/* Inner highlight */}
-        <div className="absolute inset-1 bg-gradient-to-br from-white/20 to-transparent rounded-full" />
+        {/* Inner iOS highlight */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent" />
         
         {/* Icon */}
-        <Icon className="relative z-10 h-6 w-6 text-white drop-shadow-lg" />
+        <Icon className="relative z-10 h-7 w-7 text-white drop-shadow-lg" />
         
-        {/* Ripple effect */}
-        <div className={cn(
-          "absolute inset-0 rounded-full transition-all duration-700",
-          isActive ? "bg-white/10 animate-ping" : ""
-        )} />
+        {/* Active indicator */}
+        {isActive && (
+          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white" />
+        )}
       </Button>
     </div>
   );
