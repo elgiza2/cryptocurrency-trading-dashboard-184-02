@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { EnhancedDepositDialog } from "./EnhancedDepositDialog";
 import { supabase } from "@/integrations/supabase/client";
-import vireonLogo from "@/assets/vireon-logo.png";
+import viralLogo from "@/assets/viral-logo.jpg";
 import usdtLogo from "@/assets/usdt-logo.png";
 
 const tonLogo = "/lovable-uploads/512a8240-b5f7-4248-acb5-8c6170abc85c.png";

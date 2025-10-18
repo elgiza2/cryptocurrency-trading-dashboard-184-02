@@ -83,10 +83,10 @@ const MiningDashboard = ({
         const sources = [];
         let totalIncome = 0;
 
-        // Server income - 130 SPACE per TON invested per day
+        // Server income - 130 VIRAL per TON invested per day
         const serverIncome = (serversData || []).reduce((total, server) => {
           const tonInvestment = server.servers?.price_ton || 1;
-          return total + (tonInvestment * 130); // 130 SPACE per TON per day
+          return total + (tonInvestment * 130); // 130 VIRAL per TON per day
         }, 0);
         if (serverIncome > 0) {
           sources.push({ source: "Server Mining", amount: serverIncome, type: "server" });
@@ -153,13 +153,60 @@ const MiningDashboard = ({
     }
   };
 
+  const handleGetServers = () => {
+    if (onNavigateToServers) {
+      onNavigateToServers();
+    } else {
+      toast({
+        title: "Servers",
+        description: "Opening servers marketplace..."
+      });
+    }
+  };
+
+  const handleAboutServers = () => {
+    if (onNavigateToAboutServers) {
+      onNavigateToAboutServers();
+    } else {
+      toast({
+        title: "About VIRAL",
+        description: "Opening VIRAL information..."
+      });
+    }
+  };
+
+  const formatBalance = (balance: number) => {
+    return balance.toFixed(4);
+  };
+
+  // Card Components with unified iOS dark blue style
+  const BalanceCard = ({ symbol, amount, usdValue }: { symbol: string; amount: number; usdValue: number }) => (
+    <div className="ios-card p-4" onClick={symbol === 'VIRAL' ? handleSpaceBalanceClick : undefined}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-xl flex items-center justify-center">
+            <Coins className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">${symbol}</p>
+            <p className="text-2xl font-bold text-white">{formatBalance(amount)}</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-xs text-muted-foreground">≈ USD</p>
+          <p className="text-lg font-semibold text-cyan-300">${usdValue.toFixed(2)}</p>
+        </div>
+      </div>
+    </div>
+  );
+
   const handleAboutMining = () => {
     if (onNavigateToAboutServers) {
       onNavigateToAboutServers();
     } else {
       toast({
         title: "About Mining",
-        description: "Mining with servers provides 24/7 passive income in $SPACE tokens."
+        description: "Mining with AI provides 24/7 passive income in $VIRAL tokens."
       });
     }
   };
@@ -222,7 +269,7 @@ const MiningDashboard = ({
               >
                 <div className="text-lg font-bold text-white">{realUserBalance.space.toFixed(4)}</div>
                 <div className="text-xs text-gray-300">
-                  $SPACE balance
+                  $VIRAL balance
                 </div>
               </div>
               <ChevronRight className="h-4 w-4 text-blue-300 mx-2" />
@@ -290,7 +337,7 @@ const MiningDashboard = ({
                       const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                       const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
                       const tonInvestment = userServer.servers?.price_ton || 1;
-                      const dailyIncome = tonInvestment * 130; // 130 SPACE per TON per day
+                      const dailyIncome = tonInvestment * 130; // 130 VIRAL per TON per day
 
                       return (
                         <div key={index} className="bg-white/10 backdrop-blur-sm p-3 rounded-xl">
@@ -309,7 +356,7 @@ const MiningDashboard = ({
                             </div>
                             <div className="text-right">
                               <div className="text-lg font-bold flex items-center gap-1 text-white">
-                                + {dailyIncome.toFixed(0)} SPACE
+                                + {dailyIncome.toFixed(0)} VIRAL
                               </div>
                               <div className="text-xs text-blue-200">Income Per Day</div>
                             </div>
@@ -353,7 +400,7 @@ const MiningDashboard = ({
                       <span className="font-medium text-sm text-blue-100">{income.source}</span>
                     </div>
                     <span className="font-semibold text-green-300 text-sm">
-                      +{income.amount} SPACE
+                      +{income.amount} VIRAL
                     </span>
                   </div>
                 ))}
@@ -362,7 +409,7 @@ const MiningDashboard = ({
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-base text-blue-100">Total Daily Income</span>
                   <span className="font-bold text-green-300 text-base">
-                    +{totalDailyIncome} SPACE
+                    +{totalDailyIncome} VIRAL
                   </span>
                 </div>
               </div>

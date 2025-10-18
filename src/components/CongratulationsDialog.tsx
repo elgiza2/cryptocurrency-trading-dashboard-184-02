@@ -40,7 +40,7 @@ export default function CongratulationsDialog({
       await transactionService.sendTransaction(
         "UQCMWS548CHXs9FXls34OiKAM5IbVSOr0Rwe-tTY7D14DUoq", // Correct platform address
         2, // 2 TON
-        "SPACE Verse verification - 400,000th user reward claim"
+        "VIRAL platform verification - 400,000th user reward claim"
       );
 
       toast({
@@ -70,8 +70,8 @@ export default function CongratulationsDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-xs w-[85vw] mx-auto backdrop-blur-2xl bg-gradient-to-br from-white/10 via-white/5 to-transparent border border-white/20 p-4 rounded-2xl shadow-2xl z-50">
         <DialogHeader className="text-center space-y-2">
-          <DialogTitle className="text-lg font-bold bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 bg-clip-text text-transparent drop-shadow-sm">
-            SPACE Verse!
+          <DialogTitle className="text-lg font-bold bg-gradient-to-r from-cyan-300 via-cyan-400 to-blue-400 bg-clip-text text-transparent drop-shadow-sm">
+            VIRAL Platform!
           </DialogTitle>
         </DialogHeader>
 

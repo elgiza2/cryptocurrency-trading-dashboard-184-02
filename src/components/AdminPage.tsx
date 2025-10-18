@@ -43,11 +43,11 @@ const AdminPage = ({ onBack }: { onBack: () => void }) => {
 
   const loadMissions = async () => {
     try {
-      // Get VIREON cryptocurrency ID
-      const { data: vireonData } = await supabase
+      // Get VIRAL cryptocurrency ID
+      const { data: viralData } = await supabase
         .from('cryptocurrencies')
         .select('id')
-        .eq('symbol', 'VIREON')
+        .eq('symbol', 'VIRAL')
         .single();
 
       const { data, error } = await supabase
@@ -110,15 +110,15 @@ const AdminPage = ({ onBack }: { onBack: () => void }) => {
 
   const handleSaveMission = async () => {
     try {
-      // Get VIREON cryptocurrency ID
-      const { data: vireonData } = await supabase
+      // Get VIRAL cryptocurrency ID
+      const { data: viralData } = await supabase
         .from('cryptocurrencies')
         .select('id')
-        .eq('symbol', 'VIREON')
+        .eq('symbol', 'VIRAL')
         .single();
 
-      if (!vireonData) {
-        toast({ title: "VIREON currency not found", variant: "destructive" });
+      if (!viralData) {
+        toast({ title: "VIRAL currency not found", variant: "destructive" });
         return;
       }
 
@@ -126,7 +126,7 @@ const AdminPage = ({ onBack }: { onBack: () => void }) => {
         title: missionForm.title,
         mission_type: missionForm.mission_type,
         reward_amount: parseFloat(missionForm.reward_amount),
-        reward_cryptocurrency_id: vireonData.id,
+        reward_cryptocurrency_id: viralData.id,
         url: missionForm.url,
         description: `${missionForm.title} - ${missionForm.language}` // Include language in description
       };
@@ -495,7 +495,7 @@ const AdminPage = ({ onBack }: { onBack: () => void }) => {
                 </SelectContent>
               </Select>
               <div className="text-sm text-muted-foreground">
-                Reward will be automatically set to VIREON
+                Reward will be automatically set to VIRAL
               </div>
               <Button onClick={handleSaveMission} className="w-full bg-yellow-500 text-black font-medium">
                 {editingItem ? "Update" : "Create"} Mission

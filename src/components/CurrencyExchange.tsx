@@ -12,7 +12,7 @@ import { DatabaseService } from "@/lib/database";
 import CryptoChart from "./CryptoChart";
 import UnifiedBackButton from "./UnifiedBackButton";
 import WithdrawSection from "./WithdrawSection";
-import spaceLogoUrl from "@/assets/space-logo.png";
+import viralLogo from "@/assets/viral-logo.jpg";
 import { useApp } from "@/contexts/AppContext";
 
 interface CurrencyExchangeProps {
@@ -22,9 +22,9 @@ interface CurrencyExchangeProps {
 const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
   const [giveAmount, setGiveAmount] = useState('');
   const [isSwapDirection, setIsSwapDirection] = useState(true);
-  const [spaceData, setSpaceData] = useState<any>(null);
+  const [viralData, setViralData] = useState<any>(null);
   const [tonData, setTonData] = useState<any>(null);
-  const [userBalances, setUserBalances] = useState<{ space: number; ton: number }>({ space: 0, ton: 0 });
+  const [userBalances, setUserBalances] = useState<{ viral: number; ton: number }>({ viral: 0, ton: 0 });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { tonPrice } = useTonPrice();
@@ -34,22 +34,22 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load SPACE and TON data
+        // Load VIRAL and TON data
         const { data: cryptoData, error: cryptoError } = await supabase
           .from('cryptocurrencies')
           .select('*')
-          .in('symbol', ['SPACE', 'TON']);
+          .in('symbol', ['VIRAL', 'TON']);
         
         if (cryptoError) throw cryptoError;
         
-        const space = cryptoData.find(crypto => crypto.symbol === 'SPACE');
+        const viral = cryptoData.find(crypto => crypto.symbol === 'VIRAL');
         const ton = cryptoData.find(crypto => crypto.symbol === 'TON');
         
-        setSpaceData(space || {
+        setViralData(viral || {
           current_price: 0.0006835,
           price_change_24h: 11.84,
-          name: 'SPACE',
-          symbol: 'SPACE'
+          name: 'VIRAL',
+          symbol: 'VIRAL'
         });
         
         setTonData(ton || {
@@ -61,16 +61,16 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
         
         // Load user balances if user is logged in
         if (telegramUser) {
-          setUserBalances(appBalance);
+          setUserBalances({ viral: appBalance.space, ton: appBalance.ton });
         }
       } catch (error) {
         console.error('Error loading data:', error);
         // Fallback to default data
-        setSpaceData({
+        setViralData({
           current_price: 0.0006835,
           price_change_24h: 11.84,
-          name: 'SPACE',
-          symbol: 'SPACE'
+          name: 'VIRAL',
+          symbol: 'VIRAL'
         });
         setTonData({
           current_price: tonPrice,
@@ -86,9 +86,9 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
     loadData();
   }, [telegramUser, tonPrice, appBalance]);
 
-  const exchangeRate = spaceData?.current_price || 0.0006835;
-  const spacePrice = exchangeRate * tonPrice;
-  const priceChange24h = spaceData?.price_change_24h || 11.84;
+  const exchangeRate = viralData?.current_price || 0.0006835;
+  const viralPrice = exchangeRate * tonPrice;
+  const priceChange24h = viralData?.price_change_24h || 11.84;
   
   const calculateReceiveAmount = () => {
     const inputAmount = parseFloat(giveAmount);
@@ -102,7 +102,7 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
   };
 
   const getMaxAmount = () => {
-    return isSwapDirection ? userBalances.space : userBalances.ton;
+    return isSwapDirection ? userBalances.viral : userBalances.ton;
   };
 
   const handleSwap = async () => {
@@ -128,7 +128,7 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
     }
 
     if (inputAmount > maxAmount) {
-      const currency = isSwapDirection ? 'SPACE' : 'TON';
+      const currency = isSwapDirection ? 'VIRAL' : 'TON';
       toast({
         title: "Insufficient Balance",
         description: `You don't have enough ${currency}`,
@@ -139,10 +139,10 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
 
     try {
       const receiveAmount = calculateReceiveAmount();
-      const fromCurrency = isSwapDirection ? 'SPACE' : 'TON';
-      const toCurrency = isSwapDirection ? 'TON' : 'SPACE';
-      const fromCurrencyData = isSwapDirection ? spaceData : tonData;
-      const toCurrencyData = isSwapDirection ? tonData : spaceData;
+      const fromCurrency = isSwapDirection ? 'VIRAL' : 'TON';
+      const toCurrency = isSwapDirection ? 'TON' : 'VIRAL';
+      const fromCurrencyData = isSwapDirection ? viralData : tonData;
+      const toCurrencyData = isSwapDirection ? tonData : viralData;
 
       // Use database function to process exchange
       const { data, error } = await supabase.rpc('process_currency_exchange', {
@@ -164,8 +164,8 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
       
       // Update local state
       const newBalance = isSwapDirection ? 
-        { space: userBalances.space - inputAmount, ton: userBalances.ton + receiveAmount } :
-        { space: userBalances.space + receiveAmount, ton: userBalances.ton - inputAmount };
+        { viral: userBalances.viral - inputAmount, ton: userBalances.ton + receiveAmount } :
+        { viral: userBalances.viral + receiveAmount, ton: userBalances.ton - inputAmount };
       setUserBalances(newBalance);
 
       toast({
@@ -203,12 +203,12 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
               {/* Top row with logo and name */}
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
-                  <img src={spaceLogoUrl} alt="$SPACE" className="w-full h-full object-cover" />
+                  <img src={viralLogo} alt="$VIRAL" className="w-full h-full object-cover rounded-full" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-xl font-bold text-white mb-1">$SPACE</div>
+                  <div className="text-xl font-bold text-white mb-1">$VIRAL</div>
                   <div className="text-base text-gray-300">
-                    ${loading ? '0.000000' : spacePrice.toFixed(6)}
+                    ${loading ? '0.000000' : viralPrice.toFixed(6)}
                   </div>
                 </div>
               </div>
@@ -231,7 +231,7 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
 
           {/* Chart - Much larger for better visibility */}
           <Card className="bg-black backdrop-blur-xl border-white/20 rounded-2xl h-64 p-6">
-            <CryptoChart currentPrice={spacePrice} />
+            <CryptoChart currentPrice={viralPrice} />
           </Card>
 
           {/* Balance Card */}
@@ -241,7 +241,7 @@ const CurrencyExchange = ({ onBack }: CurrencyExchangeProps) => {
                 <div className="w-8 h-8 bg-purple-500 rounded-full"></div>
                 <div>
                   <div className="text-lg font-bold text-white">
-                    {(isSwapDirection ? userBalances.space : userBalances.ton).toFixed(4)} {isSwapDirection ? '$SPACE' : 'TON'}
+                    {(isSwapDirection ? userBalances.viral : userBalances.ton).toFixed(4)} {isSwapDirection ? '$VIRAL' : 'TON'}
                   </div>
                   <div className="text-blue-200 text-xs">Your Balance</div>
                 </div>

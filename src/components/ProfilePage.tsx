@@ -180,7 +180,7 @@ const ProfilePage = () => {
                         {player.mined.toLocaleString()}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        VIREON
+                        VIRAL
                       </div>
                     </div>
                   </div>
